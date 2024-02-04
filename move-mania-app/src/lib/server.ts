@@ -1,0 +1,24 @@
+import { Socket } from "socket.io-client";
+import { BetData, CashOutData, SOCKET_EVENTS } from "./types";
+
+
+export function setNewBet (socket: Socket, betData: BetData): boolean {
+
+  if (socket.disconnected || !socket.connected) {
+    console.error('Socket is not connected');
+    return false;
+  }
+
+  socket.emit(SOCKET_EVENTS.SET_BET, betData);
+  return true;
+}
+
+export function cashOutBet (socket: Socket, cashOutData: CashOutData): boolean {
+  if (socket.disconnected || !socket.connected) {
+    console.error('Socket is not connected');
+    return false;
+  }
+
+  socket.emit(SOCKET_EVENTS.CASH_OUT, cashOutData);
+  return true;
+}
