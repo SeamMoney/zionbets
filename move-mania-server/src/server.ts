@@ -22,10 +22,6 @@ httpServer.listen(PORT, HOST, () => {
 
 io.on("connection", (socket) => {
   console.log(socket.id);
-  socket.on("message", (message) => {
-    console.log(`Received message: ${message}`);
-    io.emit("notification", message);
-  });
   socket.on(SOCKET_EVENTS.SET_BET, (betData) => {
     console.log(`Received bet: ${JSON.stringify(betData)}`);
     io.emit(SOCKET_EVENTS.BET_CONFIRMED, betData);
@@ -35,7 +31,35 @@ io.on("connection", (socket) => {
     console.log(`Received cash out: ${JSON.stringify(cashOutData)}`);
     io.emit(SOCKET_EVENTS.CASH_OUT_CONFIRMED, cashOutData);
   })
+
+  socket.on(SOCKET_EVENTS.START_ROUND, () => {
+    console.log('Starting round');
+    const crashPoint = (Math.random() * 10);
+    console.log(`Round crashed at ${crashPoint}`);
+    io.emit(SOCKET_EVENTS.ROUND_START, { roundId: 1, startTime: Date.now() + 5000, crashPoint });
+
+    setTimeout(() => {
+      io.emit(SOCKET_EVENTS.ROUND_RESULT, { roundId: 1, crashPoint });
+      setTimeout(() => {
+        cycleRounds();
+      }, 5000);
+    }, 5000 + crashPoint * 1000);
+  })
 });
+
+function cycleRounds() {
+  console.log('cycling rounds');
+  const crashPoint = (Math.random() * 10);
+  console.log(`Round crashed at ${crashPoint}`);
+  io.emit(SOCKET_EVENTS.ROUND_START, { roundId: 1, startTime: Date.now() + 5000, crashPoint });
+
+  setTimeout(() => {
+    io.emit(SOCKET_EVENTS.ROUND_RESULT, { roundId: 1, crashPoint });
+    setTimeout(() => {
+      cycleRounds();
+    }, 5000);
+  }, 5000 + crashPoint * 1000);
+}
 
 
 
