@@ -1,6 +1,15 @@
 import { Socket } from "socket.io-client";
 import { BetData, CashOutData, SOCKET_EVENTS } from "./types";
 
+export function startRound (socket: Socket): boolean {
+  if (socket.disconnected || !socket.connected) {
+    console.error('Socket is not connected');
+    return false;
+  }
+
+  socket.emit(SOCKET_EVENTS.START_ROUND);
+  return true;
+}
 
 export function setNewBet (socket: Socket, betData: BetData): boolean {
 
