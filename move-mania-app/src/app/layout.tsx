@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import ChatWindow from "./crash/chatWindow";
+import Link from "next/link";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,11 +18,41 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={inter.className + " text-white"}>
           <div className="flex h-screen overflow-hidden bg-neutral-950">
             <nav className="fixed w-full h-16 z-30 px-4 border-b border-neutral-700 bg-neutral-950">
-              <div className="flex flex-row items-center w-full h-full">
-                <h1 className="text-white text-2xl font-bold">Move Mania</h1>
+              <div className="flex flex-row items-center justify-between w-full h-full">
+                <div className="flex flex-row gap-4 items-center ">
+                  <Link href='/' className="text-white text-2xl font-bold">Move Mania</Link>
+                  <div className="flex flex-row items-center justify-start gap-2">
+                    <Link href='/crash' className="text-xl">
+                      Crash
+                    </Link>
+                    <span className="text-lg opacity-50">
+                      /
+                    </span>
+                    <Link href='/roulette' className="text-xl opacity-50">
+                      Roulette
+                    </Link>
+                    <span className="text-lg opacity-50">
+                      /
+                    </span>
+                    <Link href='/coinflip' className="text-xl opacity-50">
+                      Coin Flip
+                    </Link>
+                    <span className="text-lg opacity-50">
+                      /
+                    </span>
+                    <Link href='/jackpot' className="text-xl opacity-50">
+                      Jackpot
+                    </Link>
+                  </div>
+                </div>
+                <div>
+                  <button className="bg-white px-6 py-1 font-mono text-neutral-950" >
+                    DanTheMan.apt
+                  </button>
+                </div>
               </div>
             </nav>
             <div className="flex flex-1 flex-col pt-16 mr-96">
