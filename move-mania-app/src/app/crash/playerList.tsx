@@ -16,7 +16,6 @@ export default function PlayerList() {
 
   const [players, setPlayers] = useState<PlayerState[]>([]);
 
-
   useEffect(() => {
     const newSocket = io("http://localhost:8080");
 
@@ -79,22 +78,48 @@ export default function PlayerList() {
 
       setPlayers(newPlayers);
     });
-  })
+
+    // fill player list with dummy data
+    setPlayers([
+      { username: 'player1', betAmount: 100, coinType: 'BTC', cashOutMultiplier: null },
+      { username: 'player2', betAmount: 200, coinType: 'BTC', cashOutMultiplier: null },
+      { username: 'player3', betAmount: 300, coinType: 'BTC', cashOutMultiplier: null },
+      { username: 'player4', betAmount: 400, coinType: 'BTC', cashOutMultiplier: null },
+      { username: 'player5', betAmount: 500, coinType: 'BTC', cashOutMultiplier: null },
+      { username: 'player6', betAmount: 600, coinType: 'BTC', cashOutMultiplier: null },
+      { username: 'player7', betAmount: 700, coinType: 'BTC', cashOutMultiplier: null },
+      { username: 'player8', betAmount: 800, coinType: 'BTC', cashOutMultiplier: null },
+      { username: 'player9', betAmount: 900, coinType: 'BTC', cashOutMultiplier: null },
+      { username: 'player10', betAmount: 1000, coinType: 'BTC', cashOutMultiplier: null },
+    ]);
+  }, [])
 
   return (
-    <div>
-      <span>
-        Player List
-      </span>
-      <div>
-        {players.map((player, index) => (
-          <div key={index}>
-            <span>Player: {player.username}</span>
-            <span>Cash Out: {player.cashOutMultiplier}</span>
-            <span>Bet: {player.betAmount} {player.coinType}</span>
-          </div>
-        ))}
-      </div>
+    <div className="bg-neutral-950 border border-neutral-700 h-[150px] w-[400px] flex flex-col items-center py-1 px-2 gap-2">
+      <table className="w-full scroll">
+        <thead>
+          <tr className="text-green-400 text-center">
+            <th className="w-[300px] text-left">Username</th>
+            <th className="w-[50px]">@</th>
+            <th className="w-[150px]">Bet</th>
+          </tr>
+        </thead>
+        <tbody>
+          {players.map((player, index) => (
+            <tr key={index} className="text-white text-center">
+              <td className="w-[300px] text-left">{player.username}</td>
+              <td className="w-[50px] text-center">{player.cashOutMultiplier || '...'}</td>
+              {
+                player.cashOutMultiplier == null
+                ? <td className="w-[150px]">- {player.betAmount} {player.coinType}</td>
+                : player.cashOutMultiplier === 0
+                ? <td className="w-[150px]">- {player.betAmount} {player.coinType}</td> : 
+                <td className="w-[150px]">+ {player.betAmount * player.cashOutMultiplier} {player.coinType}</td>
+              }
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   )
 }
