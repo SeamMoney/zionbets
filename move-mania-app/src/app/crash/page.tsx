@@ -16,7 +16,7 @@ export default function CrashPage() {
           </div>
           <ControlCenter />
         </div>
-        <div className="h-full ">
+        <div className="h-full max-w-[300px]">
           <PlayerList />
         </div>
       </div>
