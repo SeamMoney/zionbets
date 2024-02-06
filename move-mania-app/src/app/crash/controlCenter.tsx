@@ -1,5 +1,6 @@
 'use client';
 
+import { Slider } from "@/components/ui/slider";
 import { cashOutBet, setNewBet, startRound } from "@/lib/server";
 import { RoundStart, SOCKET_EVENTS } from "@/lib/types";
 import { useEffect, useState } from "react"
@@ -91,6 +92,48 @@ export default function ControlCenter() {
     const succes = cashOutBet(socket, data);
     console.log('cashOutBet', data, succes)
   }
+
+  return (
+    <div className="w-full h-full flex flex-col items-center justify-start gap-1">
+      <div className="flex flex-row gap-4 items-center justify-center">
+        <span className="cursor-pointer">
+          Manual
+        </span>
+        <span className="cursor-pointer opacity-50">
+          Automatic
+        </span>
+      </div>
+      <div className="w-fit flex flex-row items-end px-2 gap-4">
+        <div className="flex flex-col gap-1">
+          <div className="border border-neutral-700 flex flex-row justify-between px-4 py-2">
+            <span className="font-mono font-light">
+              BET
+            </span>
+            <span className="font-mono opacity-50 flex flex-row justify-center items-center gap-1">
+              <input className="bg-transparent border-none outline-none max-w-[40px]" placeholder="2.50"></input><span>APT</span>
+            </span>
+          </div>
+          <div className="flex flex-row items-center text-xs">
+            <div className="border border-neutral-700 opacity-50 px-2 py-1">
+              1 APT
+            </div>
+            <div className="border border-green-500 text-green-500 px-2 py-1">
+              5 APT
+            </div>
+            <div className="border border-neutral-700 opacity-50 px-2 py-1">
+              10 APT
+            </div>
+            <div className="border border-neutral-700 opacity-50 px-2 py-1">
+              25 APT
+            </div>
+          </div>
+        </div>
+        <button className="bg-green-500 text-neutral-950 px-8 py-1">
+          Bet
+        </button>
+      </div>
+    </div>
+  )
 
   if (gameStatus.status === 'lobby') {
     return (

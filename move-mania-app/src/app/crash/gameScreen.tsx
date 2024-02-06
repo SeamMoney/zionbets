@@ -53,6 +53,12 @@ export default function GameScreen() {
 
   }, [])
 
+  return (
+    <div className="w-full h-full border-l border-b border-green-500">
+
+    </div>
+  )
+
   if (gameStatus.status === 'lobby') {
     return (
       <div>
