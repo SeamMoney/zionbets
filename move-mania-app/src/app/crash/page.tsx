@@ -6,7 +6,7 @@ import PlayerList from "./playerList";
 
 export default function CrashPage() {
   return (
-    <div>
+    <div className="h-full min-h-screen w-full bg-neutral-950">
       <span>
         Crash page
       </span>
