@@ -7,6 +7,8 @@ export const SOCKET_EVENTS = {
   CASH_OUT_CONFIRMED: 'cash-out-confirmed',
   ROUND_RESULT: 'round-result', 
   ROUND_START: 'round-start',
+  CHAT_MESSAGE: 'chat-message',
+  CHAT_NOTIFICATION: 'chat-notification',
 }
 
 export type BetData = {
@@ -33,3 +35,7 @@ export type RoundStart = {
   crashPoint: number
 }
 
+export type ChatMessage = {
+  author: string, 
+  message: string
+}
