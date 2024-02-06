@@ -45,6 +45,11 @@ io.on("connection", (socket) => {
       }, 5000);
     }, 5000 + crashPoint * 1000);
   })
+
+  socket.on(SOCKET_EVENTS.CHAT_MESSAGE, (message) => {
+    console.log(`Received chat message: ${JSON.stringify(message)}`);
+    io.emit(SOCKET_EVENTS.CHAT_NOTIFICATION, message);
+  })
 });
 
 function cycleRounds() {

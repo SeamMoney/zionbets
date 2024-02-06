@@ -1,3 +1,4 @@
+import ChatWindow from "./chatWindow";
 import ControlCenter from "./controlCenter";
 import GameScreen from "./gameScreen";
 import PlayerList from "./playerList";
@@ -12,7 +13,7 @@ export default function CrashPage() {
       <GameScreen />
       <ControlCenter />
       <PlayerList />
-      
+      <ChatWindow />
     </div>
   )
 }
