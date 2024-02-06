@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import ChatWindow from "./crash/chatWindow";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,7 +17,24 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+          <div className="flex h-screen overflow-hidden bg-neutral-950">
+            <nav className="fixed w-full h-16 z-30 px-4 border-b border-neutral-700 bg-neutral-950">
+              <div className="flex flex-row items-center w-full h-full">
+                <h1 className="text-white text-2xl font-bold">Move Mania</h1>
+              </div>
+            </nav>
+            <div className="flex flex-1 flex-col pt-16 mr-96">
+              <main className="flex-1 overflow-y-auto">
+                {children}
+              </main>
+            </div>
+
+            <aside className="fixed inset-y-0 right-0 w-96 z-20 bg-gray-800 text-white overflow-hidden">
+              <ChatWindow />
+            </aside>
+          </div>
+        </body>
     </html>
   );
 }

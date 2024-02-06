@@ -95,7 +95,7 @@ export default function PlayerList() {
   }, [])
 
   return (
-    <div className="bg-neutral-950 border border-neutral-700 h-[150px] w-[400px] flex flex-col items-center py-1 px-2 gap-2">
+    <div className="bg-neutral-950 border border-neutral-700 h-full flex flex-col items-center py-1 px-2 gap-2">
       <table className="w-full scroll">
         <thead>
           <tr className="text-green-400 text-center">

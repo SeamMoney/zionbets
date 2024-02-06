@@ -46,7 +46,7 @@ export default function ChatWindow() {
   }
 
   return (
-    <div className="bg-neutral-950 border border-neutral-700 h-[300px] w-[700px] flex flex-col items-center py-1 px-2 gap-2" >
+    <div className="bg-neutral-950 border border-neutral-700 h-full w-full flex flex-col items-center py-1 px-2 gap-2" >
       <div className="grow flex flex-col items-start justify-end w-full gap-1 overflow-hidden">
         {chatMessages.map((message, index) => (
           <ChatBubble key={index} message={message} />

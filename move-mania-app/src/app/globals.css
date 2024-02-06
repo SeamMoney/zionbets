@@ -17,8 +17,11 @@ body {
   }
 }
 
+table {
+  border: none;
+}
+
 table.scroll {
-  width: 100%; /* Optional */
   /* border-collapse: collapse; */
   border-spacing: 0;
   border: 2px solid black;
@@ -34,7 +37,6 @@ thead tr th {
 }
 
 table.scroll tbody {
-  height: 100px;
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -42,7 +44,7 @@ table.scroll tbody {
 tbody { border-top: 2px solid black; }
 
 tbody td, thead th {
-  width: 20%; /* Optional */
+
   border-right: 1px solid black;
 }
 
