@@ -1,3 +1,74 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background-color: white; /* Directly set the background color to white */
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+table {
+  border: none;
+}
+
+table.scroll {
+  /* border-collapse: collapse; */
+  border-spacing: 0;
+  border: 2px solid black;
+}
+
+table.scroll tbody,
+table.scroll thead { display: block; }
+
+thead tr th { 
+  height: 30px;
+  line-height: 30px;
+  /*text-align: left;*/
+}
+
+table.scroll tbody {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+tbody { border-top: 2px solid black; }
+
+tbody td, thead th {
+
+  border-right: 1px solid black;
+}
+
+tbody td:last-child, thead th:last-child {
+  border-right: none;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  /* background: #ff0000; */
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #737373;
+  /* border-radius: 5px; */
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #22c55e;
+}
