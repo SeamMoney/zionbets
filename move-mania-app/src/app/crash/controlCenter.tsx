@@ -95,7 +95,7 @@ export default function ControlCenter() {
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-start gap-1">
-      <div className="flex flex-row gap-4 items-center justify-center">
+      <div className="w-full flex flex-row gap-4 items-center justify-start">
         <span className="cursor-pointer">
           Manual
         </span>
@@ -103,7 +103,7 @@ export default function ControlCenter() {
           Automatic
         </span>
       </div>
-      <div className="w-fit flex flex-row items-end px-2 gap-4">
+      <div className="w-full max-w-[600px] flex flex-row items-center justify-center px-2 gap-4">
         <div className="flex flex-col gap-1">
           <div className="border border-neutral-700 flex flex-row justify-between px-4 py-2">
             <span className="font-mono font-light">
