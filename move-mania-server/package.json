@@ -4,7 +4,8 @@
   "main": "index.ts",
   "license": "MIT",
   "scripts": {
-    "server": "nodemon src/server.ts"
+    "server": "nodemon src/server.ts",
+    "api": "nodemon src/api.ts"
   },
   "dependencies": {
     "@types/node": "^20.11.16",
