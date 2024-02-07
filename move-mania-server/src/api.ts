@@ -1,8 +1,10 @@
 
 import express from 'express'
 import { createUser, deleteUser, getUser, getUsers, updateUser } from './database';
+var cors = require('cors')
 const app = express()
 app.use(express.json())
+app.use(cors())
 
 const PORT = 3008
 
@@ -30,7 +32,12 @@ app.get('/users/:username', async (req, res) => {
 
 app.post('/users', async (req, res) => {
   const user = req.body
-  await createUser(user);
+  try {
+    await createUser(user);
+  } catch (e) {
+    res.status(400).send('User already exists');
+    return;
+  }
   res.send('User created');
 });
 
