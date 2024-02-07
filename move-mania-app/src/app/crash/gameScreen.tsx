@@ -55,6 +55,7 @@ export default function GameScreen() {
 
   return (
     <div className="w-full h-full border-l border-b border-green-500">
+      hey
 
     </div>
   )
@@ -80,8 +81,8 @@ export default function GameScreen() {
           prefix="Game starts in "
           suffix=" seconds"
           useEasing={false}
-          // onEnd={() => console.log('Ended! 👏')}
-          // onStart={() => console.log('Started! 💨')}
+        // onEnd={() => console.log('Ended! 👏')}
+        // onStart={() => console.log('Started! 💨')}
         />
       </div>
     )
@@ -107,20 +108,20 @@ export default function GameScreen() {
     return (
       <div>
         <div>
-        <CountUp
-          start={gameStatus.crashPoint!}
-          end={gameStatus.crashPoint!}
-          duration={0}
-          separator=""
-          decimals={2}
-          decimal="."
-          prefix=""
-          suffix="x"
-          useEasing={false}
-          onEnd={() => console.log('Ended! 👏')}
-          onStart={() => console.log('Started! 💨', gameStatus.crashPoint)}
-        />
-      </div>
+          <CountUp
+            start={gameStatus.crashPoint!}
+            end={gameStatus.crashPoint!}
+            duration={0}
+            separator=""
+            decimals={2}
+            decimal="."
+            prefix=""
+            suffix="x"
+            useEasing={false}
+            onEnd={() => console.log('Ended! 👏')}
+            onStart={() => console.log('Started! 💨', gameStatus.crashPoint)}
+          />
+        </div>
       </div>
     )
   }

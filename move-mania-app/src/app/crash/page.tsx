@@ -12,7 +12,6 @@ export default function CrashPage() {
         <div className=" w-[75%] flex flex-col items-center gap-2 h-full border border-neutral-700 p-2">
           <div className="h-full w-full p-4">
             <GameScreen />
-            {/* <CrashChart /> */}
           </div>
           <div className="max-h-[100px] h-full w-full">
             <ControlCenter />
