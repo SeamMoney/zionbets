@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import ChatWindow from "./crash/chatWindow";
 import Link from "next/link";
+import AccountButton from "./accountButton";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,6 +20,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className + " text-white"}>
+        
           <div className="flex h-screen overflow-hidden bg-neutral-950">
             <nav className="fixed w-full h-16 z-30 px-4 border-b border-neutral-700 bg-neutral-950">
               <div className="flex flex-row items-center justify-between w-full h-full">
@@ -49,9 +51,7 @@ export default function RootLayout({
                   </div>
                 </div>
                 <div>
-                  <button className="bg-white px-6 py-1 font-mono text-neutral-950" >
-                    DanTheMan.apt
-                  </button>
+                  <AccountButton />
                 </div>
               </div>
             </nav>
