@@ -51,7 +51,7 @@ export async function createUser(user: User) {
   await db.close();
 }
 
-export async function getUser(username: string) {
+export async function getUser(email: string) {
   await initializeUsersTable(); // Initialize the users table if it doesn't exist
 
   // Open the database
@@ -60,15 +60,15 @@ export async function getUser(username: string) {
     driver: require('sqlite3').Database
   })
 
-  // Get the user with the given username
-  const user = await db.get('SELECT * FROM users WHERE username = ?', username) as User | undefined;
+  // Get the user with the given email
+  const user = await db.get('SELECT * FROM users WHERE email = ?', email) as User | undefined;
 
   await db.close();
 
   return user;
 }
 
-export async function updateUser(username: string, user: User) {
+export async function updateUser(email: string, user: User) {
   await initializeUsersTable(); // Initialize the users table if it doesn't exist
 
   // Open the database
@@ -80,16 +80,16 @@ export async function updateUser(username: string, user: User) {
   await db.run(
     'UPDATE users SET image = ?, email = ?, public_address = ?, private_key = ? WHERE username = ?', 
     user.image, 
-    user.email, 
+    email, 
     user.public_address, 
     user.private_key,
-    username
+    user.username
   );
 
   await db.close();
 }
 
-export async function deleteUser(username: string) {
+export async function deleteUser(email: string) {
   await initializeUsersTable(); // Initialize the users table if it doesn't exist
 
   // Open the database
@@ -98,7 +98,7 @@ export async function deleteUser(username: string) {
     driver: require('sqlite3').Database
   })
 
-  await db.run('DELETE FROM users WHERE username = ?', username);
+  await db.run('DELETE FROM users WHERE email = ?', email);
 
   await db.close();
 }
