@@ -12,7 +12,7 @@ export async function initializeUsersTable() {
 }
 
 export async function getUsers() {
-  initializeUsersTable(); // Initialize the users table if it doesn't exist
+  await initializeUsersTable(); // Initialize the users table if it doesn't exist
 
   // Open the database
   const db = await open({
@@ -31,7 +31,7 @@ export async function getUsers() {
 
 export async function createUser(user: User) {
 
-  initializeUsersTable(); // Initialize the users table if it doesn't exist
+  await initializeUsersTable(); // Initialize the users table if it doesn't exist
 
   // Open the database
   const db = await open({
@@ -52,7 +52,7 @@ export async function createUser(user: User) {
 }
 
 export async function getUser(username: string) {
-  initializeUsersTable(); // Initialize the users table if it doesn't exist
+  await initializeUsersTable(); // Initialize the users table if it doesn't exist
 
   // Open the database
   const db = await open({
@@ -69,7 +69,7 @@ export async function getUser(username: string) {
 }
 
 export async function updateUser(username: string, user: User) {
-  initializeUsersTable(); // Initialize the users table if it doesn't exist
+  await initializeUsersTable(); // Initialize the users table if it doesn't exist
 
   // Open the database
   const db = await open({
@@ -90,7 +90,7 @@ export async function updateUser(username: string, user: User) {
 }
 
 export async function deleteUser(username: string) {
-  initializeUsersTable(); // Initialize the users table if it doesn't exist
+  await initializeUsersTable(); // Initialize the users table if it doesn't exist
 
   // Open the database
   const db = await open({
