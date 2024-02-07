@@ -24,10 +24,9 @@ export default function AccountButton() {
       if (session) {
         console.log(session)
         if (!session.user) return;
-        if (!session.user.name) return
 
         setUpAndGetUser({
-          username: session.user.name.replace(' ', '_'),
+          username: session.user.name || '',
           image: session.user.image || '',
           email: session.user.email || '',
         }).then(user => {

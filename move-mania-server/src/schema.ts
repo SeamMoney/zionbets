@@ -7,9 +7,9 @@ export type User = {
 };
 
 export const UserSchema = `CREATE TABLE IF NOT EXISTS users (
-  username TEXT PRIMARY KEY,
+  email TEXT PRIMARY KEY,
+  username TEXT,
   image TEXT,
-  email TEXT,
   public_address TEXT,
   private_key TEXT
 )`;

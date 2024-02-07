@@ -20,9 +20,9 @@ app.get('/users', async (req, res) => {
   res.send(users);
 });
 
-app.get('/users/:username', async (req, res) => {
-  const username = req.params.username;
-  const user = await getUser(username);
+app.get('/users/:email', async (req, res) => {
+  const email = req.params.email;
+  const user = await getUser(email);
   if (user) {
     res.send(user);
   } else {
@@ -41,16 +41,16 @@ app.post('/users', async (req, res) => {
   res.send('User created');
 });
 
-app.put('/users/:username', async (req, res) => {
-  const username = req.params.username;
+app.put('/users/:email', async (req, res) => {
+  const email = req.params.email;
   const user = req.body
-  await updateUser(username, user);
+  await updateUser(email, user);
   res.send('User updated'); 
 });
 
-app.delete('/users/:username', async (req, res) => {
-    const username = req.params.username;
-    await deleteUser(username);
+app.delete('/users/:email', async (req, res) => {
+    const email = req.params.email;
+    await deleteUser(email);
     res.send('User deleted');
 });
 
