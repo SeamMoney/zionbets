@@ -85,3 +85,21 @@ export async function setUpAndGetUser(userToSetup: Omit<User, "public_address" |
     return getUser(userToSetup.email)
   }
 }
+
+export async function updateUser(email: string, user: User): Promise<boolean> {
+  try {
+    const response = await fetch(
+      `${API_URL}/users/${email}`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(user)
+      }
+    )
+    return response.ok
+  } catch (e) {
+    return false
+  }
+}
