@@ -1,7 +1,10 @@
 'use client';
 
+import { setUpAndGetUser } from "@/lib/api";
+import { User } from "@/lib/schema";
 import { sendMessage } from "@/lib/server";
 import { ChatMessage, SOCKET_EVENTS } from "@/lib/types";
+import { getSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { Socket, io } from "socket.io-client";
 
@@ -11,6 +14,27 @@ export default function ChatWindow() {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [newMessage, setNewMessage] = useState<ChatMessage | null>(null);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+
+  const [account, setAccount] = useState<User | null>(null);
+
+  useEffect(() => {
+    getSession().then(session => {
+      if (session) {
+        console.log(session)
+        if (!session.user) return;
+
+        setUpAndGetUser({
+          username: session.user.name || '',
+          image: session.user.image || '',
+          email: session.user.email || '',
+        }).then(user => {
+          if (user) {
+            setAccount(user)
+          }
+        })
+      }
+    })
+  }, [])
 
   useEffect(() => {
     if (newMessage) {
@@ -39,10 +63,15 @@ export default function ChatWindow() {
       return;
     }
 
+    if (!account) {
+      console.error('User not signed in');
+      return;
+    }
+
     console.log('onSendMessage', message);
 
     // Send message to server
-    sendMessage(socket, { author: `player-${Math.floor(Math.random() * 100)}`, message});
+    sendMessage(socket, { author: account?.username, message});
   }
 
   return (
@@ -52,16 +81,24 @@ export default function ChatWindow() {
           <ChatBubble key={index} message={message} />
         ))}
       </div>
-      <div className="w-full min-h-[30px] flex flex-row gap-1">
-        <input className="bg-neutral-800 grow text-white outline-none ps-2" type="text" placeholder="Type a message..." onKeyPress={(e) => {
-          if (e.key === 'Enter') {
-            const input = e.target as HTMLInputElement;
-            onSendMessage(input.value);
-            input.value = '';
-          }
-        }} />
-        <button className="border border-green-400 text-white w-[50px]">Send</button>
-      </div>
+      {
+        account ? (
+          <div className="w-full min-h-[30px] flex flex-row gap-1">
+            <input className="bg-neutral-800 grow text-white outline-none ps-2" type="text" placeholder="Type a message..." onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                const input = e.target as HTMLInputElement;
+                onSendMessage(input.value);
+                input.value = '';
+              }
+            }} />
+            <button className="border border-green-400 text-white w-[50px]">Send</button>
+          </div>
+        ) : (
+          <div className="w-full min-h-[30px] flex flex-row gap-1 justify-center opacity-50">
+            Sign in to chat with other players
+          </div>
+        )
+      }
     </div>
   )
 }
