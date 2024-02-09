@@ -14,7 +14,14 @@ export type PlayerState = {
 
 export default function PlayerList() {
 
+  const [newPlayerList, setNewPlayerList] = useState<PlayerState[]>([]);
   const [players, setPlayers] = useState<PlayerState[]>([]);
+
+  useEffect(() => {
+    if (newPlayerList.length > 0) {
+      setPlayers(newPlayerList);
+    }
+  }, [newPlayerList])
 
   useEffect(() => {
     const newSocket = io("http://localhost:8080");
@@ -36,7 +43,10 @@ export default function PlayerList() {
         coinType: data.coinType,
         cashOutMultiplier: null
       }
-      setPlayers([newPlayer, ...players]);
+      console.log('newPlayer', newPlayer)
+      console.log('players', players)
+      console.log('newPlayerList', newPlayerList)
+      setNewPlayerList([newPlayer, ...players]);
     });
 
     newSocket.on(SOCKET_EVENTS.CASH_OUT_CONFIRMED, (data: CashOutData) => {
@@ -79,19 +89,19 @@ export default function PlayerList() {
       setPlayers(newPlayers);
     });
 
-    // fill player list with dummy data
-    setPlayers([
-      { username: 'player1', betAmount: 100, coinType: 'BTC', cashOutMultiplier: null },
-      { username: 'player2', betAmount: 200, coinType: 'BTC', cashOutMultiplier: null },
-      { username: 'player3', betAmount: 300, coinType: 'BTC', cashOutMultiplier: null },
-      { username: 'player4', betAmount: 400, coinType: 'BTC', cashOutMultiplier: null },
-      { username: 'player5', betAmount: 500, coinType: 'BTC', cashOutMultiplier: null },
-      { username: 'player6', betAmount: 600, coinType: 'BTC', cashOutMultiplier: null },
-      { username: 'player7', betAmount: 700, coinType: 'BTC', cashOutMultiplier: null },
-      { username: 'player8', betAmount: 800, coinType: 'BTC', cashOutMultiplier: null },
-      { username: 'player9', betAmount: 900, coinType: 'BTC', cashOutMultiplier: null },
-      { username: 'player10', betAmount: 1000, coinType: 'BTC', cashOutMultiplier: null },
-    ]);
+    // // fill player list with dummy data
+    // setPlayers([
+    //   { username: 'player1', betAmount: 100, coinType: 'BTC', cashOutMultiplier: null },
+    //   { username: 'player2', betAmount: 200, coinType: 'BTC', cashOutMultiplier: null },
+    //   { username: 'player3', betAmount: 300, coinType: 'BTC', cashOutMultiplier: null },
+    //   { username: 'player4', betAmount: 400, coinType: 'BTC', cashOutMultiplier: null },
+    //   { username: 'player5', betAmount: 500, coinType: 'BTC', cashOutMultiplier: null },
+    //   { username: 'player6', betAmount: 600, coinType: 'BTC', cashOutMultiplier: null },
+    //   { username: 'player7', betAmount: 700, coinType: 'BTC', cashOutMultiplier: null },
+    //   { username: 'player8', betAmount: 800, coinType: 'BTC', cashOutMultiplier: null },
+    //   { username: 'player9', betAmount: 900, coinType: 'BTC', cashOutMultiplier: null },
+    //   { username: 'player10', betAmount: 1000, coinType: 'BTC', cashOutMultiplier: null },
+    // ]);
   }, [])
 
   return (

@@ -1,8 +1,10 @@
 'use client';
 
-import { Slider } from "@/components/ui/slider";
+import { setUpAndGetUser } from "@/lib/api";
+import { User } from "@/lib/schema";
 import { cashOutBet, setNewBet, startRound } from "@/lib/server";
 import { RoundStart, SOCKET_EVENTS } from "@/lib/types";
+import { getSession } from "next-auth/react";
 import { useEffect, useState } from "react"
 import { Socket, io } from "socket.io-client";
 
@@ -19,6 +21,29 @@ export default function ControlCenter() {
   const [gameStatus, setGameStatus] = useState<GameStatus>({
     status: 'lobby',
   })
+
+  const [account, setAccount] = useState<User | null>(null);
+
+  const [betAmount, setBetAmount] = useState('');
+
+  useEffect(() => {
+    getSession().then(session => {
+      if (session) {
+        console.log(session)
+        if (!session.user) return;
+
+        setUpAndGetUser({
+          username: session.user.name || '',
+          image: session.user.image || '',
+          email: session.user.email || '',
+        }).then(user => {
+          if (user) {
+            setAccount(user)
+          }
+        })
+      }
+    })
+  }, [])
 
   useEffect(() => {
     const newSocket = io("http://localhost:8080");
@@ -70,10 +95,12 @@ export default function ControlCenter() {
 
     if (!socket) return;
 
+    if (!account) return;
+
     const data = {
       roundId: 1, 
-      playerUsername: `player-${Math.floor(Math.random() * 100)}`,
-      betAmount: Math.floor(Math.random() * 100),
+      playerUsername: account.username,
+      betAmount: parseInt(betAmount),
       coinType: 'APT'
     };
     const success = setNewBet(socket, data);
@@ -84,10 +111,16 @@ export default function ControlCenter() {
 
     if (!socket) return;
 
+    if (!account) return;
+
+    if (!gameStatus.startTime) return;
+
+    const cashoutMultipler = (Date.now() - gameStatus.startTime) / 1000;
+
     const data = {
       roundId: 1,
-      playerUsername: `player-${Math.floor(Math.random() * 100)}`,
-      cashOutMultiplier: Math.floor(Math.random() * 100),
+      playerUsername: account.username,
+      cashOutMultiplier: cashoutMultipler,
     };
     const succes = cashOutBet(socket, data);
     console.log('cashOutBet', data, succes)
@@ -102,35 +135,61 @@ export default function ControlCenter() {
         <span className="cursor-pointer opacity-50">
           Automatic
         </span>
+        <button onClick={onStartRound}>
+          Admin: start game
+        </button>
       </div>
-      <div className="w-full max-w-[600px] flex flex-row items-center justify-center px-2 gap-4">
+      <div className="w-full max-w-[600px] flex flex-row items-end justify-center px-2 gap-4">
         <div className="flex flex-col gap-1">
           <div className="border border-neutral-700 flex flex-row justify-between px-4 py-2">
             <span className="font-mono font-light">
               BET
             </span>
             <span className="font-mono opacity-50 flex flex-row justify-center items-center gap-1">
-              <input className="bg-transparent border-none outline-none max-w-[40px]" placeholder="2.50"></input><span>APT</span>
+              <input className="bg-transparent border-none outline-none text-right max-w-[40px]" value={betAmount} onChange={(e) => {
+                setBetAmount(e.target.value)
+              }} placeholder="2.50" disabled={gameStatus.status == 'inProgress'}></input><span>APT</span>
             </span>
           </div>
           <div className="flex flex-row items-center text-xs">
-            <div className="border border-neutral-700 opacity-50 px-2 py-1">
+            <div className={
+              `border px-2 py-1 cursor-pointer ${parseInt(betAmount) === 1 ? 'border-green-500 text-green-500' : 'opacity-50 border-neutral-700'}`
+            } onClick={() => setBetAmount('1')}>
               1 APT
             </div>
-            <div className="border border-green-500 text-green-500 px-2 py-1">
+            <div className={
+              `border px-2 py-1 cursor-pointer ${parseInt(betAmount) === 5 ? 'border-green-500 text-green-500' : 'opacity-50 border-neutral-700'}`
+            } onClick={() => setBetAmount('5')}>
               5 APT
             </div>
-            <div className="border border-neutral-700 opacity-50 px-2 py-1">
+            <div className={
+              `border px-2 py-1 cursor-pointer ${parseInt(betAmount) === 10 ? 'border-green-500 text-green-500' : 'opacity-50 border-neutral-700'}`
+            } onClick={() => setBetAmount('10')}>
               10 APT
             </div>
-            <div className="border border-neutral-700 opacity-50 px-2 py-1">
+            <div className={
+              `border px-2 py-1 cursor-pointer ${parseInt(betAmount) === 25 ? 'border-green-500 text-green-500' : 'opacity-50 border-neutral-700'}`
+            } onClick={() => setBetAmount('25')}>
               25 APT
             </div>
           </div>
         </div>
-        <button className="bg-green-500 text-neutral-950 px-8 py-1">
-          Bet
-        </button>
+        {
+          (gameStatus.status === 'lobby' || gameStatus.status === 'countdown' || gameStatus.status === 'end') && (
+            <button className={
+              `bg-green-500 text-neutral-950 px-8 py-1 ${parseInt(betAmount) > 0 ? '' : 'opacity-50 cursor-not-allowed'}` 
+            } onClick={onSetBet} disabled={!(parseInt(betAmount) > 0)}>
+              Bet
+            </button>
+          )
+        }
+        {
+          gameStatus.status === 'inProgress' && (
+            <button className="bg-green-500 text-neutral-950 px-8 py-1" onClick={onCashOut}>
+              Cash out
+            </button>
+          )
+        }
       </div>
     </div>
   )
