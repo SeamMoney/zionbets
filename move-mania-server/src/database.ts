@@ -78,12 +78,12 @@ export async function updateUser(email: string, user: User) {
   })
 
   await db.run(
-    'UPDATE users SET image = ?, email = ?, public_address = ?, private_key = ? WHERE username = ?', 
+    'UPDATE users SET image = ?, username = ?, public_address = ?, private_key = ? WHERE email = ?', 
     user.image, 
-    email, 
+    user.username, 
     user.public_address, 
     user.private_key,
-    user.username
+    email
   );
 
   await db.close();
