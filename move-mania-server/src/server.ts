@@ -3,6 +3,8 @@ import http from "http";
 import { Server } from "socket.io";
 import { SOCKET_EVENTS } from "./types";
 
+const COUNTDOWN = 20 * 1000; // 20 seconds
+const SUMMARY = 20 * 1000; // 20 seconds
 
 const httpServer = http.createServer();
 
@@ -36,14 +38,14 @@ io.on("connection", (socket) => {
     console.log('Starting round');
     const crashPoint = (Math.random() * 10);
     console.log(`Round crashed at ${crashPoint}`);
-    io.emit(SOCKET_EVENTS.ROUND_START, { roundId: 1, startTime: Date.now() + 5000, crashPoint });
+    io.emit(SOCKET_EVENTS.ROUND_START, { roundId: 1, startTime: Date.now() + COUNTDOWN, crashPoint });
 
     setTimeout(() => {
       io.emit(SOCKET_EVENTS.ROUND_RESULT, { roundId: 1, crashPoint });
       setTimeout(() => {
         cycleRounds();
-      }, 5000);
-    }, 5000 + crashPoint * 1000);
+      }, COUNTDOWN);
+    }, COUNTDOWN + crashPoint * 1000);
   })
 
   socket.on(SOCKET_EVENTS.CHAT_MESSAGE, (message) => {
@@ -56,14 +58,14 @@ function cycleRounds() {
   console.log('cycling rounds');
   const crashPoint = (Math.random() * 10);
   console.log(`Round crashed at ${crashPoint}`);
-  io.emit(SOCKET_EVENTS.ROUND_START, { roundId: 1, startTime: Date.now() + 5000, crashPoint });
+  io.emit(SOCKET_EVENTS.ROUND_START, { roundId: 1, startTime: Date.now() + COUNTDOWN, crashPoint });
 
   setTimeout(() => {
     io.emit(SOCKET_EVENTS.ROUND_RESULT, { roundId: 1, crashPoint });
     setTimeout(() => {
       cycleRounds();
-    }, 5000);
-  }, 5000 + crashPoint * 1000);
+    }, SUMMARY);
+  }, COUNTDOWN + crashPoint * 1000);
 }
 
 

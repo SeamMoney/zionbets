@@ -42,6 +42,8 @@ app.post('/users', async (req, res) => {
 });
 
 app.put('/users/:email', async (req, res) => {
+  console.log(req.params.email)
+  console.log(req.body)
   const email = req.params.email;
   const user = req.body
   await updateUser(email, user);
