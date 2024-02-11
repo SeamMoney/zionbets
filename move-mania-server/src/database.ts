@@ -1,6 +1,17 @@
 import { open } from "sqlite";
-import { User, UserSchema } from "./schema";
+import { AllSchemas, ChatMessageSchema, GameSchema, PlayerListSchema, User, UserSchema } from "./schema";
 import crypto from 'crypto';
+
+export async function initializeGameTable() {
+  const db = await open({
+    filename: './db/games.db',
+    driver: require('sqlite3').Database
+  })
+
+  await db.exec(GameSchema);
+
+  await db.close();
+}
 
 export async function initializeUsersTable() {
   const db = await open({
@@ -11,8 +22,52 @@ export async function initializeUsersTable() {
   await db.exec(UserSchema);
 }
 
+export async function initializeChatMessagesTable() {
+  const db = await open({
+    filename: './db/chat_messages.db',
+    driver: require('sqlite3').Database
+  });
+
+  await db.exec(ChatMessageSchema);
+
+  await db.close();
+}
+
+export async function initializePlayerListTable() {
+  const db = await open({
+    filename: './db/player_list.db',
+    driver: require('sqlite3').Database
+  });
+
+  await db.exec(PlayerListSchema);
+
+  await db.close();
+}
+
+export async function initializeAllTables() {
+  // await initializeGameTable();
+  // await initializeUsersTable();
+  // await initializeChatMessagesTable();
+  // await initializePlayerListTable();
+
+  const db = await open({
+    filename: './games.db',
+    driver: require('sqlite3').Database
+  });
+
+  await db.exec(UserSchema);
+  await db.exec(GameSchema);
+  await db.exec(PlayerListSchema);
+  await db.exec(ChatMessageSchema);
+
+  // console.log(AllSchemas)
+  // await db.exec(AllSchemas);
+
+  await db.close();
+}
+
 export async function getUsers() {
-  await initializeUsersTable(); // Initialize the users table if it doesn't exist
+  await initializeAllTables(); // initialize tables if not yet initialized
 
   // Open the database
   const db = await open({
@@ -31,7 +86,7 @@ export async function getUsers() {
 
 export async function createUser(user: User) {
 
-  await initializeUsersTable(); // Initialize the users table if it doesn't exist
+  await initializeAllTables(); // initialize tables if not yet initialized
 
   // Open the database
   const db = await open({
@@ -52,7 +107,7 @@ export async function createUser(user: User) {
 }
 
 export async function getUser(email: string) {
-  await initializeUsersTable(); // Initialize the users table if it doesn't exist
+  await initializeAllTables(); // initialize tables if not yet initialized
 
   // Open the database
   const db = await open({
@@ -69,7 +124,7 @@ export async function getUser(email: string) {
 }
 
 export async function updateUser(email: string, user: User) {
-  await initializeUsersTable(); // Initialize the users table if it doesn't exist
+  await initializeAllTables(); // initialize tables if not yet initialized
 
   // Open the database
   const db = await open({
@@ -90,7 +145,7 @@ export async function updateUser(email: string, user: User) {
 }
 
 export async function deleteUser(email: string) {
-  await initializeUsersTable(); // Initialize the users table if it doesn't exist
+  await initializeAllTables(); // initialize tables if not yet initialized
 
   // Open the database
   const db = await open({
