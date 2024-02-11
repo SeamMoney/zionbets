@@ -1,5 +1,6 @@
 import { createAptosKeyPair } from "./aptos";
 import { User } from "./schema"
+import { ChatMessage } from "./types";
 
 const API_URL = process.env.API_URL || 'http://localhost:3008'
 
@@ -101,5 +102,27 @@ export async function updateUser(email: string, user: User): Promise<boolean> {
     return response.ok
   } catch (e) {
     return false
+  }
+}
+
+export async function getChatMessages(): Promise<ChatMessage[]> {
+  try {
+    const response = await fetch(
+      `${API_URL}/chat`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+    const res = await response.json()
+    return res.map((message: any) => ({
+      message: message.message,
+      authorEmail: message.user_id,
+      authorUsername: message.username,
+    }))
+  } catch (e) {
+    return []
   }
 }

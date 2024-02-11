@@ -1,6 +1,6 @@
 'use client';
 
-import { setUpAndGetUser } from "@/lib/api";
+import { getChatMessages, setUpAndGetUser } from "@/lib/api";
 import { User } from "@/lib/schema";
 import { sendMessage } from "@/lib/server";
 import { ChatMessage, SOCKET_EVENTS } from "@/lib/types";
@@ -57,6 +57,13 @@ export default function ChatWindow() {
     });
   }, [])
 
+  useEffect(() => {
+    getChatMessages().then((messages) => {
+      console.log('Received messages', messages);
+      setChatMessages(messages);
+    })
+  }, [])
+
   const onSendMessage = (message: string) => {
     if (!socket) {
       console.error('Socket not connected');
@@ -71,7 +78,7 @@ export default function ChatWindow() {
     console.log('onSendMessage', message);
 
     // Send message to server
-    sendMessage(socket, { author: account?.username, message});
+    sendMessage(socket, { authorEmail: account?.email, message, authorUsername: account?.username});
   }
 
   return (
@@ -106,7 +113,7 @@ export default function ChatWindow() {
 function ChatBubble({ message }: { message: ChatMessage }) {
   return (
     <div className="bg-neutral-800 w-full px-2 py-1">
-      <strong className="text-green-400">{message.author}:</strong> <span className="text-white">{message.message}</span>
+      <strong className="text-green-400">{message.authorUsername}:</strong> <span className="text-white">{message.message}</span>
     </div>
   )
 }

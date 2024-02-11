@@ -38,5 +38,4 @@ export type RoundStart = {
 export type ChatMessage = {
   authorEmail: string, 
   message: string,
-  sentAt: number
 }
