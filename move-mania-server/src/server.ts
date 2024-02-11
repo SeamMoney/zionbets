@@ -39,7 +39,10 @@ io.on("connection", (socket) => {
 
   socket.on(SOCKET_EVENTS.START_ROUND, () => {
     console.log('Starting round');
-    const crashPoint = (Math.random() * 10);
+    let crashPoint = (Math.random() * 10);
+    if (crashPoint < 1) {
+      crashPoint = 0;
+    }
     console.log(`Round crashed at ${crashPoint}`);
     io.emit(SOCKET_EVENTS.ROUND_START, { roundId: 1, startTime: Date.now() + COUNTDOWN, crashPoint });
 
@@ -64,7 +67,10 @@ io.on("connection", (socket) => {
 
 function cycleRounds() {
   console.log('cycling rounds');
-  const crashPoint = (Math.random() * 10);
+  let crashPoint = (Math.random() * 10);
+  if (crashPoint < 1) {
+    crashPoint = 0;
+  }
   console.log(`Round crashed at ${crashPoint}`);
   io.emit(SOCKET_EVENTS.ROUND_START, { roundId: 1, startTime: Date.now() + COUNTDOWN, crashPoint });
 
