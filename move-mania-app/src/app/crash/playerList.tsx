@@ -48,25 +48,9 @@ export default function PlayerList() {
       setUpdateList(true);
     });
 
-    newSocket.on(SOCKET_EVENTS.ROUND_RESULT, (data: RoundResult) => {
+    newSocket.on(SOCKET_EVENTS.ROUND_RESULT, (data: any) => {
       console.log('SOCKET_EVENTS.ROUND_RESULT', data);
-      const newPlayers = players.map(player => {
-        if (player.cashOutMultiplier == null) {
-          player.cashOutMultiplier = 0
-        } 
-        return player;
-      }).sort((a, b) => {
-        if (a.cashOutMultiplier == null) {
-          return -1;
-        } else if (b.cashOutMultiplier == null) {
-          return 1;
-        } else {
-          return a.cashOutMultiplier - b.cashOutMultiplier;
-        }
-      
-      });
-
-      // setPlayers(newPlayers);
+      setUpdateList(true);
     });
 
     // // fill player list with dummy data
