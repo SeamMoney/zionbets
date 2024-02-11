@@ -1,3 +1,4 @@
+import { PlayerState } from "@/app/crash/playerList";
 import { createAptosKeyPair } from "./aptos";
 import { User } from "./schema"
 import { ChatMessage } from "./types";
@@ -122,6 +123,29 @@ export async function getChatMessages(): Promise<ChatMessage[]> {
       authorEmail: message.user_id,
       authorUsername: message.username,
     }))
+  } catch (e) {
+    return []
+  }
+}
+
+export async function getPlayerList(): Promise<PlayerState[]> {
+  try {
+    const response = await fetch(
+      `${API_URL}/playerlist`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+    const res = await response.json()
+    return res.map((player: any) => ({
+      username: player.username,
+      betAmount: player.bet_amount,
+      cashOutMultiplier: player.crash_point,
+      coinType: player.bet_type,
+    }));
   } catch (e) {
     return []
   }

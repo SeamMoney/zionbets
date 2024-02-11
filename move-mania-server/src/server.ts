@@ -2,10 +2,10 @@ import http from "http";
 
 import { Server } from "socket.io";
 import { ChatMessage, SOCKET_EVENTS } from "./types";
-import { addChatMessage, getUser } from "./database";
+import { addBetToPlayerList, addCashOutToPlayerList, addChatMessage, getUser } from "./database";
 
-const COUNTDOWN = 20 * 1000; // 20 seconds
-const SUMMARY = 20 * 1000; // 20 seconds
+const COUNTDOWN = 5 * 1000; 
+const SUMMARY = 10 * 1000; 
 
 const httpServer = http.createServer();
 
@@ -25,13 +25,15 @@ httpServer.listen(PORT, HOST, () => {
 
 io.on("connection", (socket) => {
   console.log(socket.id);
-  socket.on(SOCKET_EVENTS.SET_BET, (betData) => {
+  socket.on(SOCKET_EVENTS.SET_BET, async (betData) => {
     console.log(`Received bet: ${JSON.stringify(betData)}`);
+    await addBetToPlayerList(betData);
     io.emit(SOCKET_EVENTS.BET_CONFIRMED, betData);
   })
   
-  socket.on(SOCKET_EVENTS.CASH_OUT, (cashOutData) => {
+  socket.on(SOCKET_EVENTS.CASH_OUT, async (cashOutData) => {
     console.log(`Received cash out: ${JSON.stringify(cashOutData)}`);
+    await addCashOutToPlayerList(cashOutData);
     io.emit(SOCKET_EVENTS.CASH_OUT_CONFIRMED, cashOutData);
   })
 

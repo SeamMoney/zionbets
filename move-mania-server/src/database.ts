@@ -297,8 +297,8 @@ export async function getPlayerList() {
     driver: require('sqlite3').Database
   })
 
-  // Get all the players
-  const players = await db.all('SELECT * FROM player_list');
+  // Get all the players in the player list and get their corresponding usernames from the users table
+  const players = await db.all('SELECT user_id, username, bet_type, bet_amount, crash_point FROM player_list JOIN users ON player_list.user_id = users.email');
 
   await db.close();
 
@@ -347,8 +347,8 @@ export async function addCashOutToPlayerList(cashOut: CashOutData) {
   })
 
   await db.run(
-    'UPDATE player_list SET cash_out = ? WHERE user_id = ?', 
-    cashOut,
+    'UPDATE player_list SET crash_point = ? WHERE user_id = ?', 
+    cashOut.cashOutMultiplier,
     cashOut.playerEmail
   );
 

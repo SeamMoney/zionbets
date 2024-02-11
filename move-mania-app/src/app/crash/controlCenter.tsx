@@ -99,7 +99,7 @@ export default function ControlCenter() {
 
     const data = {
       roundId: 1, 
-      playerUsername: account.username,
+      playerEmail: account.email || '',
       betAmount: parseInt(betAmount),
       coinType: 'APT'
     };
@@ -119,7 +119,7 @@ export default function ControlCenter() {
 
     const data = {
       roundId: 1,
-      playerUsername: account.username,
+      playerEmail: account.email || '',
       cashOutMultiplier: cashoutMultipler,
     };
     const succes = cashOutBet(socket, data);
