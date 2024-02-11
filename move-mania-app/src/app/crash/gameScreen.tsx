@@ -5,6 +5,7 @@ import { GameStatus } from "./controlCenter"
 import { SOCKET_EVENTS, RoundStart } from "@/lib/types";
 import { io } from "socket.io-client";
 import CountUp from 'react-countup';
+import { getCurrentGame } from "@/lib/api";
 
 
 export default function GameScreen() {
@@ -15,6 +16,7 @@ export default function GameScreen() {
     startTime: undefined,
     crashPoint: undefined
   })
+  const [update, setUpdate] = useState(true);
 
   useEffect(() => {
     const newSocket = io("http://localhost:8080");
@@ -26,32 +28,56 @@ export default function GameScreen() {
 
     newSocket.on(SOCKET_EVENTS.ROUND_START, (data: RoundStart) => {
       console.log('SOCKET_EVENTS.ROUND_START', data);
-      setGameStatus({
-        status: 'countdown',
-        roundId: data.roundId,
-        startTime: data.startTime,
-        crashPoint: data.crashPoint
-      });
+      // setGameStatus({
+      //   status: 'countdown',
+      //   roundId: data.roundId,
+      //   startTime: data.startTime,
+      //   crashPoint: data.crashPoint
+      // });
+      setUpdate(true);
 
       setTimeout(() => {
-        setGameStatus({
-          status: 'inProgress',
-          roundId: data.roundId,
-          startTime: data.startTime,
-          crashPoint: data.crashPoint
-        });
+        // setGameStatus({
+        //   status: 'IN_PROGRESS',
+        //   roundId: data.roundId,
+        //   startTime: data.startTime,
+        //   crashPoint: data.crashPoint
+        // });
+        setUpdate(true);
       }, data.startTime - Date.now());
     });
 
     newSocket.on(SOCKET_EVENTS.ROUND_RESULT, (data: RoundStart) => {
       console.log('SOCKET_EVENTS.ROUND_RESULT', data);
-      setGameStatus({
-        status: 'end',
-        crashPoint: data.crashPoint
-      });
+      // setGameStatus({
+      //   status: 'end',
+      //   crashPoint: data.crashPoint
+      // });
+      setUpdate(true);
     });
 
   }, [])
+
+  useEffect(() => {
+    if (update) {
+      getCurrentGame().then((game) => {
+        console.log('getCurrentGame', game);
+        if (game == null) {
+          setGameStatus({
+            status: 'lobby',
+          })
+        } else {
+          setGameStatus({
+            status: game.status,
+            roundId: game.game_id,
+            startTime: game.start_time,
+            crashPoint: game.secret_crash_point
+          })
+        }
+      });
+      setUpdate(false);
+    }
+  }, [update])
 
   // return (
   //   <div className="w-full h-full border-l border-b border-green-500">
@@ -67,7 +93,7 @@ export default function GameScreen() {
         </span>
       </div>
     )
-  } else if (gameStatus.status === 'countdown') {
+  } else if (gameStatus.startTime && gameStatus.startTime > Date.now()) {
     return (
       <div>
         <CountUp
@@ -85,7 +111,7 @@ export default function GameScreen() {
         />
       </div>
     )
-  } else if (gameStatus.status === 'inProgress') {
+  } else if (gameStatus.status === 'IN_PROGRESS') {
     return (
       <div>
         <CountUp
@@ -103,7 +129,7 @@ export default function GameScreen() {
         />
       </div>
     )
-  } else if (gameStatus.status === 'end') {
+  } else if (gameStatus.status === 'END') {
     return (
       <div>
         <div>

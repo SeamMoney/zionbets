@@ -150,3 +150,21 @@ export async function getPlayerList(): Promise<PlayerState[]> {
     return []
   }
 }
+
+export async function getCurrentGame() {
+  try {
+    const response = await fetch(
+      `${API_URL}/games/current`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+    const res = await response.json()
+    return res
+  } catch (e) {
+    return null
+  }
+}

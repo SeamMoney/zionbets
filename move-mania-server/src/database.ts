@@ -234,6 +234,8 @@ export async function createGame(game: Game) {
   );
 
   await db.close();
+
+  console.log('Game created');
 }
 
 /**
@@ -277,6 +279,22 @@ export async function endGame(gameId: string) {
   })
 
   await db.run('UPDATE games SET status = "ENDED" WHERE game_id = ?', gameId);
+
+  await db.close();
+
+  console.log('Game ended');
+}
+
+export async function clearGames() {
+  await initializeAllTables(); // initialize tables if not yet initialized
+
+  // Open the database
+  const db = await open({
+    filename: './games.db',
+    driver: require('sqlite3').Database
+  })
+
+  await db.run('DELETE FROM games');
 
   await db.close();
 }
