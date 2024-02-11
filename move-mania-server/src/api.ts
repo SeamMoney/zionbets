@@ -1,6 +1,6 @@
 
 import express from 'express'
-import { createUser, deleteUser, getUser, getUsers, updateUser } from './database';
+import { addChatMessage, createUser, deleteUser, getChatMessages, getCurrentGame, getGames, getPlayerList, getUser, getUserBalance, getUsers, updateUser } from './database';
 var cors = require('cors')
 const app = express()
 app.use(express.json())
@@ -15,9 +15,33 @@ app.get('/', (req, res) => {
   res.send('Hello from the Move Mania server!')
 });
 
+/**
+ * This is the endpoint to get all users
+ */
 app.get('/users', async (req, res) => {
   const users = await getUsers();
   res.send(users);
+});
+/**
+ * This is the endpoint to get all games
+ */
+app.get('/games', async (req, res) => {
+  const games = await getGames();
+  res.send(games);
+});
+/**
+ * This is the endpoint to get all playerlist
+ */
+app.get('/playerlist', async (req, res) => {
+  const playerList = await getPlayerList();
+  res.send(playerList);
+});
+/**
+ * This is the endpoint to get all chat messages
+ */
+app.get('/chat', async (req, res) => {
+  const chatMessages = await getChatMessages();
+  res.send(chatMessages);
 });
 
 app.get('/users/:email', async (req, res) => {
@@ -30,6 +54,18 @@ app.get('/users/:email', async (req, res) => {
   }
 });
 
+app.get('/users/balance/:email', async (req, res) => {
+  const email = req.params.email;
+  const balance = getUserBalance(email);
+  res.send(balance);
+});
+
+app.get('/games/current', async (req, res) => {
+  const game = await getCurrentGame();
+  res.send(game);
+});
+
+
 app.post('/users', async (req, res) => {
   const user = req.body
   try {
@@ -39,6 +75,12 @@ app.post('/users', async (req, res) => {
     return;
   }
   res.send('User created');
+});
+
+app.post('/chat', async (req, res) => {
+  const chatMessage = req.body;
+  await addChatMessage(chatMessage);
+  res.send('Chat message added');
 });
 
 app.put('/users/:email', async (req, res) => {

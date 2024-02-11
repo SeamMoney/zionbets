@@ -8,9 +8,10 @@ export type User = {
 };
 
 export type Game = {
-  id: string;
+  game_id: string;
   start_time: string;
-  secret_crash_point: number
+  secret_crash_point: number;
+  status: "IN_PROGRESS" | "ENDED";
 }
 
 export type PlayerListEntry = {
@@ -21,7 +22,7 @@ export type PlayerListEntry = {
 }
 
 export type ChatMessage = {
-  id: string;
+  message_id: string;
   user_id: string;
   message: string;
   sent_at: string;
@@ -37,23 +38,24 @@ export const UserSchema = `CREATE TABLE IF NOT EXISTS users (
 )`;
 
 export const GameSchema = `CREATE TABLE IF NOT EXISTS games (
-  id TEXT PRIMARY KEY,
+  game_id TEXT PRIMARY KEY,
   start_time TEXT,
-  secret_crash_point FLOAT
+  secret_crash_point FLOAT,
+  status TEXT CHECK (status IN ('IN_PROGRESS', 'ENDED'))
 )`;
 
 export const PlayerListSchema = `CREATE TABLE IF NOT EXISTS player_list (
   bet_type TEXT,
   bet_amount FLOAT,
-  crash_point FLOAT,
+  crash_point FLOAT DEFAULT NULL,
   user_id TEXT PRIMARY KEY,
   FOREIGN KEY (user_id) REFERENCES users(email)
 )`;
 
 export const ChatMessageSchema = `CREATE TABLE IF NOT EXISTS chat_messages (
-  id TEXT PRIMARY KEY,
+  message_id TEXT PRIMARY KEY,
   message TEXT,
-  sent_at TEXT,
+  sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   user_id TEXT,
   FOREIGN KEY (user_id) REFERENCES users(email)
 )`;
