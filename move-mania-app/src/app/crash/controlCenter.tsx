@@ -1,6 +1,6 @@
 'use client';
 
-import { setUpAndGetUser } from "@/lib/api";
+import { getCurrentGame, setUpAndGetUser } from "@/lib/api";
 import { User } from "@/lib/schema";
 import { cashOutBet, setNewBet, startRound } from "@/lib/server";
 import { RoundStart, SOCKET_EVENTS } from "@/lib/types";
@@ -9,7 +9,7 @@ import { useEffect, useState } from "react"
 import { Socket, io } from "socket.io-client";
 
 export type GameStatus = {
-  status: 'lobby' | 'countdown' | 'inProgress' | 'end',
+  status: 'lobby' | 'countdown' | 'IN_PROGRESS' | 'END',
   roundId?: number,
   startTime?: number,
   crashPoint?: number
@@ -20,8 +20,11 @@ export default function ControlCenter() {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [gameStatus, setGameStatus] = useState<GameStatus>({
     status: 'lobby',
+    roundId: undefined,
+    startTime: undefined,
+    crashPoint: undefined
   })
-
+  const [update, setUpdate] = useState(true);
   const [account, setAccount] = useState<User | null>(null);
 
   const [betAmount, setBetAmount] = useState('');
@@ -46,6 +49,27 @@ export default function ControlCenter() {
   }, [])
 
   useEffect(() => {
+    if (update) {
+      getCurrentGame().then((game) => {
+        console.log('getCurrentGame', game);
+        if (game == null) {
+          setGameStatus({
+            status: 'lobby',
+          })
+        } else {
+          setGameStatus({
+            status: game.status,
+            roundId: game.game_id,
+            startTime: game.start_time,
+            crashPoint: game.secret_crash_point
+          })
+        }
+      });
+      setUpdate(false);
+    }
+  }, [update])
+
+  useEffect(() => {
     const newSocket = io("http://localhost:8080");
     setSocket(newSocket);
 
@@ -56,29 +80,32 @@ export default function ControlCenter() {
 
     newSocket.on(SOCKET_EVENTS.ROUND_START, (data: RoundStart) => {
       console.log('SOCKET_EVENTS.ROUND_START', data);
-      setGameStatus({
-        status: 'countdown',
-        roundId: data.roundId,
-        startTime: data.startTime
-      });
-      
+      // setGameStatus({
+      //   status: 'countdown',
+      //   roundId: data.roundId,
+      //   startTime: data.startTime,
+      //   crashPoint: data.crashPoint
+      // });
+      setUpdate(true);
 
       setTimeout(() => {
-        setGameStatus({
-          status: 'inProgress',
-          roundId: data.roundId,
-          startTime: data.startTime
-        });
+        // setGameStatus({
+        //   status: 'IN_PROGRESS',
+        //   roundId: data.roundId,
+        //   startTime: data.startTime,
+        //   crashPoint: data.crashPoint
+        // });
+        setUpdate(true);
       }, data.startTime - Date.now());
     });
 
     newSocket.on(SOCKET_EVENTS.ROUND_RESULT, (data: RoundStart) => {
       console.log('SOCKET_EVENTS.ROUND_RESULT', data);
-      setGameStatus({
-        status: 'end',
-        roundId: undefined,
-        startTime: undefined
-      });
+      // setGameStatus({
+      //   status: 'end',
+      //   crashPoint: data.crashPoint
+      // });
+      setUpdate(true);
     });
 
   }, [])
@@ -139,7 +166,7 @@ export default function ControlCenter() {
           Admin: start game
         </button>
       </div>
-      <div className="w-full max-w-[600px] flex flex-row items-end justify-center px-2 gap-4">
+      <div className="w-full max-w-[600px] flex flex-row items-END justify-center px-2 gap-4">
         <div className="flex flex-col gap-1">
           <div className="border border-neutral-700 flex flex-row justify-between px-4 py-2">
             <span className="font-mono font-light">
@@ -148,7 +175,7 @@ export default function ControlCenter() {
             <span className="font-mono opacity-50 flex flex-row justify-center items-center gap-1">
               <input className="bg-transparent border-none outline-none text-right max-w-[40px]" value={betAmount} onChange={(e) => {
                 setBetAmount(e.target.value)
-              }} placeholder="2.50" disabled={gameStatus.status == 'inProgress'}></input><span>APT</span>
+              }} placeholder="2.50" disabled={gameStatus.status == 'IN_PROGRESS'}></input><span>APT</span>
             </span>
           </div>
           <div className="flex flex-row items-center text-xs">
@@ -175,7 +202,7 @@ export default function ControlCenter() {
           </div>
         </div>
         {
-          (gameStatus.status === 'lobby' || gameStatus.status === 'countdown' || gameStatus.status === 'end') && (
+          ((gameStatus.startTime && gameStatus.startTime > Date.now()) || gameStatus.status === 'END') && (
             <button className={
               `bg-green-500 text-neutral-950 px-8 py-1 ${parseInt(betAmount) > 0 ? '' : 'opacity-50 cursor-not-allowed'}` 
             } onClick={onSetBet} disabled={!(parseInt(betAmount) > 0)}>
@@ -184,7 +211,7 @@ export default function ControlCenter() {
           )
         }
         {
-          gameStatus.status === 'inProgress' && (
+          gameStatus.status === 'IN_PROGRESS' && (gameStatus.startTime && gameStatus.startTime <= Date.now()) && (
             <button className="bg-green-500 text-neutral-950 px-8 py-1" onClick={onCashOut}>
               Cash out
             </button>
@@ -210,7 +237,7 @@ export default function ControlCenter() {
         </button>
       </div>
     )
-  } else if (gameStatus.status === 'inProgress') {
+  } else if (gameStatus.status === 'IN_PROGRESS') {
     return (
       <div>
         <button onClick={onCashOut}>

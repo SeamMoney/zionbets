@@ -9,7 +9,7 @@ export type User = {
 
 export type Game = {
   game_id: string;
-  start_time: string;
+  start_time: number;
   secret_crash_point: number;
   status: "IN_PROGRESS" | "ENDED";
 }
@@ -40,7 +40,7 @@ export const UserSchema = `CREATE TABLE IF NOT EXISTS users (
 
 export const GameSchema = `CREATE TABLE IF NOT EXISTS games (
   game_id TEXT PRIMARY KEY,
-  start_time TEXT,
+  start_time TIMESTAMP,
   secret_crash_point FLOAT,
   status TEXT CHECK (status IN ('IN_PROGRESS', 'ENDED'))
 )`;

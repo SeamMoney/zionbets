@@ -2,9 +2,9 @@ import http from "http";
 
 import { Server } from "socket.io";
 import { ChatMessage, SOCKET_EVENTS } from "./types";
-import { addBetToPlayerList, addCashOutToPlayerList, addChatMessage, clearPlayerList, getUser } from "./database";
+import { addBetToPlayerList, addCashOutToPlayerList, addChatMessage, clearPlayerList, createGame, endGame, getUser } from "./database";
 
-const COUNTDOWN = 5 * 1000; 
+const COUNTDOWN = 20 * 1000; 
 const SUMMARY = 10 * 1000; 
 
 const httpServer = http.createServer();
@@ -37,20 +37,29 @@ io.on("connection", (socket) => {
     io.emit(SOCKET_EVENTS.CASH_OUT_CONFIRMED, cashOutData);
   })
 
-  socket.on(SOCKET_EVENTS.START_ROUND, () => {
+  socket.on(SOCKET_EVENTS.START_ROUND, async () => {
+    await clearPlayerList();
     console.log('Starting round');
     let crashPoint = (Math.random() * 10);
     if (crashPoint < 1) {
       crashPoint = 0;
     }
     console.log(`Round crashed at ${crashPoint}`);
+    const startTime = Date.now() + COUNTDOWN;
+    const gameId = Math.random().toString(36).substring(7);
+    await createGame({
+      game_id: gameId,
+      start_time: startTime,
+      secret_crash_point: crashPoint,
+      status: "IN_PROGRESS"
+    })
     io.emit(SOCKET_EVENTS.ROUND_START, { roundId: 1, startTime: Date.now() + COUNTDOWN, crashPoint });
 
     setTimeout(async () => {
-      await clearPlayerList();
+      await endGame(gameId);
       io.emit(SOCKET_EVENTS.ROUND_RESULT, { roundId: 1, crashPoint });
-      setTimeout(() => {
-        cycleRounds();
+      setTimeout(async () => {
+        await cycleRounds();
       }, COUNTDOWN);
     }, COUNTDOWN + crashPoint * 1000);
   })
@@ -65,21 +74,30 @@ io.on("connection", (socket) => {
   })
 });
 
-function cycleRounds() {
+async function cycleRounds() {
+  await clearPlayerList();
   console.log('cycling rounds');
   let crashPoint = (Math.random() * 10);
   if (crashPoint < 1) {
     crashPoint = 0;
   }
   console.log(`Round crashed at ${crashPoint}`);
+  const startTime = Date.now() + COUNTDOWN;
+  const gameId = Math.random().toString(36).substring(7);
+  await createGame({
+    game_id: gameId,
+    start_time: startTime,
+    secret_crash_point: crashPoint,
+    status: "IN_PROGRESS"
+  })
   io.emit(SOCKET_EVENTS.ROUND_START, { roundId: 1, startTime: Date.now() + COUNTDOWN, crashPoint });
 
   setTimeout(async () => {
-    await clearPlayerList();
+    await endGame(gameId);
     io.emit(SOCKET_EVENTS.ROUND_RESULT, { roundId: 1, crashPoint });
-    setTimeout(() => {
-      cycleRounds();
-    }, SUMMARY);
+    setTimeout(async () => {
+      await cycleRounds();
+    }, COUNTDOWN);
   }, COUNTDOWN + crashPoint * 1000);
 }
 

@@ -1,6 +1,6 @@
 
 import express from 'express'
-import { addChatMessage, createUser, deleteUser, getChatMessages, getCurrentGame, getGames, getPlayerList, getUser, getUserBalance, getUsers, updateUser } from './database';
+import { addChatMessage, clearGames, clearPlayerList, createUser, deleteUser, getChatMessages, getCurrentGame, getGames, getPlayerList, getUser, getUserBalance, getUsers, updateUser } from './database';
 var cors = require('cors')
 const app = express()
 app.use(express.json())
@@ -63,6 +63,16 @@ app.get('/users/balance/:email', async (req, res) => {
 app.get('/games/current', async (req, res) => {
   const game = await getCurrentGame();
   res.send(game);
+});
+
+app.delete('/games', async (req, res) => {
+  await clearGames();
+  res.send('Games cleared');
+});
+
+app.delete('/playerlist', async (req, res) => {
+  await clearPlayerList();
+  res.send('Player list cleared');
 });
 
 
