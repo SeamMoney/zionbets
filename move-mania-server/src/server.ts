@@ -2,7 +2,7 @@ import http from "http";
 
 import { Server } from "socket.io";
 import { ChatMessage, SOCKET_EVENTS } from "./types";
-import { addBetToPlayerList, addCashOutToPlayerList, addChatMessage, getUser } from "./database";
+import { addBetToPlayerList, addCashOutToPlayerList, addChatMessage, clearPlayerList, getUser } from "./database";
 
 const COUNTDOWN = 5 * 1000; 
 const SUMMARY = 10 * 1000; 
@@ -43,7 +43,8 @@ io.on("connection", (socket) => {
     console.log(`Round crashed at ${crashPoint}`);
     io.emit(SOCKET_EVENTS.ROUND_START, { roundId: 1, startTime: Date.now() + COUNTDOWN, crashPoint });
 
-    setTimeout(() => {
+    setTimeout(async () => {
+      await clearPlayerList();
       io.emit(SOCKET_EVENTS.ROUND_RESULT, { roundId: 1, crashPoint });
       setTimeout(() => {
         cycleRounds();
@@ -67,7 +68,8 @@ function cycleRounds() {
   console.log(`Round crashed at ${crashPoint}`);
   io.emit(SOCKET_EVENTS.ROUND_START, { roundId: 1, startTime: Date.now() + COUNTDOWN, crashPoint });
 
-  setTimeout(() => {
+  setTimeout(async () => {
+    await clearPlayerList();
     io.emit(SOCKET_EVENTS.ROUND_RESULT, { roundId: 1, crashPoint });
     setTimeout(() => {
       cycleRounds();
