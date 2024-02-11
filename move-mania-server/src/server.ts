@@ -1,7 +1,8 @@
 import http from "http";
 
 import { Server } from "socket.io";
-import { SOCKET_EVENTS } from "./types";
+import { ChatMessage, SOCKET_EVENTS } from "./types";
+import { addChatMessage, getUser } from "./database";
 
 const COUNTDOWN = 20 * 1000; // 20 seconds
 const SUMMARY = 20 * 1000; // 20 seconds
@@ -48,8 +49,12 @@ io.on("connection", (socket) => {
     }, COUNTDOWN + crashPoint * 1000);
   })
 
-  socket.on(SOCKET_EVENTS.CHAT_MESSAGE, (message) => {
+  socket.on(SOCKET_EVENTS.CHAT_MESSAGE, async (message) => {
     console.log(`Received chat message: ${JSON.stringify(message)}`);
+    await addChatMessage({
+      authorEmail: message.authorEmail,
+      message: message.message,
+    });
     io.emit(SOCKET_EVENTS.CHAT_NOTIFICATION, message);
   })
 });

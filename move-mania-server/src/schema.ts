@@ -26,6 +26,7 @@ export type ChatMessage = {
   user_id: string;
   message: string;
   sent_at: string;
+  username: string;
 }
 
 export const UserSchema = `CREATE TABLE IF NOT EXISTS users (

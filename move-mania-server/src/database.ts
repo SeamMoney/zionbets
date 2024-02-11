@@ -392,7 +392,7 @@ export async function addChatMessage(chatMessage: ChatMessage) {
   })
 
   await db.run(
-    'INSERT INTO chat_messages (message_id, message, user_id) VALUES (?, ?, ?, ?)', 
+    'INSERT INTO chat_messages (message_id, message, user_id) VALUES (?, ?, ?)', 
     chatMessage.authorEmail + Math.random().toString(36).substring(7),
     chatMessage.message,
     chatMessage.authorEmail
@@ -418,8 +418,9 @@ export async function getChatMessages() {
     driver: require('sqlite3').Database
   })
 
-  // Get all the chat messages
-  const chatMessages = await db.all('SELECT * FROM chat_messages ORDER BY sent_at DESC');
+  // Get all the chat messages and get the corresponding usernames from the users table
+  const chatMessages = await db.all('SELECT user_id, username, message FROM chat_messages JOIN users ON chat_messages.user_id = users.email');
+  console.log(chatMessages)
 
   await db.close();
 

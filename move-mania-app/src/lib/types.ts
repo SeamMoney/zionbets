@@ -31,6 +31,7 @@ export type RoundStart = {
 }
 
 export type ChatMessage = {
-  author: string, 
+  authorEmail: string, 
+  authorUsername: string,
   message: string
 }
