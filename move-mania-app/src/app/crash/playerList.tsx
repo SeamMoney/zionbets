@@ -1,6 +1,7 @@
 'use client';
 
-import { BetData, CashOutData, RoundResult, SOCKET_EVENTS } from "@/lib/types";
+import { getPlayerList } from "@/lib/api";
+import { BetData, CashOutData, SOCKET_EVENTS } from "@/lib/types";
 import { useEffect, useState } from "react";
 import { Socket, io } from "socket.io-client";
 
@@ -14,14 +15,18 @@ export type PlayerState = {
 
 export default function PlayerList() {
 
-  const [newPlayerList, setNewPlayerList] = useState<PlayerState[]>([]);
+  const [updateList, setUpdateList] = useState(true);
   const [players, setPlayers] = useState<PlayerState[]>([]);
 
   useEffect(() => {
-    if (newPlayerList.length > 0) {
-      setPlayers(newPlayerList);
+    if (updateList) {
+      getPlayerList().then((players) => {
+        console.log('getPlayerList', players);
+        setPlayers(players);
+      })
+      setUpdateList(false);
     }
-  }, [newPlayerList])
+  }, [updateList])
 
   useEffect(() => {
     const newSocket = io("http://localhost:8080");
@@ -36,36 +41,11 @@ export default function PlayerList() {
     });
     
     newSocket.on(SOCKET_EVENTS.BET_CONFIRMED, (data: BetData) => {
-      console.log('SOCKET_EVENTS.BET_CONFIRMED', data);
-      const newPlayer = {
-        username: data.playerUsername,
-        betAmount: data.betAmount,
-        coinType: data.coinType,
-        cashOutMultiplier: null
-      }
-      console.log('newPlayer', newPlayer)
-      console.log('players', players)
-      console.log('newPlayerList', newPlayerList)
-      setNewPlayerList([newPlayer, ...players]);
+      setUpdateList(true);
     });
 
     newSocket.on(SOCKET_EVENTS.CASH_OUT_CONFIRMED, (data: CashOutData) => {
-      console.log('SOCKET_EVENTS.BET_CASHED_OUT', data);
-      const newPlayers = players.map(player => {
-        if (player.username === data.playerUsername) {
-          player.cashOutMultiplier = data.cashOutMultiplier;
-        }
-        return player;
-      }).sort((a, b) => {
-        if (a.cashOutMultiplier == null) {
-          return 1;
-        } else if (b.cashOutMultiplier == null) {
-          return -1;
-        } else {
-          return a.cashOutMultiplier - b.cashOutMultiplier;
-        }
-      });
-      setPlayers(newPlayers);
+      setUpdateList(true);
     });
 
     newSocket.on(SOCKET_EVENTS.ROUND_RESULT, (data: RoundResult) => {
@@ -86,7 +66,7 @@ export default function PlayerList() {
       
       });
 
-      setPlayers(newPlayers);
+      // setPlayers(newPlayers);
     });
 
     // // fill player list with dummy data
