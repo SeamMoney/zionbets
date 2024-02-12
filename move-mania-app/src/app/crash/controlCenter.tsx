@@ -4,6 +4,7 @@ import { getCurrentGame, getUserBalance, hasUserBet, hasUserCashOut, setUpAndGet
 import { User } from "@/lib/schema";
 import { cashOutBet, setNewBet, startRound } from "@/lib/server";
 import { RoundStart, SOCKET_EVENTS } from "@/lib/types";
+import { cn } from "@/lib/utils";
 import { getSession } from "next-auth/react";
 import { useEffect, useState } from "react"
 import { Socket, io } from "socket.io-client";
@@ -220,9 +221,10 @@ export default function ControlCenter() {
         {
           ((gameStatus.startTime && gameStatus.startTime > Date.now()) || gameStatus.status === 'END') && (
             <button 
-              className={
-              `bg-green-500 text-neutral-950 px-8 py-1 ${(!(parseInt(betAmount) > 0) || hasBet) ? 'opacity-50 cursor-not-allowed' : ''}` 
-              } 
+              className={cn(
+                "bg-green-500 text-neutral-950 px-8 py-1",
+                (!(parseInt(betAmount) > 0) || hasBet) ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-80',
+              )}
               onClick={onSetBet} 
               disabled={(!(parseInt(betAmount) > 0) || hasBet)}
             >
@@ -233,9 +235,10 @@ export default function ControlCenter() {
         {
           gameStatus.status === 'IN_PROGRESS' && (gameStatus.startTime && gameStatus.startTime <= Date.now()) && (
             <button 
-              className={
-                `bg-green-500 text-neutral-950 px-8 py-1 ${(hasCashOut == true || hasBet == false) ? 'opacity-50 cursor-not-allowed' : ''}`
-              }
+              className={cn(
+                "bg-green-500 text-neutral-950 px-8 py-1",
+                (hasCashOut == true || hasBet == false) ? "opacity-50 cursor-not-allowed" : "hover:opacity-80"
+              )}
               onClick={onCashOut} 
               disabled={(hasCashOut == true || hasBet == false)}
             >
