@@ -4,6 +4,7 @@ import "./globals.css";
 import ChatWindow from "./crash/chatWindow";
 import Link from "next/link";
 import AccountButton from "./accountButton";
+import BalanceButton from "./balanceButton";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,7 +23,7 @@ export default function RootLayout({
       <body className={inter.className + " text-white"}>
         
           <div className="flex h-screen overflow-hidden bg-neutral-950">
-            <nav className="fixed w-full h-16 z-30 px-4 border-b border-neutral-700 bg-neutral-950">
+            <nav className="fixed w-full h-20 z-30 px-4 border-b border-neutral-700 bg-neutral-950">
               <div className="flex flex-row items-center justify-between w-full h-full">
                 <div className="flex flex-row gap-4 items-center ">
                   <Link href='/' className="text-white text-2xl font-bold">Move Mania</Link>
@@ -50,18 +51,19 @@ export default function RootLayout({
                     </Link>
                   </div>
                 </div>
-                <div>
+                <div className="flex flex-row gap-4 items-center">
+                  <BalanceButton />
                   <AccountButton />
                 </div>
               </div>
             </nav>
-            <div className="flex flex-1 flex-col pt-16 mr-96">
+            <div className="flex flex-1 flex-col pt-20 mr-96">
               <main className="flex-1 overflow-y-auto">
                 {children}
               </main>
             </div>
 
-            <aside className="fixed inset-y-0 right-0 w-96 z-20 bg-gray-800 text-white overflow-hidden">
+            <aside className="fixed inset-y-0 right-0 w-96 pt-20 z-20 bg-gray-800 text-white overflow-hidden">
               <ChatWindow />
             </aside>
           </div>
