@@ -168,3 +168,22 @@ export async function getCurrentGame() {
     return null
   }
 }
+
+export async function getUserBalance(email: string) {
+  console.log('herheh ' + `${API_URL}/users/balance/${email}`)
+  try {
+    const response = await fetch(
+      `${API_URL}/users/balance/${email}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+    const res = await response.json()
+    return res.balance
+  } catch (e) {
+    return 0
+  }
+}

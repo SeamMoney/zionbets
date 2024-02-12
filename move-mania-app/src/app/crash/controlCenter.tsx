@@ -1,6 +1,6 @@
 'use client';
 
-import { getCurrentGame, setUpAndGetUser } from "@/lib/api";
+import { getCurrentGame, getUserBalance, setUpAndGetUser } from "@/lib/api";
 import { User } from "@/lib/schema";
 import { cashOutBet, setNewBet, startRound } from "@/lib/server";
 import { RoundStart, SOCKET_EVENTS } from "@/lib/types";
@@ -29,6 +29,8 @@ export default function ControlCenter() {
 
   const [betAmount, setBetAmount] = useState('');
 
+  const [playerBalance, setPlayerBalance] = useState(0);
+
   useEffect(() => {
     getSession().then(session => {
       if (session) {
@@ -49,7 +51,7 @@ export default function ControlCenter() {
   }, [])
 
   useEffect(() => {
-    if (update) {
+    if (update && account) {
       getCurrentGame().then((game) => {
         console.log('getCurrentGame', game);
         if (game == null) {
@@ -65,9 +67,15 @@ export default function ControlCenter() {
           })
         }
       });
+
+      getUserBalance(account?.email || '').then((balance) => {
+        console.log('getUserBalance', balance)
+        setPlayerBalance(balance);
+      });
+
       setUpdate(false);
     }
-  }, [update])
+  }, [update, account])
 
   useEffect(() => {
     const newSocket = io("http://localhost:8080");
@@ -165,6 +173,9 @@ export default function ControlCenter() {
         <button onClick={onStartRound}>
           Admin: start game
         </button>
+        <span>
+          balance: {playerBalance} APT
+        </span>
       </div>
       <div className="w-full max-w-[600px] flex flex-row items-END justify-center px-2 gap-4">
         <div className="flex flex-col gap-1">
