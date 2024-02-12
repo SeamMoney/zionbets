@@ -5,6 +5,7 @@ import ChatWindow from "./crash/chatWindow";
 import Link from "next/link";
 import AccountButton from "./accountButton";
 import BalanceButton from "./balanceButton";
+import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -60,6 +61,7 @@ export default function RootLayout({
             <div className="flex flex-1 flex-col pt-20 mr-96">
               <main className="flex-1 overflow-y-auto">
                 {children}
+                <Toaster />
               </main>
             </div>
 
