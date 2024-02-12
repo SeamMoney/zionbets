@@ -1,128 +1,140 @@
+import express from "express";
+import {
+  addChatMessage,
+  clearGames,
+  clearPlayerList,
+  createUser,
+  deleteUser,
+  getChatMessages,
+  getCurrentGame,
+  getGames,
+  getPlayerList,
+  getUser,
+  getUserBalance,
+  getUsers,
+  hasUserBet,
+  hasUserCashOut,
+  updateUser,
+} from "./database";
+var cors = require("cors");
+const app = express();
+app.use(express.json());
+app.use(cors());
 
-import express from 'express'
-import { addChatMessage, clearGames, clearPlayerList, createUser, deleteUser, getChatMessages, getCurrentGame, getGames, getPlayerList, getUser, getUserBalance, getUsers, hasUserBet, hasUserCashOut, updateUser } from './database';
-var cors = require('cors')
-const app = express()
-app.use(express.json())
-app.use(cors())
-
-const PORT = 3008
+const PORT = 3008;
 
 /* 
   This is the entry point for the server. 
 */
-app.get('/', (req, res) => {
-  res.send('Hello from the Move Mania server!')
+app.get("/", (req, res) => {
+  res.send("Hello from the Move Mania server!");
 });
 
 /**
  * This is the endpoint to get all users
  */
-app.get('/users', async (req, res) => {
+app.get("/users", async (req, res) => {
   const users = await getUsers();
   res.send(users);
 });
 /**
  * This is the endpoint to get all games
  */
-app.get('/games', async (req, res) => {
+app.get("/games", async (req, res) => {
   const games = await getGames();
   res.send(games);
 });
 /**
  * This is the endpoint to get all playerlist
  */
-app.get('/playerlist', async (req, res) => {
+app.get("/playerlist", async (req, res) => {
   const playerList = await getPlayerList();
   res.send(playerList);
 });
 /**
  * This is the endpoint to get all chat messages
  */
-app.get('/chat', async (req, res) => {
+app.get("/chat", async (req, res) => {
   const chatMessages = await getChatMessages();
   res.send(chatMessages);
 });
 
-app.get('/users/:email', async (req, res) => {
+app.get("/users/:email", async (req, res) => {
   const email = req.params.email;
   const user = await getUser(email);
   if (user) {
     res.send(user);
   } else {
-    res.status(404).send('User not found');
+    res.status(404).send("User not found");
   }
 });
 
-app.get('/users/balance/:email', async (req, res) => {
+app.get("/users/balance/:email", async (req, res) => {
   const email = req.params.email;
   const balance = await getUserBalance(email);
-  console.log('balance', balance);
   res.send(balance);
 });
 
-app.get('/games/current', async (req, res) => {
+app.get("/games/current", async (req, res) => {
   const game = await getCurrentGame();
   res.send(game);
 });
 
-app.delete('/games', async (req, res) => {
+app.delete("/games", async (req, res) => {
   await clearGames();
-  res.send('Games cleared');
+  res.send("Games cleared");
 });
 
-app.delete('/playerlist', async (req, res) => {
+app.delete("/playerlist", async (req, res) => {
   await clearPlayerList();
-  res.send('Player list cleared');
+  res.send("Player list cleared");
 });
 
-app.get('/playerlist/:email/hasbet', async (req, res) => {
+app.get("/playerlist/:email/hasbet", async (req, res) => {
   const email = req.params.email;
   const hasBet = await hasUserBet(email);
   res.send(hasBet);
 });
 
-app.get('/playerlist/:email/hascashout', async (req, res) => {
+app.get("/playerlist/:email/hascashout", async (req, res) => {
   const email = req.params.email;
   const hasCashOut = await hasUserCashOut(email);
   res.send(hasCashOut);
 });
 
-app.post('/users', async (req, res) => {
-  const user = req.body
+app.post("/users", async (req, res) => {
+  const user = req.body;
   try {
     await createUser(user);
   } catch (e) {
-    res.status(400).send('User already exists');
+    res.status(400).send("User already exists");
     return;
   }
-  res.send('User created');
+  res.send("User created");
 });
 
-app.post('/chat', async (req, res) => {
+app.post("/chat", async (req, res) => {
   const chatMessage = req.body;
   await addChatMessage(chatMessage);
-  res.send('Chat message added');
+  res.send("Chat message added");
 });
 
-app.put('/users/:email', async (req, res) => {
-  console.log(req.params.email)
-  console.log(req.body)
+app.put("/users/:email", async (req, res) => {
   const email = req.params.email;
-  const user = req.body
+  const user = req.body;
   await updateUser(email, user);
-  res.send('User updated'); 
+  res.send("User updated");
 });
 
-app.delete('/users/:email', async (req, res) => {
-    const email = req.params.email;
-    await deleteUser(email);
-    res.send('User deleted');
+app.delete("/users/:email", async (req, res) => {
+  const email = req.params.email;
+  await deleteUser(email);
+  res.send("User deleted");
 });
 
 /* 
   The server will listen on port PORT
 */
 app.listen(PORT, () => {
-  console.log('Server is running on port ' + PORT);
-})
+  console.log("Server is running on port " + PORT);
+});

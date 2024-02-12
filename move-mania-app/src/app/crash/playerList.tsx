@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { getCurrentGame, getPlayerList } from "@/lib/api";
 import { BetData, CashOutData, SOCKET_EVENTS } from "@/lib/types";
@@ -12,17 +12,15 @@ export type PlayerState = {
   betAmount: number;
   coinType: string;
   cashOutMultiplier: number | null;
-}
-
+};
 
 export default function PlayerList() {
-
   const [gameStatus, setGameStatus] = useState<GameStatus>({
-    status: 'lobby',
+    status: "lobby",
     roundId: undefined,
     startTime: undefined,
-    crashPoint: undefined
-  })
+    crashPoint: undefined,
+  });
   const [update, setUpdate] = useState(true);
   const [updateList, setUpdateList] = useState(true);
   const [players, setPlayers] = useState<PlayerState[]>([]);
@@ -30,27 +28,25 @@ export default function PlayerList() {
   useEffect(() => {
     if (updateList) {
       getPlayerList().then((players) => {
-        console.log('getPlayerList', players);
         setPlayers(players);
-      })
+      });
       setUpdateList(false);
     }
-  }, [updateList])
+  }, [updateList]);
 
   useEffect(() => {
     if (update) {
       getCurrentGame().then((game) => {
-        console.log('getCurrentGame', game);
         if (game == null) {
           setGameStatus({
-            status: 'lobby',
-          })
+            status: "lobby",
+          });
         } else {
           setGameStatus({
             status: game.status,
             roundId: game.game_id,
             startTime: game.start_time,
-            crashPoint: game.secret_crash_point
+            crashPoint: game.secret_crash_point,
           });
 
           if (game.start_time > Date.now()) {
@@ -63,21 +59,16 @@ export default function PlayerList() {
 
       setUpdate(false);
     }
-  }, [update])
+  }, [update]);
 
   useEffect(() => {
     const newSocket = io("http://localhost:8080");
 
-    newSocket.on("connect", () => console.log("Connected to WebSocket"));
-
-    newSocket.on("disconnect", () => console.log("Disconnected from WebSocket"));
-
     newSocket.on(SOCKET_EVENTS.ROUND_START, () => {
-      console.log('SOCKET_EVENTS.ROUND_START', 'Emptying players');
       setPlayers([]);
       setUpdate(true);
     });
-    
+
     newSocket.on(SOCKET_EVENTS.BET_CONFIRMED, (data: BetData) => {
       setUpdateList(true);
       setUpdate(true);
@@ -89,11 +80,10 @@ export default function PlayerList() {
     });
 
     newSocket.on(SOCKET_EVENTS.ROUND_RESULT, (data: any) => {
-      console.log('SOCKET_EVENTS.ROUND_RESULT', data);
       setUpdateList(true);
       setUpdate(true);
     });
-  }, [])
+  }, []);
 
   return (
     <div className="bg-neutral-950 border border-neutral-700 h-full flex flex-col items-left gap-2">
@@ -103,63 +93,72 @@ export default function PlayerList() {
           <tr className="border-b border-neutral-700 text-neutral-400">
             <th className="w-[200px] text-left ps-4">Username</th>
             <th className="w-[50px] text-center">@</th>
-            <th className="w-[150px] text-right pr-4">Bet <span className="text-neutral-500 font-mono text-xs">apt</span></th>
+            <th className="w-[150px] text-right pr-4">
+              Bet{" "}
+              <span className="text-neutral-500 font-mono text-xs">apt</span>
+            </th>
           </tr>
         </thead>
         <tbody>
           {players.map((player, index) => (
             <tr key={index} className="text-white text-sm font-mono">
-              {
-                gameStatus.status == 'lobby' ? // IF the game has ended
-                  player.cashOutMultiplier ? 
-                  <td className="w-[200px] text-left ps-4 text-green-500">{player.username}</td>
-                  : 
-                  <td className="w-[200px] text-left ps-4 text-red-500">{player.username}</td>
-                :
-                  player.cashOutMultiplier ? 
-                  <td className="w-[200px] text-left ps-4 text-green-500">{player.username}</td>
-                  : 
-                  <td className="w-[200px] text-left ps-4">{player.username}</td>
-              }
-              {
-                gameStatus.status == 'lobby' ? 
-                  player.cashOutMultiplier ? 
-                  <td 
-                    className={cn(
-                      "w-[50px] text-center text-green-500", 
-                    )}>
+              {gameStatus.status == "lobby" ? ( // IF the game has ended
+                player.cashOutMultiplier ? (
+                  <td className="w-[200px] text-left ps-4 text-green-500">
+                    {player.username}
+                  </td>
+                ) : (
+                  <td className="w-[200px] text-left ps-4 text-red-500">
+                    {player.username}
+                  </td>
+                )
+              ) : player.cashOutMultiplier ? (
+                <td className="w-[200px] text-left ps-4 text-green-500">
+                  {player.username}
+                </td>
+              ) : (
+                <td className="w-[200px] text-left ps-4">{player.username}</td>
+              )}
+              {gameStatus.status == "lobby" ? (
+                player.cashOutMultiplier ? (
+                  <td className={cn("w-[50px] text-center text-green-500")}>
                     {player.cashOutMultiplier.toFixed(2)}x
-                  </td> 
-                  : 
+                  </td>
+                ) : (
                   <td className="w-[50px] text-center text-red-500">0.00x</td>
-                :
-                  player.cashOutMultiplier ? 
-                  <td 
-                    className={cn(
-                      "w-[50px] text-center text-green-500", 
-                    )}>
-                    {player.cashOutMultiplier.toFixed(2)}x
-                  </td> 
-                  : 
-                  <td className="w-[50px] text-center">--</td>
-              }
-              {
-                gameStatus.status == 'lobby' ? // IF the game has ended
-                  player.cashOutMultiplier ? 
-                  <td className="w-[150px] text-right pr-4 font-mono text-green-500">+{(player.betAmount * player.cashOutMultiplier).toFixed(2)} {player.coinType}</td>
-                  : 
-                  <td className="w-[150px] text-right pr-4 font-mono text-red-500">-{player.betAmount.toFixed(2)} {player.coinType}</td>
-                :
-                  player.cashOutMultiplier ? 
-                  <td className="w-[150px] text-right pr-4 font-mono text-green-500">+{(player.betAmount * player.cashOutMultiplier).toFixed(2)} {player.coinType}</td>
-                  : 
-                  <td className="w-[150px] text-right pr-4 font-mono">-{player.betAmount.toFixed(2)} {player.coinType}</td>
-              }
-              
+                )
+              ) : player.cashOutMultiplier ? (
+                <td className={cn("w-[50px] text-center text-green-500")}>
+                  {player.cashOutMultiplier.toFixed(2)}x
+                </td>
+              ) : (
+                <td className="w-[50px] text-center">--</td>
+              )}
+              {gameStatus.status == "lobby" ? ( // IF the game has ended
+                player.cashOutMultiplier ? (
+                  <td className="w-[150px] text-right pr-4 font-mono text-green-500">
+                    +{(player.betAmount * player.cashOutMultiplier).toFixed(2)}{" "}
+                    {player.coinType}
+                  </td>
+                ) : (
+                  <td className="w-[150px] text-right pr-4 font-mono text-red-500">
+                    -{player.betAmount.toFixed(2)} {player.coinType}
+                  </td>
+                )
+              ) : player.cashOutMultiplier ? (
+                <td className="w-[150px] text-right pr-4 font-mono text-green-500">
+                  +{(player.betAmount * player.cashOutMultiplier).toFixed(2)}{" "}
+                  {player.coinType}
+                </td>
+              ) : (
+                <td className="w-[150px] text-right pr-4 font-mono">
+                  -{player.betAmount.toFixed(2)} {player.coinType}
+                </td>
+              )}
             </tr>
           ))}
         </tbody>
       </table>
     </div>
-  )
+  );
 }

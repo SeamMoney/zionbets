@@ -12,14 +12,14 @@ export type Game = {
   start_time: number;
   secret_crash_point: number;
   status: "IN_PROGRESS" | "ENDED";
-}
+};
 
 export type PlayerListEntry = {
   user_id: string;
   bet_type: string;
   bet_amount: number;
   crash_point?: number;
-}
+};
 
 export type ChatMessage = {
   message_id: string;
@@ -27,7 +27,7 @@ export type ChatMessage = {
   message: string;
   sent_at: string;
   username: string;
-}
+};
 
 export const UserSchema = `CREATE TABLE IF NOT EXISTS users (
   email TEXT PRIMARY KEY,
@@ -61,4 +61,10 @@ export const ChatMessageSchema = `CREATE TABLE IF NOT EXISTS chat_messages (
   FOREIGN KEY (user_id) REFERENCES users(email)
 )`;
 
-export const AllSchemas = [UserSchema, GameSchema, PlayerListSchema, ChatMessageSchema, ''].join(';\n');
+export const AllSchemas = [
+  UserSchema,
+  GameSchema,
+  PlayerListSchema,
+  ChatMessageSchema,
+  "",
+].join(";\n");

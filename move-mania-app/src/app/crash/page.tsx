@@ -4,7 +4,6 @@ import ControlCenter from "./controlCenter";
 import GameScreen from "./gameScreen";
 import PlayerList from "./playerList";
 
-
 export default function CrashPage() {
   return (
     <div className="bg-neutral-950 text-white flex flex-col items-center px-2 gap-2 py-4">
@@ -21,9 +20,7 @@ export default function CrashPage() {
           <PlayerList />
         </div>
       </div>
-      <div className="border border-neutral-700 p-2 w-full h-[800px]">
-
-      </div>
+      <div className="border border-neutral-700 p-2 w-full h-[800px]"></div>
     </div>
-  )
+  );
 }

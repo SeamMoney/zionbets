@@ -1,5 +1,4 @@
-
-import { AptosAccount } from 'aptos';
+import { AptosAccount } from "aptos";
 
 export async function createAptosKeyPair(): Promise<{
   public_address: string;
