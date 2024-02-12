@@ -1,145 +1,119 @@
 import { PlayerState } from "@/app/crash/playerList";
 import { createAptosKeyPair } from "./aptos";
-import { User } from "./schema"
+import { User } from "./schema";
 import { ChatMessage } from "./types";
 
-const API_URL = process.env.API_URL || 'http://localhost:3008'
+const API_URL = process.env.API_URL || "http://localhost:3008";
 
-export async function doesUserExist(username: string) { 
-
-  console.log(`${API_URL}/users/${username}`)
-
+export async function doesUserExist(username: string) {
   try {
-    const response = await fetch(
-      `${API_URL}/users/${username}`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    )
-    return response.ok
+    const response = await fetch(`${API_URL}/users/${username}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response.ok;
   } catch (e) {
-    return false
+    return false;
   }
 }
 
-export async function setUpUser(userToSetup: Omit<User, "public_address" | "private_key">) {
-  
+export async function setUpUser(
+  userToSetup: Omit<User, "public_address" | "private_key">
+) {
   const keyPair = await createAptosKeyPair();
-  console.log(keyPair)
-
-  console.log(userToSetup)
-
-  console.log(`${API_URL}/users`)
 
   try {
-    const response = await fetch(
-      `${API_URL}/users`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...userToSetup,
-          ...keyPair
-        })
-      }
-    )
-    return response.ok
+    const response = await fetch(`${API_URL}/users`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ...userToSetup,
+        ...keyPair,
+      }),
+    });
+    return response.ok;
   } catch (e) {
-    return false
+    return false;
   }
 }
 
 export async function getUser(email: string): Promise<User | null> {
-
-  console.log(`${API_URL}/users/${email}`)
-
   try {
-    const response = await fetch(
-      `${API_URL}/users/${email}`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    )
-    return response.json()
+    const response = await fetch(`${API_URL}/users/${email}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response.json();
   } catch (e) {
-    return null
+    return null;
   }
 }
 
-export async function setUpAndGetUser(userToSetup: Omit<User, "public_address" | "private_key">): Promise<User | null> {
-  const userExists = await doesUserExist(userToSetup.email)
+export async function setUpAndGetUser(
+  userToSetup: Omit<User, "public_address" | "private_key">
+): Promise<User | null> {
+  const userExists = await doesUserExist(userToSetup.email);
   if (!userExists) {
-    const res = await setUpUser(userToSetup)
+    const res = await setUpUser(userToSetup);
     if (res) {
-      return getUser(userToSetup.email)
+      return getUser(userToSetup.email);
     } else {
-      return null
+      return null;
     }
   } else {
-    return getUser(userToSetup.email)
+    return getUser(userToSetup.email);
   }
 }
 
 export async function updateUser(email: string, user: User): Promise<boolean> {
   try {
-    const response = await fetch(
-      `${API_URL}/users/${email}`,
-      {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(user)
-      }
-    )
-    return response.ok
+    const response = await fetch(`${API_URL}/users/${email}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(user),
+    });
+    return response.ok;
   } catch (e) {
-    return false
+    return false;
   }
 }
 
 export async function getChatMessages(): Promise<ChatMessage[]> {
   try {
-    const response = await fetch(
-      `${API_URL}/chat`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    )
-    const res = await response.json()
+    const response = await fetch(`${API_URL}/chat`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const res = await response.json();
     return res.map((message: any) => ({
       message: message.message,
       authorEmail: message.user_id,
       authorUsername: message.username,
-    }))
+    }));
   } catch (e) {
-    return []
+    return [];
   }
 }
 
 export async function getPlayerList(): Promise<PlayerState[]> {
   try {
-    const response = await fetch(
-      `${API_URL}/playerlist`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    )
-    const res = await response.json()
+    const response = await fetch(`${API_URL}/playerlist`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const res = await response.json();
     return res.map((player: any) => ({
       username: player.username,
       betAmount: player.bet_amount,
@@ -147,77 +121,64 @@ export async function getPlayerList(): Promise<PlayerState[]> {
       coinType: player.bet_type,
     }));
   } catch (e) {
-    return []
+    return [];
   }
 }
 
 export async function getCurrentGame() {
   try {
-    const response = await fetch(
-      `${API_URL}/games/current`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    )
-    const res = await response.json()
-    return res
+    const response = await fetch(`${API_URL}/games/current`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const res = await response.json();
+    return res;
   } catch (e) {
-    return null
+    return null;
   }
 }
 
 export async function getUserBalance(email: string) {
-  console.log('herheh ' + `${API_URL}/users/balance/${email}`)
   try {
-    const response = await fetch(
-      `${API_URL}/users/balance/${email}`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    )
-    const res = await response.json()
-    return res.balance
+    const response = await fetch(`${API_URL}/users/balance/${email}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const res = await response.json();
+    return res.balance;
   } catch (e) {
-    return 0
+    return 0;
   }
 }
 
 export async function hasUserBet(email: string) {
   try {
-    const response = await fetch(
-      `${API_URL}/playerlist/${email}/hasbet`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    )
-    return response.json()
+    const response = await fetch(`${API_URL}/playerlist/${email}/hasbet`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response.json();
   } catch (e) {
-    return false
+    return false;
   }
 }
 
 export async function hasUserCashOut(email: string) {
   try {
-    const response = await fetch(
-      `${API_URL}/playerlist/${email}/hascashout`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    )
-    return response.json()
+    const response = await fetch(`${API_URL}/playerlist/${email}/hascashout`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response.json();
   } catch (e) {
-    return false
+    return false;
   }
 }

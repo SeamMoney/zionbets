@@ -1,33 +1,25 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from "react"
-import { GameStatus } from "./controlCenter"
+import { useEffect, useState } from "react";
+import { GameStatus } from "./controlCenter";
 import { SOCKET_EVENTS, RoundStart } from "@/lib/types";
 import { io } from "socket.io-client";
-import CountUp from 'react-countup';
+import CountUp from "react-countup";
 import { getCurrentGame } from "@/lib/api";
 
-
 export default function GameScreen() {
-
   const [gameStatus, setGameStatus] = useState<GameStatus>({
-    status: 'lobby',
+    status: "lobby",
     roundId: undefined,
     startTime: undefined,
-    crashPoint: undefined
-  })
+    crashPoint: undefined,
+  });
   const [update, setUpdate] = useState(true);
 
   useEffect(() => {
     const newSocket = io("http://localhost:8080");
 
-    newSocket.on("connect", () => console.log("Connected to WebSocket"));
-    newSocket.on("disconnect", () =>
-      console.log("Disconnected from WebSocket")
-    );
-
     newSocket.on(SOCKET_EVENTS.ROUND_START, (data: RoundStart) => {
-      console.log('SOCKET_EVENTS.ROUND_START', data);
       setUpdate(true);
 
       setTimeout(() => {
@@ -36,27 +28,24 @@ export default function GameScreen() {
     });
 
     newSocket.on(SOCKET_EVENTS.ROUND_RESULT, (data: RoundStart) => {
-      console.log('SOCKET_EVENTS.ROUND_RESULT', data);
       setUpdate(true);
     });
-
-  }, [])
+  }, []);
 
   useEffect(() => {
     if (update) {
       getCurrentGame().then((game) => {
-        console.log('getCurrentGame', game);
         if (game == null) {
           setGameStatus({
-            status: 'lobby',
-          })
+            status: "lobby",
+          });
         } else {
           setGameStatus({
             status: game.status,
             roundId: game.game_id,
             startTime: game.start_time,
-            crashPoint: game.secret_crash_point
-          })
+            crashPoint: game.secret_crash_point,
+          });
 
           if (game.start_time > Date.now()) {
             setTimeout(() => {
@@ -67,16 +56,14 @@ export default function GameScreen() {
       });
       setUpdate(false);
     }
-  }, [update])
+  }, [update]);
 
-  if (gameStatus.status === 'lobby') {
+  if (gameStatus.status === "lobby") {
     return (
       <div>
-        <span>
-          Lobby
-        </span>
+        <span>Lobby</span>
       </div>
-    )
+    );
   } else if (gameStatus.startTime && gameStatus.startTime > Date.now()) {
     return (
       <div>
@@ -90,12 +77,10 @@ export default function GameScreen() {
           prefix="Game starts in "
           suffix=" seconds"
           useEasing={false}
-        // onEnd={() => console.log('Ended! 👏')}
-        // onStart={() => console.log('Started! 💨')}
         />
       </div>
-    )
-  } else if (gameStatus.status === 'IN_PROGRESS') {
+    );
+  } else if (gameStatus.status === "IN_PROGRESS") {
     return (
       <div>
         <CountUp
@@ -108,12 +93,10 @@ export default function GameScreen() {
           prefix=""
           suffix="x"
           useEasing={false}
-          onEnd={() => console.log('Ended! 👏')}
-          onStart={() => console.log('Started! 💨', gameStatus.crashPoint)}
         />
       </div>
-    )
-  } else if (gameStatus.status === 'END') {
+    );
+  } else if (gameStatus.status === "END") {
     return (
       <div>
         <div>
@@ -127,11 +110,9 @@ export default function GameScreen() {
             prefix=""
             suffix="x"
             useEasing={false}
-            onEnd={() => console.log('Ended! 👏')}
-            onStart={() => console.log('Started! 💨', gameStatus.crashPoint)}
           />
         </div>
       </div>
-    )
+    );
   }
 }

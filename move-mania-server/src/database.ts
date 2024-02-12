@@ -1,15 +1,24 @@
 import { open } from "sqlite";
-import { AllSchemas, ChatMessageSchema, Game, GameSchema, PlayerListEntry, PlayerListSchema, User, UserSchema } from "./schema";
-import crypto from 'crypto';
+import {
+  AllSchemas,
+  ChatMessageSchema,
+  Game,
+  GameSchema,
+  PlayerListEntry,
+  PlayerListSchema,
+  User,
+  UserSchema,
+} from "./schema";
+import crypto from "crypto";
 import { BetData, CashOutData, ChatMessage } from "./types";
 
 const STARTING_BALANCE = 100;
 
 export async function initializeGameTable() {
   const db = await open({
-    filename: './db/games.db',
-    driver: require('sqlite3').Database
-  })
+    filename: "./db/games.db",
+    driver: require("sqlite3").Database,
+  });
 
   await db.exec(GameSchema);
 
@@ -18,17 +27,17 @@ export async function initializeGameTable() {
 
 export async function initializeUsersTable() {
   const db = await open({
-    filename: 'games.db',
-    driver: require('sqlite3').Database
-  })
+    filename: "games.db",
+    driver: require("sqlite3").Database,
+  });
 
   await db.exec(UserSchema);
 }
 
 export async function initializeChatMessagesTable() {
   const db = await open({
-    filename: './db/chat_messages.db',
-    driver: require('sqlite3').Database
+    filename: "./db/chat_messages.db",
+    driver: require("sqlite3").Database,
   });
 
   await db.exec(ChatMessageSchema);
@@ -38,8 +47,8 @@ export async function initializeChatMessagesTable() {
 
 export async function initializePlayerListTable() {
   const db = await open({
-    filename: './db/player_list.db',
-    driver: require('sqlite3').Database
+    filename: "./db/player_list.db",
+    driver: require("sqlite3").Database,
   });
 
   await db.exec(PlayerListSchema);
@@ -54,17 +63,14 @@ export async function initializeAllTables() {
   // await initializePlayerListTable();
 
   const db = await open({
-    filename: './games.db',
-    driver: require('sqlite3').Database
+    filename: "./games.db",
+    driver: require("sqlite3").Database,
   });
 
   await db.exec(UserSchema);
   await db.exec(GameSchema);
   await db.exec(PlayerListSchema);
   await db.exec(ChatMessageSchema);
-
-  // console.log(AllSchemas)
-  // await db.exec(AllSchemas);
 
   await db.close();
 }
@@ -74,35 +80,33 @@ export async function getUsers() {
 
   // Open the database
   const db = await open({
-    filename: 'games.db',
-    driver: require('sqlite3').Database
-  })
+    filename: "games.db",
+    driver: require("sqlite3").Database,
+  });
 
   // Get all the users
-  const users = await db.all('SELECT * FROM users') as User[];
+  const users = (await db.all("SELECT * FROM users")) as User[];
 
   await db.close();
 
   return users;
-
 }
 
 export async function createUser(user: User) {
-
   await initializeAllTables(); // initialize tables if not yet initialized
 
   // Open the database
   const db = await open({
-    filename: 'games.db',
-    driver: require('sqlite3').Database
-  })
+    filename: "games.db",
+    driver: require("sqlite3").Database,
+  });
 
   await db.run(
-    'INSERT INTO users (username, image, email, public_address, private_key, balance) VALUES (?, ?, ?, ?, ?, ?)', 
-    user.username, 
-    user.image, 
-    user.email, 
-    user.public_address, 
+    "INSERT INTO users (username, image, email, public_address, private_key, balance) VALUES (?, ?, ?, ?, ?, ?)",
+    user.username,
+    user.image,
+    user.email,
+    user.public_address,
     user.private_key,
     STARTING_BALANCE
   );
@@ -115,12 +119,14 @@ export async function getUser(email: string) {
 
   // Open the database
   const db = await open({
-    filename: 'games.db',
-    driver: require('sqlite3').Database
-  })
+    filename: "games.db",
+    driver: require("sqlite3").Database,
+  });
 
   // Get the user with the given email
-  const user = await db.get('SELECT * FROM users WHERE email = ?', email) as User | undefined;
+  const user = (await db.get("SELECT * FROM users WHERE email = ?", email)) as
+    | User
+    | undefined;
 
   await db.close();
 
@@ -132,15 +138,15 @@ export async function updateUser(email: string, user: User) {
 
   // Open the database
   const db = await open({
-    filename: 'games.db',
-    driver: require('sqlite3').Database
-  })
+    filename: "games.db",
+    driver: require("sqlite3").Database,
+  });
 
   await db.run(
-    'UPDATE users SET image = ?, username = ?, public_address = ?, private_key = ? WHERE email = ?', 
-    user.image, 
-    user.username, 
-    user.public_address, 
+    "UPDATE users SET image = ?, username = ?, public_address = ?, private_key = ? WHERE email = ?",
+    user.image,
+    user.username,
+    user.public_address,
     user.private_key,
     email
   );
@@ -153,23 +159,23 @@ export async function deleteUser(email: string) {
 
   // Open the database
   const db = await open({
-    filename: 'games.db',
-    driver: require('sqlite3').Database
-  })
+    filename: "games.db",
+    driver: require("sqlite3").Database,
+  });
 
-  await db.run('DELETE FROM users WHERE email = ?', email);
+  await db.run("DELETE FROM users WHERE email = ?", email);
 
   await db.close();
 }
 
 /**
- * 
+ *
  * @param email The email of the user to get the balance of
- * 
- * @description This function gets the balance of the user with 
- * the given email from the database. This function is to be used 
+ *
+ * @description This function gets the balance of the user with
+ * the given email from the database. This function is to be used
  * on the client side to get the balance of the user.
- * 
+ *
  * @returns The balance of the user with the given email
  */
 export async function getUserBalance(email: string) {
@@ -177,12 +183,12 @@ export async function getUserBalance(email: string) {
 
   // Open the database
   const db = await open({
-    filename: 'games.db',
-    driver: require('sqlite3').Database
-  })
+    filename: "games.db",
+    driver: require("sqlite3").Database,
+  });
 
   // Get the user with the given email
-  const user = await db.get('SELECT balance FROM users WHERE email = ?', email);
+  const user = await db.get("SELECT balance FROM users WHERE email = ?", email);
 
   await db.close();
 
@@ -190,10 +196,10 @@ export async function getUserBalance(email: string) {
 }
 
 /**
- * 
- * @description This function gets all the games from the database. 
+ *
+ * @description This function gets all the games from the database.
  * This function is to be used on the client side to get all the games.
- * 
+ *
  * @returns A list of all the games in the database
  */
 export async function getGames() {
@@ -201,12 +207,12 @@ export async function getGames() {
 
   // Open the database
   const db = await open({
-    filename: './games.db',
-    driver: require('sqlite3').Database
-  })
+    filename: "./games.db",
+    driver: require("sqlite3").Database,
+  });
 
   // Get all the games
-  const games = await db.all('SELECT * FROM games');
+  const games = await db.all("SELECT * FROM games");
 
   await db.close();
 
@@ -218,11 +224,14 @@ export async function hasUserBet(email: string) {
 
   // Open the database
   const db = await open({
-    filename: './games.db',
-    driver: require('sqlite3').Database
-  })
+    filename: "./games.db",
+    driver: require("sqlite3").Database,
+  });
 
-  const result = await db.get('SELECT * FROM player_list WHERE user_id = ?', email);
+  const result = await db.get(
+    "SELECT * FROM player_list WHERE user_id = ?",
+    email
+  );
 
   await db.close();
 
@@ -234,11 +243,14 @@ export async function hasUserCashOut(email: string) {
 
   // Open the database
   const db = await open({
-    filename: './games.db',
-    driver: require('sqlite3').Database
-  })
+    filename: "./games.db",
+    driver: require("sqlite3").Database,
+  });
 
-  const result = await db.get('SELECT * FROM player_list WHERE user_id = ? AND crash_point IS NOT NULL', email);
+  const result = await db.get(
+    "SELECT * FROM player_list WHERE user_id = ? AND crash_point IS NOT NULL",
+    email
+  );
 
   await db.close();
 
@@ -248,7 +260,7 @@ export async function hasUserCashOut(email: string) {
 /**
  * @description This function creates a game in the database.
  * It is to be used on the server side to create a game.
- * 
+ *
  * @param game The game to be created
  */
 export async function createGame(game: Game) {
@@ -256,12 +268,12 @@ export async function createGame(game: Game) {
 
   // Open the database
   const db = await open({
-    filename: './games.db',
-    driver: require('sqlite3').Database
-  })
+    filename: "./games.db",
+    driver: require("sqlite3").Database,
+  });
 
   await db.run(
-    'INSERT INTO games (game_id, start_time, secret_crash_point, status) VALUES (?, ?, ?, ?)', 
+    "INSERT INTO games (game_id, start_time, secret_crash_point, status) VALUES (?, ?, ?, ?)",
     game.game_id,
     game.start_time,
     game.secret_crash_point,
@@ -269,15 +281,13 @@ export async function createGame(game: Game) {
   );
 
   await db.close();
-
-  console.log('Game created');
 }
 
 /**
- * 
+ *
  * @description This function gets the game that is currently in progress.
  * This function is to be used on the client side to get the game that is currently in progress.
- * 
+ *
  * @returns The game that is currently in progress
  */
 export async function getCurrentGame() {
@@ -285,9 +295,9 @@ export async function getCurrentGame() {
 
   // Open the database
   const db = await open({
-    filename: './games.db',
-    driver: require('sqlite3').Database
-  })
+    filename: "./games.db",
+    driver: require("sqlite3").Database,
+  });
 
   // Get the first occurence of a game with status "IN_PROGRESS"
   const game = await db.get('SELECT * FROM games WHERE status = "IN_PROGRESS"');
@@ -298,10 +308,10 @@ export async function getCurrentGame() {
 }
 
 /**
- * 
+ *
  * @description This function ends the game with the given id.
  * This function is to be used on the server side to end a game.
- * 
+ *
  * @param gameId The id of the game to be ended
  */
 export async function endGame(gameId: string) {
@@ -309,15 +319,13 @@ export async function endGame(gameId: string) {
 
   // Open the database
   const db = await open({
-    filename: './games.db',
-    driver: require('sqlite3').Database
-  })
+    filename: "./games.db",
+    driver: require("sqlite3").Database,
+  });
 
   await db.run('UPDATE games SET status = "ENDED" WHERE game_id = ?', gameId);
 
   await db.close();
-
-  console.log('Game ended');
 }
 
 export async function clearGames() {
@@ -325,20 +333,20 @@ export async function clearGames() {
 
   // Open the database
   const db = await open({
-    filename: './games.db',
-    driver: require('sqlite3').Database
-  })
+    filename: "./games.db",
+    driver: require("sqlite3").Database,
+  });
 
-  await db.run('DELETE FROM games');
+  await db.run("DELETE FROM games");
 
   await db.close();
 }
 
 /**
- * 
+ *
  * @description This function gets all the players in the player list.
  * This function is to be used on the client side to get all the players in the player list.
- * 
+ *
  * @returns A list of all the players in the player list
  */
 export async function getPlayerList() {
@@ -346,12 +354,14 @@ export async function getPlayerList() {
 
   // Open the database
   const db = await open({
-    filename: './games.db',
-    driver: require('sqlite3').Database
-  })
+    filename: "./games.db",
+    driver: require("sqlite3").Database,
+  });
 
   // Get all the players in the player list and get their corresponding usernames from the users table
-  const players = await db.all('SELECT user_id, username, bet_type, bet_amount, crash_point FROM player_list JOIN users ON player_list.user_id = users.email');
+  const players = await db.all(
+    "SELECT user_id, username, bet_type, bet_amount, crash_point FROM player_list JOIN users ON player_list.user_id = users.email"
+  );
 
   await db.close();
 
@@ -359,10 +369,10 @@ export async function getPlayerList() {
 }
 
 /**
- * 
+ *
  * @description This function adds a bet to the player list.
  * This function is to be used on the server side to add a bet to the player list.
- * 
+ *
  * @param bet The bet to be added to the player list
  */
 export async function addBetToPlayerList(bet: BetData) {
@@ -370,12 +380,12 @@ export async function addBetToPlayerList(bet: BetData) {
 
   // Open the database
   const db = await open({
-    filename: './games.db',
-    driver: require('sqlite3').Database
-  })
+    filename: "./games.db",
+    driver: require("sqlite3").Database,
+  });
 
   await db.run(
-    'INSERT INTO player_list (bet_type, bet_amount, user_id) VALUES (?, ?, ?)', 
+    "INSERT INTO player_list (bet_type, bet_amount, user_id) VALUES (?, ?, ?)",
     bet.coinType,
     bet.betAmount,
     bet.playerEmail
@@ -387,7 +397,7 @@ export async function addBetToPlayerList(bet: BetData) {
 /**
  * @description This function adds a cash out to the player list.
  * This function is to be used on the server side to add a cash out to the player list.
- * 
+ *
  * @param cashOut The cash out to be added to the player list
  */
 export async function addCashOutToPlayerList(cashOut: CashOutData) {
@@ -395,12 +405,12 @@ export async function addCashOutToPlayerList(cashOut: CashOutData) {
 
   // Open the database
   const db = await open({
-    filename: './games.db',
-    driver: require('sqlite3').Database
-  })
+    filename: "./games.db",
+    driver: require("sqlite3").Database,
+  });
 
   await db.run(
-    'UPDATE player_list SET crash_point = ? WHERE user_id = ?', 
+    "UPDATE player_list SET crash_point = ? WHERE user_id = ?",
     cashOut.cashOutMultiplier,
     cashOut.playerEmail
   );
@@ -413,16 +423,17 @@ export async function payOutPlayers() {
 
   // Open the database
   const db = await open({
-    filename: './games.db',
-    driver: require('sqlite3').Database
-  })
+    filename: "./games.db",
+    driver: require("sqlite3").Database,
+  });
 
-  const players = await db.all('SELECT * FROM player_list');
-
-  console.log('players', players)
+  const players = await db.all("SELECT * FROM player_list");
 
   for (const player of players) {
-    const user = await db.get('SELECT * FROM users WHERE email = ?', player.user_id);
+    const user = await db.get(
+      "SELECT * FROM users WHERE email = ?",
+      player.user_id
+    );
 
     if (user !== undefined) {
       let newBalance = user.balance - player.bet_amount;
@@ -431,10 +442,11 @@ export async function payOutPlayers() {
         newBalance += player.bet_amount * player.crash_point;
       }
 
-
-      console.log('newBalance for', player.user_id, newBalance)
-
-      await db.run('UPDATE users SET balance = ? WHERE email = ?', newBalance, player.user_id);
+      await db.run(
+        "UPDATE users SET balance = ? WHERE email = ?",
+        newBalance,
+        player.user_id
+      );
     }
   }
 
@@ -444,7 +456,7 @@ export async function payOutPlayers() {
 /**
  * @description Removes all of the players from the player list.
  * This function is to be used on the server side to remove all of the players from the player list.
- * 
+ *
  * @todo This function needs to include logic to pay out players
  */
 export async function clearPlayerList() {
@@ -452,11 +464,11 @@ export async function clearPlayerList() {
 
   // Open the database
   const db = await open({
-    filename: './games.db',
-    driver: require('sqlite3').Database
-  })
+    filename: "./games.db",
+    driver: require("sqlite3").Database,
+  });
 
-  await db.run('DELETE FROM player_list');
+  await db.run("DELETE FROM player_list");
 
   await db.close();
 }
@@ -465,7 +477,7 @@ export async function clearPlayerList() {
  * @description Adds a chat message to the chat messages.
  * If there are more than 100 chat messages, the oldest chat messages are deleted.
  * This function is to be used on the server side to add a chat message to the chat messages.
- * 
+ *
  * @param chatMessage The chat message to be added to the chat messages
  */
 export async function addChatMessage(chatMessage: ChatMessage) {
@@ -473,18 +485,20 @@ export async function addChatMessage(chatMessage: ChatMessage) {
 
   // Open the database
   const db = await open({
-    filename: './games.db',
-    driver: require('sqlite3').Database
-  })
+    filename: "./games.db",
+    driver: require("sqlite3").Database,
+  });
 
   await db.run(
-    'INSERT INTO chat_messages (message_id, message, user_id) VALUES (?, ?, ?)', 
+    "INSERT INTO chat_messages (message_id, message, user_id) VALUES (?, ?, ?)",
     chatMessage.authorEmail + Math.random().toString(36).substring(7),
     chatMessage.message,
     chatMessage.authorEmail
   );
 
-  await db.run('DELETE FROM chat_messages WHERE message_id NOT IN (SELECT message_id FROM chat_messages ORDER BY sent_at DESC LIMIT 100)')
+  await db.run(
+    "DELETE FROM chat_messages WHERE message_id NOT IN (SELECT message_id FROM chat_messages ORDER BY sent_at DESC LIMIT 100)"
+  );
 
   await db.close();
 }
@@ -492,7 +506,7 @@ export async function addChatMessage(chatMessage: ChatMessage) {
 /**
  * @description Gets all the chat messages in the chat messages.
  * This function is to be used on the client side to get all the chat messages.
- * 
+ *
  * @returns A list of all the chat messages in chronological order
  */
 export async function getChatMessages() {
@@ -500,13 +514,14 @@ export async function getChatMessages() {
 
   // Open the database
   const db = await open({
-    filename: './games.db',
-    driver: require('sqlite3').Database
-  })
+    filename: "./games.db",
+    driver: require("sqlite3").Database,
+  });
 
   // Get all the chat messages and get the corresponding usernames from the users table
-  const chatMessages = await db.all('SELECT user_id, username, message FROM chat_messages JOIN users ON chat_messages.user_id = users.email');
-  console.log(chatMessages)
+  const chatMessages = await db.all(
+    "SELECT user_id, username, message FROM chat_messages JOIN users ON chat_messages.user_id = users.email"
+  );
 
   await db.close();
 
@@ -515,14 +530,15 @@ export async function getChatMessages() {
 
 export async function initializeApiKeyTable() {
   const db = await open({
-    filename: './db/api_keys.db',
-    driver: require('sqlite3').Database
-  })
+    filename: "./db/api_keys.db",
+    driver: require("sqlite3").Database,
+  });
 
-  await db.exec('CREATE TABLE IF NOT EXISTS api_keys (username TEXT PRIMARY KEY, api_key TEXT)');
+  await db.exec(
+    "CREATE TABLE IF NOT EXISTS api_keys (username TEXT PRIMARY KEY, api_key TEXT)"
+  );
 
   await db.close();
-
 }
 
 export async function createKeyForUser(username: string) {
@@ -530,14 +546,18 @@ export async function createKeyForUser(username: string) {
 
   // Open the database
   const db = await open({
-    filename: './db/api_keys.db',
-    driver: require('sqlite3').Database
-  })
+    filename: "./db/api_keys.db",
+    driver: require("sqlite3").Database,
+  });
 
   // Generate a random API key
-  const apiKey = crypto.randomBytes(32).toString('hex');
+  const apiKey = crypto.randomBytes(32).toString("hex");
 
-  await db.run('INSERT INTO api_keys (username, api_key) VALUES (?, ?)', username, apiKey);
+  await db.run(
+    "INSERT INTO api_keys (username, api_key) VALUES (?, ?)",
+    username,
+    apiKey
+  );
 
   await db.close();
 }
@@ -547,12 +567,15 @@ export async function isValidApiKey(apiKey: string) {
 
   // Open the database
   const db = await open({
-    filename: './db/api_keys.db',
-    driver: require('sqlite3').Database
-  })
+    filename: "./db/api_keys.db",
+    driver: require("sqlite3").Database,
+  });
 
   // Check if the API key exists
-  const result = await db.get('SELECT * FROM api_keys WHERE api_key = ?', apiKey);
+  const result = await db.get(
+    "SELECT * FROM api_keys WHERE api_key = ?",
+    apiKey
+  );
 
   await db.close();
 
