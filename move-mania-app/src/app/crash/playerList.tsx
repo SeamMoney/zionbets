@@ -87,20 +87,39 @@ export default function PlayerList() {
 
   return (
     <div className="bg-neutral-950 border border-neutral-700 h-full flex flex-col items-left gap-2">
-      <span className="font-semibold text-lg pt-1 ps-4">Live</span>
+      <span className="font-semibold text-lg pt-1 ps-4">Live Bets</span>
       <table className="w-full scroll">
         <thead className="">
           <tr className="border-b border-neutral-700 text-neutral-400">
             <th className="w-[200px] text-left ps-4">Username</th>
-            <th className="w-[50px] text-center">@</th>
-            <th className="w-[150px] text-right pr-4">
+            <th className="w-[100px] text-center">
+              Multiplier{" "}
+              <span className="text-neutral-500 font-mono text-xs">x</span>
+            </th>
+            <th className="w-[100px] text-right pr-4">
               Bet{" "}
               <span className="text-neutral-500 font-mono text-xs">apt</span>
             </th>
           </tr>
         </thead>
         <tbody>
-          {players.map((player, index) => (
+          {players
+          .sort((a, b) => {
+            if (gameStatus.status == "lobby") {
+              return b.betAmount - a.betAmount;
+            } else {
+              if (a.cashOutMultiplier && b.cashOutMultiplier) {
+                return b.cashOutMultiplier - a.cashOutMultiplier;
+              } else if (a.cashOutMultiplier) {
+                return 1;
+              } else if (b.cashOutMultiplier) {
+                return -1;
+              } else {
+                return b.betAmount - a.betAmount;
+              }
+            }
+          })
+          .map((player, index) => (
             <tr key={index} className="text-white text-sm font-mono">
               {gameStatus.status == "lobby" ? ( // IF the game has ended
                 player.cashOutMultiplier ? (
@@ -121,38 +140,36 @@ export default function PlayerList() {
               )}
               {gameStatus.status == "lobby" ? (
                 player.cashOutMultiplier ? (
-                  <td className={cn("w-[50px] text-center text-green-500")}>
-                    {player.cashOutMultiplier.toFixed(2)}x
+                  <td className={cn("w-[100px] text-center text-green-500")}>
+                    {player.cashOutMultiplier.toFixed(2)}
                   </td>
                 ) : (
-                  <td className="w-[50px] text-center text-red-500">0.00x</td>
+                  <td className="w-[100px] text-center text-red-500">0.00</td>
                 )
               ) : player.cashOutMultiplier ? (
-                <td className={cn("w-[50px] text-center text-green-500")}>
-                  {player.cashOutMultiplier.toFixed(2)}x
+                <td className={cn("w-[100px] text-center text-green-500")}>
+                  {player.cashOutMultiplier.toFixed(2)}
                 </td>
               ) : (
-                <td className="w-[50px] text-center">--</td>
+                <td className="w-[100px] text-center">--</td>
               )}
               {gameStatus.status == "lobby" ? ( // IF the game has ended
                 player.cashOutMultiplier ? (
-                  <td className="w-[150px] text-right pr-4 font-mono text-green-500">
-                    +{(player.betAmount * player.cashOutMultiplier).toFixed(2)}{" "}
-                    {player.coinType}
+                  <td className="w-[100px] text-right pr-4 font-mono text-green-500">
+                    +{(player.betAmount * player.cashOutMultiplier).toFixed(2)}
                   </td>
                 ) : (
-                  <td className="w-[150px] text-right pr-4 font-mono text-red-500">
-                    -{player.betAmount.toFixed(2)} {player.coinType}
+                  <td className="w-[100px] text-right pr-4 font-mono text-red-500">
+                    -{player.betAmount.toFixed(2)}
                   </td>
                 )
               ) : player.cashOutMultiplier ? (
-                <td className="w-[150px] text-right pr-4 font-mono text-green-500">
-                  +{(player.betAmount * player.cashOutMultiplier).toFixed(2)}{" "}
-                  {player.coinType}
+                <td className="w-[100px] text-right pr-4 font-mono text-green-500">
+                  +{(player.betAmount * player.cashOutMultiplier).toFixed(2)}
                 </td>
               ) : (
-                <td className="w-[150px] text-right pr-4 font-mono">
-                  -{player.betAmount.toFixed(2)} {player.coinType}
+                <td className="w-[100px] text-right pr-4 font-mono">
+                  -{player.betAmount.toFixed(2)}
                 </td>
               )}
             </tr>
