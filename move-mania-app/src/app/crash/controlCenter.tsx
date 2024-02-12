@@ -160,7 +160,6 @@ export default function ControlCenter() {
         <span className="cursor-pointer">Manual</span>
         <span className="cursor-pointer opacity-50">Automatic</span>
         <button onClick={onStartRound}>Admin: start game</button>
-        <span>balance: {playerBalance} APT</span>
       </div>
       <div className="w-full max-w-[600px] flex flex-row items-END justify-center px-2 gap-4">
         <div className="flex flex-col gap-1">
