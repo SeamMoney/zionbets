@@ -120,7 +120,7 @@ export default function PlayerList() {
             }
           })
           .map((player, index) => (
-            <tr key={index} className="text-white text-sm font-mono">
+            <tr key={index} className="text-white text-sm font-mono h-4">
               {gameStatus.status == "lobby" ? ( // IF the game has ended
                 player.cashOutMultiplier ? (
                   <td className="w-[200px] text-left ps-4 text-green-500">
