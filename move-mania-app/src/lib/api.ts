@@ -187,3 +187,37 @@ export async function getUserBalance(email: string) {
     return 0
   }
 }
+
+export async function hasUserBet(email: string) {
+  try {
+    const response = await fetch(
+      `${API_URL}/playerlist/${email}/hasbet`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+    return response.json()
+  } catch (e) {
+    return false
+  }
+}
+
+export async function hasUserCashOut(email: string) {
+  try {
+    const response = await fetch(
+      `${API_URL}/playerlist/${email}/hascashout`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+    return response.json()
+  } catch (e) {
+    return false
+  }
+}

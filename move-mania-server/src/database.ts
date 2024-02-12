@@ -213,6 +213,38 @@ export async function getGames() {
   return games;
 }
 
+export async function hasUserBet(email: string) {
+  await initializeAllTables(); // initialize tables if not yet initialized
+
+  // Open the database
+  const db = await open({
+    filename: './games.db',
+    driver: require('sqlite3').Database
+  })
+
+  const result = await db.get('SELECT * FROM player_list WHERE user_id = ?', email);
+
+  await db.close();
+
+  return result !== undefined;
+}
+
+export async function hasUserCashOut(email: string) {
+  await initializeAllTables(); // initialize tables if not yet initialized
+
+  // Open the database
+  const db = await open({
+    filename: './games.db',
+    driver: require('sqlite3').Database
+  })
+
+  const result = await db.get('SELECT * FROM player_list WHERE user_id = ? AND crash_point IS NOT NULL', email);
+
+  await db.close();
+
+  return result !== undefined;
+}
+
 /**
  * @description This function creates a game in the database.
  * It is to be used on the server side to create a game.

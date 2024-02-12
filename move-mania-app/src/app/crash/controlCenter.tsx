@@ -1,6 +1,6 @@
 'use client';
 
-import { getCurrentGame, getUserBalance, setUpAndGetUser } from "@/lib/api";
+import { getCurrentGame, getUserBalance, hasUserBet, hasUserCashOut, setUpAndGetUser } from "@/lib/api";
 import { User } from "@/lib/schema";
 import { cashOutBet, setNewBet, startRound } from "@/lib/server";
 import { RoundStart, SOCKET_EVENTS } from "@/lib/types";
@@ -30,6 +30,8 @@ export default function ControlCenter() {
   const [betAmount, setBetAmount] = useState('');
 
   const [playerBalance, setPlayerBalance] = useState(0);
+  const [hasBet, setHasBet] = useState(false);
+  const [hasCashOut, setHasCashOut] = useState(false);
 
   useEffect(() => {
     getSession().then(session => {
@@ -52,6 +54,17 @@ export default function ControlCenter() {
 
   useEffect(() => {
     if (update && account) {
+
+      hasUserBet(account?.email || '').then((bet) => {
+        console.log('hasUserBet', bet)
+        setHasBet(bet);
+      });
+
+      hasUserCashOut(account?.email || '').then((cashout) => {
+        console.log('hasUserCashOut', cashout)
+        setHasCashOut(cashout);
+      });
+
       getCurrentGame().then((game) => {
         console.log('getCurrentGame', game);
         if (game == null) {
@@ -117,6 +130,7 @@ export default function ControlCenter() {
   }
 
   const onSetBet = () => {
+    setUpdate(true);
 
     if (!socket) return;
 
@@ -133,6 +147,7 @@ export default function ControlCenter() {
   }
 
   const onCashOut = () => {
+    setUpdate(true);
 
     if (!socket) return;
 
@@ -204,16 +219,26 @@ export default function ControlCenter() {
         </div>
         {
           ((gameStatus.startTime && gameStatus.startTime > Date.now()) || gameStatus.status === 'END') && (
-            <button className={
-              `bg-green-500 text-neutral-950 px-8 py-1 ${parseInt(betAmount) > 0 ? '' : 'opacity-50 cursor-not-allowed'}` 
-            } onClick={onSetBet} disabled={!(parseInt(betAmount) > 0)}>
+            <button 
+              className={
+              `bg-green-500 text-neutral-950 px-8 py-1 ${(!(parseInt(betAmount) > 0) || hasBet) ? 'opacity-50 cursor-not-allowed' : ''}` 
+              } 
+              onClick={onSetBet} 
+              disabled={(!(parseInt(betAmount) > 0) || hasBet)}
+            >
               Bet
             </button>
           )
         }
         {
           gameStatus.status === 'IN_PROGRESS' && (gameStatus.startTime && gameStatus.startTime <= Date.now()) && (
-            <button className="bg-green-500 text-neutral-950 px-8 py-1" onClick={onCashOut}>
+            <button 
+              className={
+                `bg-green-500 text-neutral-950 px-8 py-1 ${(hasCashOut == true || hasBet == false) ? 'opacity-50 cursor-not-allowed' : ''}`
+              }
+              onClick={onCashOut} 
+              disabled={(hasCashOut == true || hasBet == false)}
+            >
               Cash out
             </button>
           )

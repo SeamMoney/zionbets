@@ -1,6 +1,6 @@
 
 import express from 'express'
-import { addChatMessage, clearGames, clearPlayerList, createUser, deleteUser, getChatMessages, getCurrentGame, getGames, getPlayerList, getUser, getUserBalance, getUsers, updateUser } from './database';
+import { addChatMessage, clearGames, clearPlayerList, createUser, deleteUser, getChatMessages, getCurrentGame, getGames, getPlayerList, getUser, getUserBalance, getUsers, hasUserBet, hasUserCashOut, updateUser } from './database';
 var cors = require('cors')
 const app = express()
 app.use(express.json())
@@ -76,6 +76,17 @@ app.delete('/playerlist', async (req, res) => {
   res.send('Player list cleared');
 });
 
+app.get('/playerlist/:email/hasbet', async (req, res) => {
+  const email = req.params.email;
+  const hasBet = await hasUserBet(email);
+  res.send(hasBet);
+});
+
+app.get('/playerlist/:email/hascashout', async (req, res) => {
+  const email = req.params.email;
+  const hasCashOut = await hasUserCashOut(email);
+  res.send(hasCashOut);
+});
 
 app.post('/users', async (req, res) => {
   const user = req.body
