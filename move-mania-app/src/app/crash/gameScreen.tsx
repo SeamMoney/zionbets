@@ -57,6 +57,12 @@ export default function GameScreen() {
             startTime: game.start_time,
             crashPoint: game.secret_crash_point
           })
+
+          if (game.start_time > Date.now()) {
+            setTimeout(() => {
+              setUpdate(true);
+            }, game.start_time - Date.now());
+          }
         }
       });
       setUpdate(false);

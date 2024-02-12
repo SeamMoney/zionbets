@@ -64,7 +64,13 @@ export default function ControlCenter() {
             roundId: game.game_id,
             startTime: game.start_time,
             crashPoint: game.secret_crash_point
-          })
+          });
+
+          if (game.start_time > Date.now()) {
+            setTimeout(() => {
+              setUpdate(true);
+            }, game.start_time - Date.now());
+          }
         }
       });
 
@@ -88,31 +94,15 @@ export default function ControlCenter() {
 
     newSocket.on(SOCKET_EVENTS.ROUND_START, (data: RoundStart) => {
       console.log('SOCKET_EVENTS.ROUND_START', data);
-      // setGameStatus({
-      //   status: 'countdown',
-      //   roundId: data.roundId,
-      //   startTime: data.startTime,
-      //   crashPoint: data.crashPoint
-      // });
       setUpdate(true);
 
       setTimeout(() => {
-        // setGameStatus({
-        //   status: 'IN_PROGRESS',
-        //   roundId: data.roundId,
-        //   startTime: data.startTime,
-        //   crashPoint: data.crashPoint
-        // });
         setUpdate(true);
       }, data.startTime - Date.now());
     });
 
     newSocket.on(SOCKET_EVENTS.ROUND_RESULT, (data: RoundStart) => {
       console.log('SOCKET_EVENTS.ROUND_RESULT', data);
-      // setGameStatus({
-      //   status: 'end',
-      //   crashPoint: data.crashPoint
-      // });
       setUpdate(true);
     });
 
