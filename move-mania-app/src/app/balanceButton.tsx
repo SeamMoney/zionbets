@@ -20,8 +20,12 @@ import { User } from "@/lib/schema";
 import { Clipboard, EyeIcon, EyeOffIcon } from "lucide-react";
 import { getSession, signIn, signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
+import { useToast } from "@/components/ui/use-toast"
+import Link from "next/link";
+
 
 export default function BalanceButton() {
+  const { toast } = useToast()
   const [account, setAccount] = useState<User | null>(null);
 
   useEffect(() => {
@@ -44,6 +48,10 @@ export default function BalanceButton() {
 
   const onWithdraw = async () => {
     // withdraw funds
+    toast({
+      title: "Funds withdrawn",
+      description: <Link href='https://explorer.aptoslabs.com/?network=mainnet' target="_blank" className="underline">View transaction</Link>
+    })
   }
 
 
@@ -77,6 +85,9 @@ export default function BalanceButton() {
               <Clipboard className="w-4 h-4 cursor-pointer opacity-80 hover:opacity-100" onClick={() => {
                 // copy public address to clipboard
                 navigator.clipboard.writeText(account.public_address);
+                toast({
+                  title: "Address copied to clipboard",
+                });
               }} />
             </span>
           </div>
