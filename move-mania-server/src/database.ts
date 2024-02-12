@@ -3,6 +3,8 @@ import { AllSchemas, ChatMessageSchema, Game, GameSchema, PlayerListEntry, Playe
 import crypto from 'crypto';
 import { BetData, CashOutData, ChatMessage } from "./types";
 
+const STARTING_BALANCE = 100;
+
 export async function initializeGameTable() {
   const db = await open({
     filename: './db/games.db',
@@ -96,12 +98,13 @@ export async function createUser(user: User) {
   })
 
   await db.run(
-    'INSERT INTO users (username, image, email, public_address, private_key) VALUES (?, ?, ?, ?, ?)', 
+    'INSERT INTO users (username, image, email, public_address, private_key, balance) VALUES (?, ?, ?, ?, ?, ?)', 
     user.username, 
     user.image, 
     user.email, 
     user.public_address, 
-    user.private_key
+    user.private_key,
+    STARTING_BALANCE
   );
 
   await db.close();
@@ -369,6 +372,39 @@ export async function addCashOutToPlayerList(cashOut: CashOutData) {
     cashOut.cashOutMultiplier,
     cashOut.playerEmail
   );
+
+  await db.close();
+}
+
+export async function payOutPlayers() {
+  await initializeAllTables(); // initialize tables if not yet initialized
+
+  // Open the database
+  const db = await open({
+    filename: './games.db',
+    driver: require('sqlite3').Database
+  })
+
+  const players = await db.all('SELECT * FROM player_list');
+
+  console.log('players', players)
+
+  for (const player of players) {
+    const user = await db.get('SELECT * FROM users WHERE email = ?', player.user_id);
+
+    if (user !== undefined) {
+      let newBalance = user.balance - player.bet_amount;
+
+      if (player.crash_point != null && player.crash_point > 0) {
+        newBalance += player.bet_amount * player.crash_point;
+      }
+
+
+      console.log('newBalance for', player.user_id, newBalance)
+
+      await db.run('UPDATE users SET balance = ? WHERE email = ?', newBalance, player.user_id);
+    }
+  }
 
   await db.close();
 }

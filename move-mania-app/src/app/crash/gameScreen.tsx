@@ -28,31 +28,15 @@ export default function GameScreen() {
 
     newSocket.on(SOCKET_EVENTS.ROUND_START, (data: RoundStart) => {
       console.log('SOCKET_EVENTS.ROUND_START', data);
-      // setGameStatus({
-      //   status: 'countdown',
-      //   roundId: data.roundId,
-      //   startTime: data.startTime,
-      //   crashPoint: data.crashPoint
-      // });
       setUpdate(true);
 
       setTimeout(() => {
-        // setGameStatus({
-        //   status: 'IN_PROGRESS',
-        //   roundId: data.roundId,
-        //   startTime: data.startTime,
-        //   crashPoint: data.crashPoint
-        // });
         setUpdate(true);
       }, data.startTime - Date.now());
     });
 
     newSocket.on(SOCKET_EVENTS.ROUND_RESULT, (data: RoundStart) => {
       console.log('SOCKET_EVENTS.ROUND_RESULT', data);
-      // setGameStatus({
-      //   status: 'end',
-      //   crashPoint: data.crashPoint
-      // });
       setUpdate(true);
     });
 
@@ -78,12 +62,6 @@ export default function GameScreen() {
       setUpdate(false);
     }
   }, [update])
-
-  // return (
-  //   <div className="w-full h-full border-l border-b border-green-500">
-  //     {gameStatus.status}
-  //   </div>
-  // )
 
   if (gameStatus.status === 'lobby') {
     return (

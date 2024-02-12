@@ -56,7 +56,8 @@ app.get('/users/:email', async (req, res) => {
 
 app.get('/users/balance/:email', async (req, res) => {
   const email = req.params.email;
-  const balance = getUserBalance(email);
+  const balance = await getUserBalance(email);
+  console.log('balance', balance);
   res.send(balance);
 });
 
