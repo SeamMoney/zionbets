@@ -62,6 +62,7 @@ export default function AccountButton() {
       image: newImage || "",
       public_address: account?.public_address || "",
       private_key: account?.private_key || "",
+      balance: account?.balance || 0,
     };
 
     await updateUser(account?.email || "", user);
@@ -74,7 +75,7 @@ export default function AccountButton() {
       <Sheet>
         {account ? (
           <SheetTrigger asChild>
-            <button className="bg-white px-6 py-1 font-mono text-neutral-950">
+            <button className="bg-white px-6 py-2 font-mono font-bold text-neutral-950 hover:bg-neutral-300">
               {account.username}
             </button>
           </SheetTrigger>
@@ -204,7 +205,7 @@ export default function AccountButton() {
                 <SheetClose asChild>
                   <button
                     type="submit"
-                    className="border border-green-500 px-6 py-1 text-green-500"
+                    className="bg-green-500 px-6 py-1 text-neutral-950 hover:bg-green-600"
                     onClick={onSubmit}
                   >
                     Save changes

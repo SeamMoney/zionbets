@@ -4,6 +4,7 @@ export type User = {
   email: string;
   public_address: string;
   private_key: string;
+  balance: number;
 };
 
 export const UserSchema = `CREATE TABLE IF NOT EXISTS users (

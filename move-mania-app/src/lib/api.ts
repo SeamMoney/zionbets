@@ -20,7 +20,7 @@ export async function doesUserExist(username: string) {
 }
 
 export async function setUpUser(
-  userToSetup: Omit<User, "public_address" | "private_key">
+  userToSetup: Omit<User, "public_address" | "private_key" | "balance">
 ) {
   const keyPair = await createAptosKeyPair();
 
@@ -56,7 +56,7 @@ export async function getUser(email: string): Promise<User | null> {
 }
 
 export async function setUpAndGetUser(
-  userToSetup: Omit<User, "public_address" | "private_key">
+  userToSetup: Omit<User, "public_address" | "private_key" | "balance">
 ): Promise<User | null> {
   const userExists = await doesUserExist(userToSetup.email);
   if (!userExists) {
