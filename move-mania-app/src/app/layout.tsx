@@ -23,11 +23,11 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className + " text-white"}>
         
-          <div className="flex h-screen overflow-hidden bg-neutral-950">
-            <nav className="fixed w-full h-20 z-30 px-4 border-b border-neutral-700 bg-neutral-950">
+          <div className="flex h-screen overflow-hidden">
+            <nav className="fixed w-full h-20 z-30 px-4 border-b border-neutral-700 bg-[#020202] bg-noise">
               <div className="flex flex-row items-center justify-between w-full h-full">
                 <div className="flex flex-row gap-4 items-center ">
-                  <Link href='/' className="text-white text-2xl font-bold">Move Mania</Link>
+                  <Link href='/' className="text-white text-2xl font-bold font-TheNeue">MOVE MANIA</Link>
                   <div className="flex flex-row items-center justify-start gap-2">
                     <Link href='/crash' className="text-xl">
                       Crash
