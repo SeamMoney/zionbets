@@ -18,6 +18,10 @@ const config = {
       },
     },
     extend: {
+      backgroundImage: {
+        noise: 'url("/bg.png")',
+        fade: "linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.67) 30%, rgba(0, 0, 0, 0.82) 67%, black 100%)",
+      },
       keyframes: {
         "accordion-down": {
           from: { height: "0" },

@@ -74,7 +74,7 @@ export default function ChatWindow() {
   };
 
   return (
-    <div className="bg-neutral-950 border-b border-x border-neutral-700 h-full w-full flex flex-col items-center py-1 px-2 gap-2">
+    <div className="bg-[#020202] border-b border-x border-neutral-700 h-full w-full flex flex-col items-center py-1 px-2 gap-2 bg-noise">
       <div className="grow flex flex-col items-start justify-end w-full gap-1 overflow-hidden">
         {chatMessages.map((message, index) => (
           <ChatBubble key={index} message={message} />
@@ -82,19 +82,21 @@ export default function ChatWindow() {
       </div>
       {account ? (
         <div className="w-full min-h-[30px] flex flex-row gap-1">
-          <input
-            className="bg-neutral-800 grow text-white outline-none ps-2"
-            type="text"
-            placeholder="Type a message..."
-            onKeyPress={(e) => {
-              if (e.key === "Enter") {
-                const input = e.target as HTMLInputElement;
-                onSendMessage(input.value);
-                input.value = "";
-              }
-            }}
-          />
-          <button className="border border-green-400 text-white w-[50px]">
+          <div className="grow bg-noise">
+            <input
+              className="bg-neutral-800/40 border border-neutral-800 w-full h-full text-white outline-none ps-2"
+              type="text"
+              placeholder="Type a message..."
+              onKeyPress={(e) => {
+                if (e.key === "Enter") {
+                  const input = e.target as HTMLInputElement;
+                  onSendMessage(input.value);
+                  input.value = "";
+                }
+              }}
+            />
+          </div>
+          <button className="bg-green-500 text-neutral-950 px-4 py-1 hover:bg-green-600">
             Send
           </button>
         </div>
@@ -109,9 +111,11 @@ export default function ChatWindow() {
 
 function ChatBubble({ message }: { message: ChatMessage }) {
   return (
-    <div className="bg-neutral-800 w-full px-2 py-1">
-      <strong className="text-green-400">{message.authorUsername}:</strong>{" "}
-      <span className="text-white">{message.message}</span>
+    <div className="w-full bg-noise">
+      <div className="bg-neutral-800/60 border border-neutral-800 w-full px-2 py-1">
+        <strong className="text-green-400">{message.authorUsername}:</strong>{" "}
+        <span className="text-white">{message.message}</span>
+      </div>
     </div>
   );
 }
