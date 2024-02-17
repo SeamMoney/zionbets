@@ -129,7 +129,7 @@ export default function ControlCenter() {
     const data = {
       roundId: 1,
       playerEmail: account.email || "",
-      betAmount: parseInt(betAmount),
+      betAmount: parseFloat(betAmount),
       coinType: "APT",
     };
     const success = setNewBet(socket, data);
@@ -161,9 +161,9 @@ export default function ControlCenter() {
         <span className="cursor-pointer opacity-50">Automatic</span>
         <button onClick={onStartRound}>Admin: start game</button>
       </div>
-      <div className="w-full max-w-[600px] flex flex-row items-END justify-center px-2 gap-4">
+      <div className="w-full max-w-[600px] flex flex-row items-end justify-around px-2 gap-4">
         <div className="flex flex-col gap-1">
-          <div className="border border-neutral-700 flex flex-row justify-between px-4 py-2">
+          <div className="flex flex-row justify-between px-4 py-2 border border-neutral-700 bg-neutral-800/20 bg-noise">
             <span className="font-mono font-light">BET</span>
             <span className="font-mono opacity-50 flex flex-row justify-center items-center gap-1">
               <input
@@ -173,7 +173,7 @@ export default function ControlCenter() {
                   setBetAmount(e.target.value);
                 }}
                 placeholder="2.50"
-                disabled={gameStatus.status == "IN_PROGRESS"}
+                disabled={!(gameStatus.startTime !== undefined && gameStatus.startTime > Date.now())}
               ></input>
               <span>APT</span>
             </span>
@@ -181,8 +181,8 @@ export default function ControlCenter() {
           <div className="flex flex-row items-center text-xs">
             <div
               className={`border px-2 py-1 cursor-pointer ${
-                parseInt(betAmount) === 1
-                  ? "border-green-500 text-green-500"
+                parseFloat(betAmount) === 1
+                  ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
                   : "opacity-50 border-neutral-700"
               }`}
               onClick={() => setBetAmount("1")}
@@ -191,8 +191,8 @@ export default function ControlCenter() {
             </div>
             <div
               className={`border px-2 py-1 cursor-pointer ${
-                parseInt(betAmount) === 5
-                  ? "border-green-500 text-green-500"
+                parseFloat(betAmount) === 5
+                  ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
                   : "opacity-50 border-neutral-700"
               }`}
               onClick={() => setBetAmount("5")}
@@ -201,8 +201,8 @@ export default function ControlCenter() {
             </div>
             <div
               className={`border px-2 py-1 cursor-pointer ${
-                parseInt(betAmount) === 10
-                  ? "border-green-500 text-green-500"
+                parseFloat(betAmount) === 10
+                  ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
                   : "opacity-50 border-neutral-700"
               }`}
               onClick={() => setBetAmount("10")}
@@ -211,8 +211,8 @@ export default function ControlCenter() {
             </div>
             <div
               className={`border px-2 py-1 cursor-pointer ${
-                parseInt(betAmount) === 25
-                  ? "border-green-500 text-green-500"
+                parseFloat(betAmount) === 25
+                  ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
                   : "opacity-50 border-neutral-700"
               }`}
               onClick={() => setBetAmount("25")}
@@ -221,37 +221,43 @@ export default function ControlCenter() {
             </div>
           </div>
         </div>
-        {((gameStatus.startTime && gameStatus.startTime > Date.now()) ||
-          gameStatus.status === "END") && (
-          <button
-            className={cn(
-              "bg-green-500 text-neutral-950 px-8 py-1",
-              !(parseInt(betAmount) > 0) || hasBet
-                ? "opacity-50 cursor-not-allowed"
-                : "hover:opacity-80"
-            )}
-            onClick={onSetBet}
-            disabled={!(parseInt(betAmount) > 0) || hasBet}
-          >
-            Bet
-          </button>
-        )}
-        {gameStatus.status === "IN_PROGRESS" &&
-          gameStatus.startTime &&
-          gameStatus.startTime <= Date.now() && (
-            <button
-              className={cn(
-                "bg-green-500 text-neutral-950 px-8 py-1",
-                hasCashOut == true || hasBet == false
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:opacity-80"
-              )}
-              onClick={onCashOut}
-              disabled={hasCashOut == true || hasBet == false}
-            >
-              Cash out
-            </button>
-          )}
+        <div className="flex flex-row items-baseline gap-2">
+          {/* {((gameStatus.startTime && gameStatus.startTime > Date.now()) ||
+            gameStatus.status === "END") && ( */}
+            <div className="bg-noise">
+              <button
+                className={cn(
+                  "border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 ",
+                  !(parseFloat(betAmount) > 0) || hasBet
+                    ? "cursor-not-allowed"
+                    : "hover:bg-[#264234]/40 hover:cursor-pointer",
+                  hasBet && "bg-[#264234]/40"
+                )}
+                onClick={onSetBet}
+                disabled={!(parseFloat(betAmount) > 0) || hasBet}
+              >
+                Bet
+              </button>
+            </div>
+          {/* )} */}
+          {/* {gameStatus.status === "IN_PROGRESS" &&
+            gameStatus.startTime &&
+            gameStatus.startTime <= Date.now() && ( */}
+              <button
+                className={cn(
+                  "border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 ",
+                  !(parseFloat(betAmount) > 0) || hasCashOut
+                    ? "cursor-not-allowed"
+                    : "hover:bg-[#264234]/40 hover:cursor-pointer",
+                    hasCashOut && "bg-[#264234]/40"
+                )}
+                onClick={onCashOut}
+                disabled={hasCashOut == true || hasBet == false}
+              >
+                Cash out
+              </button>
+            {/* )} */}
+          </div>
       </div>
     </div>
   );

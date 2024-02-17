@@ -84,7 +84,7 @@ export default function ChatWindow() {
         <div className="w-full min-h-[30px] flex flex-row gap-1">
           <div className="grow bg-noise">
             <input
-              className="bg-neutral-800/40 border border-neutral-800 w-full h-full text-white outline-none ps-2"
+              className="bg-neutral-950 hover:bg-neutral-800/40 border border-neutral-800 w-full h-full text-white outline-none ps-2"
               type="text"
               placeholder="Type a message..."
               onKeyPress={(e) => {
@@ -96,7 +96,7 @@ export default function ChatWindow() {
               }}
             />
           </div>
-          <button className="bg-green-500 text-neutral-950 px-4 py-1 hover:bg-green-600">
+          <button className="border border-green-700 hover:bg-[#264234]/40 px-6 py-1 text-green-500">
             Send
           </button>
         </div>

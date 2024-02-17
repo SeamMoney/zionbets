@@ -60,13 +60,13 @@ export default function GameScreen() {
 
   if (gameStatus.status === "lobby") {
     return (
-      <div>
+      <div className="border-b border-l border-green-500 h-full w-full bg-neutral-950">
         <span>Lobby</span>
       </div>
     );
   } else if (gameStatus.startTime && gameStatus.startTime > Date.now()) {
     return (
-      <div>
+      <div className="border-b border-l border-green-500 h-full w-full bg-neutral-950">
         <CountUp
           start={(gameStatus.startTime! - Date.now()) / 1000}
           end={0}
@@ -82,7 +82,7 @@ export default function GameScreen() {
     );
   } else if (gameStatus.status === "IN_PROGRESS") {
     return (
-      <div>
+      <div className="border-b border-l border-green-500 h-full w-full bg-neutral-950">
         <CountUp
           start={0}
           end={gameStatus.crashPoint!}
@@ -98,7 +98,7 @@ export default function GameScreen() {
     );
   } else if (gameStatus.status === "END") {
     return (
-      <div>
+      <div className="border-b border-l border-green-500 h-full w-full bg-neutral-950">
         <div>
           <CountUp
             start={gameStatus.crashPoint!}
