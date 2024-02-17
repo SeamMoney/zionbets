@@ -63,12 +63,12 @@ export default function BalanceButton() {
           {account.balance.toFixed(2)} APT
         </button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="bg-neutral-950">
           <DialogTitle>Deposit Funds</DialogTitle>
           <DialogDescription>
             Send APT to the public address below to deposit funds into your account.
           </DialogDescription>
-          <div className="border border-neutral-700 flex flex-row justify-between px-4 py-2">
+          <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
             <label
               htmlFor="public_address"
               className="text-left font-mono"
@@ -96,7 +96,7 @@ export default function BalanceButton() {
             Withdraw APT from your account to the address specified below.
           </DialogDescription>
           <div className="flex flex-col w-full items-end w-full gap-2">
-            <div className="border border-neutral-700 flex flex-row justify-between px-4 py-2 w-full">
+            <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2 w-full">
               <label
                 htmlFor="public_address"
                 className="text-left font-mono"
@@ -111,7 +111,7 @@ export default function BalanceButton() {
                 />
               </span>
             </div>
-            <button onClick={onWithdraw} className="bg-green-500 text-neutral-950 px-6 py-2 hover:bg-green-600">
+            <button onClick={onWithdraw} className="border border-green-700 hover:bg-[#264234]/40 hover:bg-noise px-6 py-1 text-green-500">
               Withdraw
             </button>
           </div>
