@@ -102,7 +102,7 @@ export default function AccountButton() {
                 </SheetDescription>
               </SheetHeader>
               <div className="grid gap-4 py-4">
-                <div className="border border-neutral-700 flex flex-row justify-between px-4 py-2">
+                <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
                   <label htmlFor="username" className="text-left font-mono">
                     Username
                   </label>
@@ -118,7 +118,7 @@ export default function AccountButton() {
                     />
                   </span>
                 </div>
-                <div className="border border-neutral-700 flex flex-row justify-between px-4 py-2">
+                <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
                   <label htmlFor="profile_pic" className="text-left font-mono">
                     Profile picture
                   </label>
@@ -134,7 +134,7 @@ export default function AccountButton() {
                     />
                   </span>
                 </div>
-                <div className="border border-neutral-700 flex flex-row justify-between px-4 py-2">
+                <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
                   <label htmlFor="email" className="text-left font-mono">
                     Email
                   </label>
@@ -147,7 +147,7 @@ export default function AccountButton() {
                     />
                   </span>
                 </div>
-                <div className="border border-neutral-700 flex flex-row justify-between px-4 py-2">
+                <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
                   <label
                     htmlFor="public_address"
                     className="text-left font-mono"
@@ -163,7 +163,7 @@ export default function AccountButton() {
                     />
                   </span>
                 </div>
-                <div className="border border-neutral-700 flex flex-row justify-between px-4 py-2">
+                <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
                   <label
                     htmlFor="private_key"
                     className="font-mono font-light w-[100px]"
@@ -196,7 +196,7 @@ export default function AccountButton() {
                 <SheetClose asChild>
                   <button
                     type="submit"
-                    className="border border-neutral-700 px-6 py-1 text-neutral-500"
+                    className="border border-neutral-700 hover:bg-neutral-800/80 hover:bg-noise px-6 py-1 text-neutral-500"
                     onClick={() => signOut()}
                   >
                     Sign out
@@ -205,7 +205,7 @@ export default function AccountButton() {
                 <SheetClose asChild>
                   <button
                     type="submit"
-                    className="bg-green-500 px-6 py-1 text-neutral-950 hover:bg-green-600"
+                    className="border border-green-700 hover:bg-[#264234]/40 hover:bg-noise px-6 py-1 text-green-500"
                     onClick={onSubmit}
                   >
                     Save changes
