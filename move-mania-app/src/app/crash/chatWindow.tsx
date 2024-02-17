@@ -5,7 +5,7 @@ import { User } from "@/lib/schema";
 import { sendMessage } from "@/lib/server";
 import { ChatMessage, SOCKET_EVENTS } from "@/lib/types";
 import { getSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Socket, io } from "socket.io-client";
 
 export default function ChatWindow() {
@@ -14,6 +14,8 @@ export default function ChatWindow() {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
 
   const [account, setAccount] = useState<User | null>(null);
+
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     getSession().then((session) => {
@@ -84,19 +86,30 @@ export default function ChatWindow() {
         <div className="w-full min-h-[30px] flex flex-row gap-1">
           <div className="grow bg-noise">
             <input
+              ref={inputRef}
               className="bg-neutral-950 hover:bg-neutral-800/40 border border-neutral-800 w-full h-full text-white outline-none ps-2"
               type="text"
               placeholder="Type a message..."
               onKeyPress={(e) => {
                 if (e.key === "Enter") {
                   const input = e.target as HTMLInputElement;
-                  onSendMessage(input.value);
-                  input.value = "";
+                  if (input && input.value !== "") {
+                    onSendMessage(input.value);
+                    input.value = "";
+                  }
                 }
               }}
             />
           </div>
-          <button className="border border-green-700 hover:bg-[#264234]/40 px-6 py-1 text-green-500">
+          <button 
+            onClick={() => {
+              if (inputRef.current && inputRef.current.value !== "") {
+                onSendMessage(inputRef.current.value);
+                inputRef.current.value = "";
+              }
+            }}
+            className="border border-green-700 hover:bg-[#264234]/40 px-6 py-1 text-green-500"
+          >
             Send
           </button>
         </div>
