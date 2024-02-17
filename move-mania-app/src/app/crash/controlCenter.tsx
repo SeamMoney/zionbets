@@ -222,8 +222,8 @@ export default function ControlCenter() {
           </div>
         </div>
         <div className="flex flex-row items-baseline gap-2">
-          {/* {((gameStatus.startTime && gameStatus.startTime > Date.now()) ||
-            gameStatus.status === "END") && ( */}
+          {((gameStatus.startTime && gameStatus.startTime > Date.now()) ||
+            gameStatus.status === "END") && (
             <div className="bg-noise">
               <button
                 className={cn(
@@ -239,10 +239,10 @@ export default function ControlCenter() {
                 Bet
               </button>
             </div>
-          {/* )} */}
-          {/* {gameStatus.status === "IN_PROGRESS" &&
+          )}
+          {gameStatus.status === "IN_PROGRESS" &&
             gameStatus.startTime &&
-            gameStatus.startTime <= Date.now() && ( */}
+            gameStatus.startTime <= Date.now() && (
               <button
                 className={cn(
                   "border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 ",
@@ -256,7 +256,7 @@ export default function ControlCenter() {
               >
                 Cash out
               </button>
-            {/* )} */}
+            )}
           </div>
       </div>
     </div>
