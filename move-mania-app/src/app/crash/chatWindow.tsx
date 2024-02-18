@@ -125,7 +125,7 @@ export default function ChatWindow() {
 function ChatBubble({ message }: { message: ChatMessage }) {
   return (
     <div className="w-full bg-noise">
-      <div className="bg-neutral-800/60 border border-neutral-800 w-full px-2 py-1">
+      <div className="bg-neutral-800/40 border border-neutral-800 w-full px-2 py-1">
         <strong className="text-green-400">{message.authorUsername}:</strong>{" "}
         <span className="text-white">{message.message}</span>
       </div>
