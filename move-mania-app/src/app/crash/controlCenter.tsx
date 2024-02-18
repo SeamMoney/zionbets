@@ -117,12 +117,6 @@ export default function ControlCenter() {
     // });
   }, []);
 
-  const onStartRound = () => {
-    if (!socket) return;
-
-    const success = startRound(socket);
-  };
-
   const onSetBet = () => {
     setUpdate(true);
 
@@ -160,11 +154,6 @@ export default function ControlCenter() {
 
   return (
     <div className="w-full h-full flex flex-col items-start justify-start gap-1">
-      <div className="w-full flex flex-row gap-4 items-center justify-start">
-        <span className="cursor-pointer">Manual</span>
-        <span className="cursor-pointer opacity-50">Automatic</span>
-        <button onClick={onStartRound}>Admin: start game</button>
-      </div>
       <div className=" flex flex-col items-start justify-around px-2 gap-2">
         <div className="flex flex-col gap-1">
           <div className="flex flex-row justify-between px-4 py-2 border border-neutral-700 bg-neutral-800/20 bg-noise">

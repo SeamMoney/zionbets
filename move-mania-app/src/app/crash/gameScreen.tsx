@@ -3,16 +3,19 @@
 import { useEffect, useState } from "react";
 import { GameStatus } from "./controlCenter";
 import { SOCKET_EVENTS, RoundStart } from "@/lib/types";
-import { io } from "socket.io-client";
+import { Socket, io } from "socket.io-client";
 import CountUp from "react-countup";
 import { getCurrentGame } from "@/lib/api";
+import { startRound } from "@/lib/server";
 
 export default function GameScreen() {
+  const [socket, setSocket] = useState<Socket | null>(null);
   const [gameStatus, setGameStatus] = useState<GameStatus | null>(null);
   const [update, setUpdate] = useState(true);
 
   useEffect(() => {
     const newSocket = io("http://localhost:8080");
+    setSocket(newSocket);
 
     newSocket.on(SOCKET_EVENTS.ROUND_START, (data: RoundStart) => {
       setUpdate(true);
@@ -64,10 +67,16 @@ export default function GameScreen() {
     }
   }, [update]);
 
+  const onStartRound = () => {
+    if (!socket) return;
+
+    const success = startRound(socket);
+  };
+
   if (gameStatus === null) {
     return (
       <div className="border-b border-l border-green-500 h-full w-full bg-neutral-950">
-        <span>No games yet - admin start one</span>
+        <span onClick={onStartRound}>No games yet - click here to admin start one</span>
       </div>
     );
   } else if (gameStatus.status === "COUNTDOWN") {
