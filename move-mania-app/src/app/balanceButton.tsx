@@ -53,8 +53,7 @@ export default function BalanceButton() {
       description: <Link href='https://explorer.aptoslabs.com/?network=mainnet' target="_blank" className="underline">View transaction</Link>
     })
   }
-
-
+  
   if (account) {
     return (
       <Dialog>

@@ -1,7 +1,11 @@
-import { Socket } from "socket.io-client";
+'use client';
+
+import { Socket, io } from "socket.io-client";
 import { BetData, CashOutData, ChatMessage, SOCKET_EVENTS } from "./types";
 
-export function startRound(socket: Socket): boolean {
+export const socket = io("http://localhost:8080");
+
+export function startRound(): boolean {
   if (socket.disconnected || !socket.connected) {
     console.error("Socket is not connected");
     return false;
@@ -11,7 +15,7 @@ export function startRound(socket: Socket): boolean {
   return true;
 }
 
-export function setNewBet(socket: Socket, betData: BetData): boolean {
+export function setNewBet(betData: BetData): boolean {
   if (socket.disconnected || !socket.connected) {
     console.error("Socket is not connected");
     return false;
@@ -21,7 +25,7 @@ export function setNewBet(socket: Socket, betData: BetData): boolean {
   return true;
 }
 
-export function cashOutBet(socket: Socket, cashOutData: CashOutData): boolean {
+export function cashOutBet(cashOutData: CashOutData): boolean {
   if (socket.disconnected || !socket.connected) {
     console.error("Socket is not connected");
     return false;
@@ -31,7 +35,7 @@ export function cashOutBet(socket: Socket, cashOutData: CashOutData): boolean {
   return true;
 }
 
-export function sendMessage(socket: Socket, message: ChatMessage): boolean {
+export function sendMessage(message: ChatMessage): boolean {
   if (socket.disconnected || !socket.connected) {
     console.error("Socket is not connected");
     return false;
