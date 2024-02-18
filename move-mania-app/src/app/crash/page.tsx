@@ -12,7 +12,7 @@ export default function CrashPage() {
           <div className="h-full w-full p-4">
             <GameScreen />
           </div>
-          <div className="max-h-[100px] h-full w-full">
+          <div className="max-h-[150px] h-full w-full">
             <ControlCenter />
           </div>
         </div>

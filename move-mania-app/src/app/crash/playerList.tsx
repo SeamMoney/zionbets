@@ -15,107 +15,124 @@ export type PlayerState = {
 };
 
 export default function PlayerList() {
-  const [gameStatus, setGameStatus] = useState<GameStatus>({
-    status: "lobby",
-    roundId: undefined,
-    startTime: undefined,
-    crashPoint: undefined,
-  });
+  const [gameStatus, setGameStatus] = useState<GameStatus | null>(null);
   const [update, setUpdate] = useState(true);
-  const [updateList, setUpdateList] = useState(true);
+  // const [updateList, setUpdateList] = useState(true);
   const [players, setPlayers] = useState<PlayerState[]>([]);
 
-  useEffect(() => {
-    if (updateList) {
-      getPlayerList().then((players) => {
-        setPlayers(players);
-      });
-      // // set dummy data
-      // setPlayers([
-      //   {
-      //     username: "user1",
-      //     betAmount: 100,
-      //     coinType: "BTC",
-      //     cashOutMultiplier: 2.5,
-      //   },
-      //   {
-      //     username: "user2",
-      //     betAmount: 200,
-      //     coinType: "BTC",
-      //     cashOutMultiplier: 2.5,
-      //   },
-      //   {
-      //     username: "user3",
-      //     betAmount: 300,
-      //     coinType: "BTC",
-      //     cashOutMultiplier: 2.5,
-      //   },
-      //   {
-      //     username: "user4",
-      //     betAmount: 400,
-      //     coinType: "BTC",
-      //     cashOutMultiplier: 2.5,
-      //   },
-      //   {
-      //     username: "user5",
-      //     betAmount: 500,
-      //     coinType: "BTC",
-      //     cashOutMultiplier: 2.5,
-      //   },
-      //   {
-      //     username: "user6",
-      //     betAmount: 600,
-      //     coinType: "BTC",
-      //     cashOutMultiplier: 2.5,
-      //   },
-      //   {
-      //     username: "user7",
-      //     betAmount: 700,
-      //     coinType: "BTC",
-      //     cashOutMultiplier: null,
-      //   },
-      //   {
-      //     username: "user8",
-      //     betAmount: 800,
-      //     coinType: "BTC",
-      //     cashOutMultiplier: 2.5,
-      //   },
-      //   {
-      //     username: "user9",
-      //     betAmount: 900,
-      //     coinType: "BTC",
-      //     cashOutMultiplier: 2.5,
-      //   },
-      //   {
-      //     username: "user10",
-      //     betAmount: 1000,
-      //     coinType: "BTC",
-      //     cashOutMultiplier: null,
-      //   },
-      // ]);
-      setUpdateList(false);
-    }
-  }, [updateList]);
+  // useEffect(() => {
+  //   if (updateList) {
+  //     getPlayerList().then((players) => {
+  //       setPlayers(players);
+  //     });
+  //     // // set dummy data
+  //     // setPlayers([
+  //     //   {
+  //     //     username: "user1",
+  //     //     betAmount: 100,
+  //     //     coinType: "BTC",
+  //     //     cashOutMultiplier: 2.5,
+  //     //   },
+  //     //   {
+  //     //     username: "user2",
+  //     //     betAmount: 200,
+  //     //     coinType: "BTC",
+  //     //     cashOutMultiplier: 2.5,
+  //     //   },
+  //     //   {
+  //     //     username: "user3",
+  //     //     betAmount: 300,
+  //     //     coinType: "BTC",
+  //     //     cashOutMultiplier: 2.5,
+  //     //   },
+  //     //   {
+  //     //     username: "user4",
+  //     //     betAmount: 400,
+  //     //     coinType: "BTC",
+  //     //     cashOutMultiplier: 2.5,
+  //     //   },
+  //     //   {
+  //     //     username: "user5",
+  //     //     betAmount: 500,
+  //     //     coinType: "BTC",
+  //     //     cashOutMultiplier: 2.5,
+  //     //   },
+  //     //   {
+  //     //     username: "user6",
+  //     //     betAmount: 600,
+  //     //     coinType: "BTC",
+  //     //     cashOutMultiplier: 2.5,
+  //     //   },
+  //     //   {
+  //     //     username: "user7",
+  //     //     betAmount: 700,
+  //     //     coinType: "BTC",
+  //     //     cashOutMultiplier: null,
+  //     //   },
+  //     //   {
+  //     //     username: "user8",
+  //     //     betAmount: 800,
+  //     //     coinType: "BTC",
+  //     //     cashOutMultiplier: 2.5,
+  //     //   },
+  //     //   {
+  //     //     username: "user9",
+  //     //     betAmount: 900,
+  //     //     coinType: "BTC",
+  //     //     cashOutMultiplier: 2.5,
+  //     //   },
+  //     //   {
+  //     //     username: "user10",
+  //     //     betAmount: 1000,
+  //     //     coinType: "BTC",
+  //     //     cashOutMultiplier: null,
+  //     //   },
+  //     // ]);
+  //     setUpdateList(false);
+  //   }
+  // }, [updateList]);
 
   useEffect(() => {
     if (update) {
-      getCurrentGame().then((game) => {
-        if (game == null) {
-          setGameStatus({
-            status: "lobby",
-          });
-        } else {
-          setGameStatus({
-            status: game.status,
-            roundId: game.game_id,
-            startTime: game.start_time,
-            crashPoint: game.secret_crash_point,
-          });
+      getPlayerList().then((players) => {
+        setPlayers(players);
+      });
 
+      getCurrentGame().then((game) => {
+        console.log('got game', game)
+        if (game == null) {
+          setGameStatus(null);
+        } else {
           if (game.start_time > Date.now()) {
+            console.log("COUNTDOWN")
+            setGameStatus({
+              status: "COUNTDOWN",
+              roundId: game.round_id,
+              startTime: game.start_time,
+              crashPoint: game.secret_crash_point,
+            });
             setTimeout(() => {
               setUpdate(true);
             }, game.start_time - Date.now());
+          } else if (game.start_time + game.secret_crash_point * 1000 > Date.now()) {
+            console.log("IN_PROGRESS")
+            setGameStatus({
+              status: "IN_PROGRESS",
+              roundId: game.round_id,
+              startTime: game.start_time,
+              crashPoint: game.secret_crash_point,
+            });
+            setTimeout(() => {
+              setUpdate(true);
+            }, game.start_time + game.secret_crash_point * 1000 - Date.now());
+          } else {
+            console.log("END")
+            setGameStatus({
+              status: "END",
+              roundId: game.round_id,
+              startTime: game.start_time,
+              crashPoint: game.secret_crash_point,
+            });
           }
         }
       });
@@ -128,22 +145,15 @@ export default function PlayerList() {
     const newSocket = io("http://localhost:8080");
 
     newSocket.on(SOCKET_EVENTS.ROUND_START, () => {
-      setPlayers([]);
+
       setUpdate(true);
     });
 
     newSocket.on(SOCKET_EVENTS.BET_CONFIRMED, (data: BetData) => {
-      setUpdateList(true);
       setUpdate(true);
     });
 
     newSocket.on(SOCKET_EVENTS.CASH_OUT_CONFIRMED, (data: CashOutData) => {
-      setUpdateList(true);
-      setUpdate(true);
-    });
-
-    newSocket.on(SOCKET_EVENTS.ROUND_RESULT, (data: any) => {
-      setUpdateList(true);
       setUpdate(true);
     });
   }, []);
@@ -168,7 +178,7 @@ export default function PlayerList() {
         <tbody>
           {players
           .sort((a, b) => {
-            if (gameStatus.status == "lobby") {
+            if (gameStatus?.status == 'COUNTDOWN') {
               return b.betAmount - a.betAmount;
             } else {
               if (a.cashOutMultiplier && b.cashOutMultiplier) {
@@ -184,7 +194,7 @@ export default function PlayerList() {
           })
           .map((player, index) => (
             <tr key={index} className="text-white text-sm font-mono h-8">
-              {gameStatus.status == "lobby" ? ( // IF the game has ended
+              {gameStatus?.status == "END" ? ( // IF the game has ended
                 player.cashOutMultiplier ? (
                   <td className="w-[200px] text-left ps-4 text-green-500 bg-[#264234]/40 border-b border-neutral-800">
                     {player.username}
@@ -201,7 +211,7 @@ export default function PlayerList() {
               ) : (
                 <td className="w-[200px] text-left ps-4 bg-neutral-800/40 bg-[#264234]/40 border-b border-neutral-800">{player.username}</td>
               )}
-              {gameStatus.status == "lobby" ? (
+              {gameStatus?.status == "END" ? (
                 player.cashOutMultiplier ? (
                   <td className={cn("w-[100px] text-center text-green-500 bg-[#264234]/40 border-b border-neutral-800")}>
                     {player.cashOutMultiplier.toFixed(2)}
@@ -216,7 +226,7 @@ export default function PlayerList() {
               ) : (
                 <td className="w-[100px] text-center bg-neutral-800/40 bg-[#264234]/40 border-b border-neutral-800">--</td>
               )}
-              {gameStatus.status == "lobby" ? ( // IF the game has ended
+              {gameStatus?.status == "END" ? ( // IF the game has ended
                 player.cashOutMultiplier ? (
                   <td className="w-[100px] text-right pr-4 font-mono text-green-500 bg-[#264234]/40 border-b border-neutral-800">
                     +{(player.betAmount * player.cashOutMultiplier).toFixed(2)}
