@@ -8,12 +8,16 @@ import {
   setUpAndGetUser,
 } from "@/lib/api";
 import { User } from "@/lib/schema";
-import { cashOutBet, setNewBet, startRound } from "@/lib/server";
+import { cashOutBet, setNewBet, startRound } from "@/lib/socket";
 import { RoundStart, SOCKET_EVENTS } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { time } from "console";
 import { getSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Socket, io } from "socket.io-client";
+
+import { socket } from "@/lib/socket";
+import { gameStatusContext } from "./page";
 
 export type GameStatus = {
   status: "COUNTDOWN" | "IN_PROGRESS" | "END";
@@ -23,10 +27,11 @@ export type GameStatus = {
 };
 
 export default function ControlCenter() {
-  const [socket, setSocket] = useState<Socket | null>(null);
-  const [gameStatus, setGameStatus] = useState<GameStatus | null>(null);
-  const [update, setUpdate] = useState(true);
-  const [account, setAccount] = useState<User | null>(null);
+  const {
+    gameStatus,
+    account,
+    latestAction
+  } = useContext(gameStatusContext);
 
   const [betAmount, setBetAmount] = useState("");
 
@@ -37,25 +42,9 @@ export default function ControlCenter() {
   const [hasCashOut, setHasCashOut] = useState(false);
 
   useEffect(() => {
-    getSession().then((session) => {
-      if (session) {
-        if (!session.user) return;
-
-        setUpAndGetUser({
-          username: session.user.name || "",
-          image: session.user.image || "",
-          email: session.user.email || "",
-        }).then((user) => {
-          if (user) {
-            setAccount(user);
-          }
-        });
-      }
-    });
-  }, []);
-
-  useEffect(() => {
-    if (update && account) {
+    console.log('account', account)
+    if (account) {
+      console.log('updating hasBet and hasCashOut')
       hasUserBet(account?.email || "").then((bet) => {
         setHasBet(bet);
       });
@@ -64,64 +53,33 @@ export default function ControlCenter() {
         setHasCashOut(cashout);
       });
 
-      getCurrentGame().then((game) => {
-        console.log('got game', game)
-        if (game == null) {
-          setGameStatus(null);
-        } else {
-          if (game.start_time > Date.now()) {
-            console.log("COUNTDOWN")
-            setGameStatus({
-              status: "COUNTDOWN",
-              roundId: game.round_id,
-              startTime: game.start_time,
-              crashPoint: game.secret_crash_point,
-            });
-            setTimeout(() => {
-              setUpdate(true);
-            }, game.start_time - Date.now());
-          } else if (game.start_time + game.secret_crash_point * 1000 > Date.now()) {
-            console.log("IN_PROGRESS")
-            setGameStatus({
-              status: "IN_PROGRESS",
-              roundId: game.round_id,
-              startTime: game.start_time,
-              crashPoint: game.secret_crash_point,
-            });
-            setTimeout(() => {
-              setUpdate(true);
-            }, game.start_time + game.secret_crash_point * 1000 - Date.now());
-          } else {
-            console.log("END")
-            setGameStatus({
-              status: "END",
-              roundId: game.round_id,
-              startTime: game.start_time,
-              crashPoint: game.secret_crash_point,
-            });
-          }
-        }
-      });
-
-      setUpdate(false);
     }
-  }, [update, account]);
+  }, [gameStatus, account, latestAction]);
 
   useEffect(() => {
-    const newSocket = io("http://localhost:8080");
-    setSocket(newSocket);
+    console.log('gameStatus', gameStatus?.status)
+    if (gameStatus?.status === "IN_PROGRESS") {
+      console.log('setting bet and cashout to false')
+      checkAutoCashout();
+    }
+  }, [gameStatus]);
 
-    newSocket.on(SOCKET_EVENTS.ROUND_START, (data: RoundStart) => {
-      setUpdate(true);
-    });
+  const checkAutoCashout = () => {
+    const timeUntilCrash = gameStatus?.startTime! + gameStatus?.crashPoint! * 1000 - Date.now();
+    const timeUntilCashout = gameStatus?.startTime! + parseFloat(autoCashoutAmount)! * 1000 - Date.now();
 
-    // newSocket.on(SOCKET_EVENTS.ROUND_RESULT, (data: RoundStart) => {
-    //   setUpdate(true);
-    // });
-  }, []);
+    console.log('hasBet', hasBet)
+
+    if (hasBet && autoCashout && timeUntilCashout < timeUntilCrash && timeUntilCashout > 0) {
+      console.log('setting auto cashout')
+      setTimeout(() => {
+        console.log('auto cashout')
+        onCashOut();
+      }, timeUntilCashout);
+    }
+  }
 
   const onSetBet = () => {
-    setUpdate(true);
 
     if (!socket) return;
 
@@ -133,7 +91,7 @@ export default function ControlCenter() {
       betAmount: parseFloat(betAmount),
       coinType: "APT",
     };
-    const success = setNewBet(socket, data);
+    const success = setNewBet(data);
   };
 
   const onCashOut = () => {
@@ -150,9 +108,8 @@ export default function ControlCenter() {
       playerEmail: account.email || "",
       cashOutMultiplier: cashoutMultipler,
     };
-    const succes = cashOutBet(socket, data);
+    const succes = cashOutBet(data);
 
-    setUpdate(true);
   };
 
   return (
@@ -378,7 +335,10 @@ export default function ControlCenter() {
                   "border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 w-[250px]",
                     autoCashout && "bg-[#264234]/40"
                 )}
-                onClick={() => setAutoCashout(!autoCashout)}
+                onClick={() => {
+                  setAutoCashout(!autoCashout);
+            
+                }}
               >
                 {
                   autoCashout ? "Turn off auto cashout" : "Turn on auto cashout"

@@ -26,6 +26,7 @@ const io = new Server(httpServer, {
     origin: "*", // or a list of origins you want to allow, e.g. ["http://localhost:3000"]
     credentials: true,
   },
+  connectionStateRecovery: {}
 });
 
 httpServer.listen(PORT, HOST, () => {

@@ -1,76 +1,86 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { GameStatus } from "./controlCenter";
 import { SOCKET_EVENTS, RoundStart } from "@/lib/types";
 import { Socket, io } from "socket.io-client";
 import CountUp from "react-countup";
 import { getCurrentGame } from "@/lib/api";
-import { startRound } from "@/lib/server";
+import { startRound } from "@/lib/socket";
+
+import { socket } from "@/lib/socket";
+
+import { gameStatusContext } from "./page";
 
 export default function GameScreen() {
-  const [socket, setSocket] = useState<Socket | null>(null);
-  const [gameStatus, setGameStatus] = useState<GameStatus | null>(null);
+  const {
+    gameStatus,
+  } = useContext(gameStatusContext);
   const [update, setUpdate] = useState(true);
 
-  useEffect(() => {
-    const newSocket = io("http://localhost:8080");
-    setSocket(newSocket);
+  // useEffect(() => {
+  //   socket.on("disconnect", () => {
+  //     console.log("DISCONNECTED - gameScreen.tsx"); 
+  //   });
 
-    newSocket.on(SOCKET_EVENTS.ROUND_START, (data: RoundStart) => {
-      setUpdate(true);
-    });
-  }, []);
+  //   socket.on(SOCKET_EVENTS.ROUND_START, (data: RoundStart) => {
+  //     setUpdate(true);
+  //   });
 
-  useEffect(() => {
-    if (update) {
-      getCurrentGame().then((game) => {
-        console.log('got game', game)
-        if (game == null) {
-          setGameStatus(null);
-        } else {
-          if (game.start_time > Date.now()) {
-            console.log("COUNTDOWN")
-            setGameStatus({
-              status: "COUNTDOWN",
-              roundId: game.round_id,
-              startTime: game.start_time,
-              crashPoint: game.secret_crash_point,
-            });
-            setTimeout(() => {
-              setUpdate(true);
-            }, game.start_time - Date.now());
-          } else if (game.start_time + game.secret_crash_point * 1000 > Date.now()) {
-            console.log("IN_PROGRESS")
-            setGameStatus({
-              status: "IN_PROGRESS",
-              roundId: game.round_id,
-              startTime: game.start_time,
-              crashPoint: game.secret_crash_point,
-            });
-            setTimeout(() => {
-              setUpdate(true);
-            }, game.start_time + game.secret_crash_point * 1000 - Date.now());
-          } else {
-            console.log("END")
-            setGameStatus({
-              status: "END",
-              roundId: game.round_id,
-              startTime: game.start_time,
-              crashPoint: game.secret_crash_point,
-            });
-          }
-        }
-      });
+  //   socket.on(SOCKET_EVENTS.ROUND_RESULT, (data: RoundStart) => {
+  //     setUpdate(true);
+  //   });
+  // }, []);
 
-      setUpdate(false);
-    }
-  }, [update]);
+  // useEffect(() => {
+  //   if (update) {
+  //     getCurrentGame().then((game) => {
+        
+  //       if (game == null) {
+  //         setGameStatus(null);
+  //       } else {
+  //         if (game.start_time > Date.now()) {
+  //           console.log("COUNTDOWN - gameScreen.tsx")
+  //           setGameStatus({
+  //             status: "COUNTDOWN",
+  //             roundId: game.round_id,
+  //             startTime: game.start_time,
+  //             crashPoint: game.secret_crash_point,
+  //           });
+  //           setTimeout(() => {
+  //             setUpdate(true);
+  //           }, game.start_time - Date.now());
+  //         } else if (game.start_time + game.secret_crash_point * 1000 > Date.now()) {
+  //           console.log("IN_PROGRESS - gameScreen.tsx")
+  //           setGameStatus({
+  //             status: "IN_PROGRESS",
+  //             roundId: game.round_id,
+  //             startTime: game.start_time,
+  //             crashPoint: game.secret_crash_point,
+  //           });
+  //           setTimeout(() => {
+  //             setUpdate(true);
+  //           }, game.start_time + game.secret_crash_point * 1000 - Date.now());
+  //         } else {
+  //           console.log("END - gameScreen.tsx")
+  //           setGameStatus({
+  //             status: "END",
+  //             roundId: game.round_id,
+  //             startTime: game.start_time,
+  //             crashPoint: game.secret_crash_point,
+  //           });
+  //         }
+  //       }
+  //     });
+
+  //     setUpdate(false);
+  //   }
+  // }, [update]);
 
   const onStartRound = () => {
     if (!socket) return;
 
-    const success = startRound(socket);
+    const success = startRound();
   };
 
   if (gameStatus === null) {
@@ -99,7 +109,7 @@ export default function GameScreen() {
     return (
       <div className="border-b border-l border-green-500 h-full w-full bg-neutral-950">
         <CountUp
-          start={0}
+          start={(Date.now() - gameStatus.startTime!) / 1000}
           end={gameStatus.crashPoint!}
           duration={gameStatus.crashPoint!}
           separator=""

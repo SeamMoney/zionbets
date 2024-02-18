@@ -2,14 +2,15 @@
 
 import { getChatMessages, setUpAndGetUser } from "@/lib/api";
 import { User } from "@/lib/schema";
-import { sendMessage } from "@/lib/server";
+import { sendMessage } from "@/lib/socket";
 import { ChatMessage, SOCKET_EVENTS } from "@/lib/types";
 import { getSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
 import { Socket, io } from "socket.io-client";
 
+import { socket } from "@/lib/socket";
+
 export default function ChatWindow() {
-  const [socket, setSocket] = useState<Socket | null>(null);
   const [newMessage, setNewMessage] = useState<ChatMessage | null>(null);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
 
@@ -42,10 +43,8 @@ export default function ChatWindow() {
   }, [newMessage]);
 
   useEffect(() => {
-    const newSocket = io("http://localhost:8080");
-    setSocket(newSocket);
 
-    newSocket.on(SOCKET_EVENTS.CHAT_NOTIFICATION, (data: ChatMessage) => {
+    socket.on(SOCKET_EVENTS.CHAT_NOTIFICATION, (data: ChatMessage) => {
       setNewMessage(data);
     });
   }, []);
@@ -68,7 +67,7 @@ export default function ChatWindow() {
     }
 
     // Send message to server
-    sendMessage(socket, {
+    sendMessage({
       authorEmail: account?.email,
       message,
       authorUsername: account?.username,
