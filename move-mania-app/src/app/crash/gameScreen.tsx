@@ -8,26 +8,13 @@ import CountUp from "react-countup";
 import { getCurrentGame } from "@/lib/api";
 
 export default function GameScreen() {
-  const [gameStatus, setGameStatus] = useState<GameStatus>({
-    status: "lobby",
-    roundId: undefined,
-    startTime: undefined,
-    crashPoint: undefined,
-  });
+  const [gameStatus, setGameStatus] = useState<GameStatus | null>(null);
   const [update, setUpdate] = useState(true);
 
   useEffect(() => {
     const newSocket = io("http://localhost:8080");
 
     newSocket.on(SOCKET_EVENTS.ROUND_START, (data: RoundStart) => {
-      setUpdate(true);
-
-      setTimeout(() => {
-        setUpdate(true);
-      }, data.startTime - Date.now());
-    });
-
-    newSocket.on(SOCKET_EVENTS.ROUND_RESULT, (data: RoundStart) => {
       setUpdate(true);
     });
   }, []);
