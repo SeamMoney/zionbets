@@ -1,11 +1,14 @@
 "use client";
 
 import { getCurrentGame, getPlayerList } from "@/lib/api";
-import { BetData, CashOutData, SOCKET_EVENTS } from "@/lib/types";
-import { useEffect, useState } from "react";
+import { BetData, CashOutData, RoundStart, SOCKET_EVENTS } from "@/lib/types";
+import { useContext, useEffect, useState } from "react";
 import { Socket, io } from "socket.io-client";
 import { GameStatus } from "./controlCenter";
 import { cn } from "@/lib/utils";
+
+import { socket } from "@/lib/socket";
+import { gameStatusContext } from "./page";
 
 export type PlayerState = {
   username: string;
@@ -15,148 +18,152 @@ export type PlayerState = {
 };
 
 export default function PlayerList() {
-  const [gameStatus, setGameStatus] = useState<GameStatus | null>(null);
-  const [update, setUpdate] = useState(true);
+  const {
+    gameStatus,
+    latestAction
+  } = useContext(gameStatusContext);
   // const [updateList, setUpdateList] = useState(true);
   const [players, setPlayers] = useState<PlayerState[]>([]);
 
+  useEffect(() => {
+    getPlayerList().then((players) => {
+      setPlayers(players);
+    });
+    // // set dummy data
+    // setPlayers([
+    //   {
+    //     username: "user1",
+    //     betAmount: 100,
+    //     coinType: "BTC",
+    //     cashOutMultiplier: 2.5,
+    //   },
+    //   {
+    //     username: "user2",
+    //     betAmount: 200,
+    //     coinType: "BTC",
+    //     cashOutMultiplier: 2.5,
+    //   },
+    //   {
+    //     username: "user3",
+    //     betAmount: 300,
+    //     coinType: "BTC",
+    //     cashOutMultiplier: 2.5,
+    //   },
+    //   {
+    //     username: "user4",
+    //     betAmount: 400,
+    //     coinType: "BTC",
+    //     cashOutMultiplier: 2.5,
+    //   },
+    //   {
+    //     username: "user5",
+    //     betAmount: 500,
+    //     coinType: "BTC",
+    //     cashOutMultiplier: 2.5,
+    //   },
+    //   {
+    //     username: "user6",
+    //     betAmount: 600,
+    //     coinType: "BTC",
+    //     cashOutMultiplier: 2.5,
+    //   },
+    //   {
+    //     username: "user7",
+    //     betAmount: 700,
+    //     coinType: "BTC",
+    //     cashOutMultiplier: null,
+    //   },
+    //   {
+    //     username: "user8",
+    //     betAmount: 800,
+    //     coinType: "BTC",
+    //     cashOutMultiplier: 2.5,
+    //   },
+    //   {
+    //     username: "user9",
+    //     betAmount: 900,
+    //     coinType: "BTC",
+    //     cashOutMultiplier: 2.5,
+    //   },
+    //   {
+    //     username: "user10",
+    //     betAmount: 1000,
+    //     coinType: "BTC",
+    //     cashOutMultiplier: null,
+    //   },
+    // ]);
+  }, [latestAction]);
+
   // useEffect(() => {
-  //   if (updateList) {
+  //   if (update) {
   //     getPlayerList().then((players) => {
   //       setPlayers(players);
   //     });
-  //     // // set dummy data
-  //     // setPlayers([
-  //     //   {
-  //     //     username: "user1",
-  //     //     betAmount: 100,
-  //     //     coinType: "BTC",
-  //     //     cashOutMultiplier: 2.5,
-  //     //   },
-  //     //   {
-  //     //     username: "user2",
-  //     //     betAmount: 200,
-  //     //     coinType: "BTC",
-  //     //     cashOutMultiplier: 2.5,
-  //     //   },
-  //     //   {
-  //     //     username: "user3",
-  //     //     betAmount: 300,
-  //     //     coinType: "BTC",
-  //     //     cashOutMultiplier: 2.5,
-  //     //   },
-  //     //   {
-  //     //     username: "user4",
-  //     //     betAmount: 400,
-  //     //     coinType: "BTC",
-  //     //     cashOutMultiplier: 2.5,
-  //     //   },
-  //     //   {
-  //     //     username: "user5",
-  //     //     betAmount: 500,
-  //     //     coinType: "BTC",
-  //     //     cashOutMultiplier: 2.5,
-  //     //   },
-  //     //   {
-  //     //     username: "user6",
-  //     //     betAmount: 600,
-  //     //     coinType: "BTC",
-  //     //     cashOutMultiplier: 2.5,
-  //     //   },
-  //     //   {
-  //     //     username: "user7",
-  //     //     betAmount: 700,
-  //     //     coinType: "BTC",
-  //     //     cashOutMultiplier: null,
-  //     //   },
-  //     //   {
-  //     //     username: "user8",
-  //     //     betAmount: 800,
-  //     //     coinType: "BTC",
-  //     //     cashOutMultiplier: 2.5,
-  //     //   },
-  //     //   {
-  //     //     username: "user9",
-  //     //     betAmount: 900,
-  //     //     coinType: "BTC",
-  //     //     cashOutMultiplier: 2.5,
-  //     //   },
-  //     //   {
-  //     //     username: "user10",
-  //     //     betAmount: 1000,
-  //     //     coinType: "BTC",
-  //     //     cashOutMultiplier: null,
-  //     //   },
-  //     // ]);
-  //     setUpdateList(false);
+
+  //     getCurrentGame().then((game) => {
+        
+  //       if (game == null) {
+  //         setGameStatus(null);
+  //       } else {
+  //         if (game.start_time > Date.now()) {
+  //           console.log("COUNTDOWN - playerList.tsx")
+  //           setGameStatus({
+  //             status: "COUNTDOWN",
+  //             roundId: game.round_id,
+  //             startTime: game.start_time,
+  //             crashPoint: game.secret_crash_point,
+  //           });
+  //           setTimeout(() => {
+  //             setUpdate(true);
+  //           }, game.start_time - Date.now());
+  //         } else if (game.start_time + game.secret_crash_point * 1000 > Date.now()) {
+  //           console.log("IN_PROGRESS - playerList.tsx")
+  //           setGameStatus({
+  //             status: "IN_PROGRESS",
+  //             roundId: game.round_id,
+  //             startTime: game.start_time,
+  //             crashPoint: game.secret_crash_point,
+  //           });
+  //           setTimeout(() => {
+  //             setUpdate(true);
+  //           }, game.start_time + game.secret_crash_point * 1000 - Date.now());
+  //         } else {
+  //           console.log("END - playerList.tsx")
+  //           setGameStatus({
+  //             status: "END",
+  //             roundId: game.round_id,
+  //             startTime: game.start_time,
+  //             crashPoint: game.secret_crash_point,
+  //           });
+  //         }
+  //       }
+  //     });
+
+  //     setUpdate(false);
   //   }
-  // }, [updateList]);
+  // }, [update]);
 
-  useEffect(() => {
-    if (update) {
-      getPlayerList().then((players) => {
-        setPlayers(players);
-      });
+  // useEffect(() => {
+  //   socket.on("disconnect", () => {
+  //     console.log("DISCONNECTED - playerList.tsx"); 
+  //   });
 
-      getCurrentGame().then((game) => {
-        console.log('got game', game)
-        if (game == null) {
-          setGameStatus(null);
-        } else {
-          if (game.start_time > Date.now()) {
-            console.log("COUNTDOWN")
-            setGameStatus({
-              status: "COUNTDOWN",
-              roundId: game.round_id,
-              startTime: game.start_time,
-              crashPoint: game.secret_crash_point,
-            });
-            setTimeout(() => {
-              setUpdate(true);
-            }, game.start_time - Date.now());
-          } else if (game.start_time + game.secret_crash_point * 1000 > Date.now()) {
-            console.log("IN_PROGRESS")
-            setGameStatus({
-              status: "IN_PROGRESS",
-              roundId: game.round_id,
-              startTime: game.start_time,
-              crashPoint: game.secret_crash_point,
-            });
-            setTimeout(() => {
-              setUpdate(true);
-            }, game.start_time + game.secret_crash_point * 1000 - Date.now());
-          } else {
-            console.log("END")
-            setGameStatus({
-              status: "END",
-              roundId: game.round_id,
-              startTime: game.start_time,
-              crashPoint: game.secret_crash_point,
-            });
-          }
-        }
-      });
+  //   socket.on(SOCKET_EVENTS.ROUND_START, () => {
+  //     setUpdate(true);
+  //   });
 
-      setUpdate(false);
-    }
-  }, [update]);
+  //   socket.on(SOCKET_EVENTS.ROUND_RESULT, (data: RoundStart) => {
+  //     setUpdate(true);
+  //   });
 
-  useEffect(() => {
-    const newSocket = io("http://localhost:8080");
+  //   socket.on(SOCKET_EVENTS.BET_CONFIRMED, (data: BetData) => {
+  //     setUpdate(true);
+  //   });
 
-    newSocket.on(SOCKET_EVENTS.ROUND_START, () => {
-
-      setUpdate(true);
-    });
-
-    newSocket.on(SOCKET_EVENTS.BET_CONFIRMED, (data: BetData) => {
-      setUpdate(true);
-    });
-
-    newSocket.on(SOCKET_EVENTS.CASH_OUT_CONFIRMED, (data: CashOutData) => {
-      setUpdate(true);
-    });
-  }, []);
+  //   socket.on(SOCKET_EVENTS.CASH_OUT_CONFIRMED, (data: CashOutData) => {
+  //     setUpdate(true);
+  //   });
+  // }, []);
 
   return (
     <div className="border border-neutral-700 h-full flex flex-col items-left gap-2">
