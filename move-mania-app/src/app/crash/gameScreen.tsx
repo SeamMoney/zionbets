@@ -35,36 +35,55 @@ export default function GameScreen() {
   useEffect(() => {
     if (update) {
       getCurrentGame().then((game) => {
+        console.log('got game', game)
         if (game == null) {
-          setGameStatus({
-            status: "lobby",
-          });
+          setGameStatus(null);
         } else {
-          setGameStatus({
-            status: game.status,
-            roundId: game.game_id,
-            startTime: game.start_time,
-            crashPoint: game.secret_crash_point,
-          });
-
           if (game.start_time > Date.now()) {
+            console.log("COUNTDOWN")
+            setGameStatus({
+              status: "COUNTDOWN",
+              roundId: game.round_id,
+              startTime: game.start_time,
+              crashPoint: game.secret_crash_point,
+            });
             setTimeout(() => {
               setUpdate(true);
             }, game.start_time - Date.now());
+          } else if (game.start_time + game.secret_crash_point * 1000 > Date.now()) {
+            console.log("IN_PROGRESS")
+            setGameStatus({
+              status: "IN_PROGRESS",
+              roundId: game.round_id,
+              startTime: game.start_time,
+              crashPoint: game.secret_crash_point,
+            });
+            setTimeout(() => {
+              setUpdate(true);
+            }, game.start_time + game.secret_crash_point * 1000 - Date.now());
+          } else {
+            console.log("END")
+            setGameStatus({
+              status: "END",
+              roundId: game.round_id,
+              startTime: game.start_time,
+              crashPoint: game.secret_crash_point,
+            });
           }
         }
       });
+
       setUpdate(false);
     }
   }, [update]);
 
-  if (gameStatus.status === "lobby") {
+  if (gameStatus === null) {
     return (
       <div className="border-b border-l border-green-500 h-full w-full bg-neutral-950">
-        <span>Lobby</span>
+        <span>No games yet - admin start one</span>
       </div>
     );
-  } else if (gameStatus.startTime && gameStatus.startTime > Date.now()) {
+  } else if (gameStatus.status === "COUNTDOWN") {
     return (
       <div className="border-b border-l border-green-500 h-full w-full bg-neutral-950">
         <CountUp
