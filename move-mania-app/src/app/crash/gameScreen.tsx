@@ -10,7 +10,7 @@ import { startRound } from "@/lib/socket";
 
 import { socket } from "@/lib/socket";
 
-import { gameStatusContext } from "./page";
+import { gameStatusContext } from "./CrashProvider";
 
 export default function GameScreen() {
   const {
