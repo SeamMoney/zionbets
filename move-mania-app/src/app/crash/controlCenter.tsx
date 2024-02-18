@@ -30,6 +30,9 @@ export default function ControlCenter() {
 
   const [betAmount, setBetAmount] = useState("");
 
+  const [autoCashout, setAutoCashout] = useState(false);
+  const [autoCashoutAmount, setAutoCashoutAmount] = useState("");
+
   const [hasBet, setHasBet] = useState(false);
   const [hasCashOut, setHasCashOut] = useState(false);
 
@@ -153,7 +156,7 @@ export default function ControlCenter() {
   };
 
   return (
-    <div className="w-full h-full flex flex-col items-start justify-start gap-1">
+    <div className="w-full h-full flex flex-row items-center justify-between gap-1">
       <div className=" flex flex-col items-start justify-around px-2 gap-2">
         <div className="flex flex-col gap-1">
           <div className="flex flex-row justify-between px-4 py-2 border border-neutral-700 bg-neutral-800/20 bg-noise">
@@ -283,41 +286,106 @@ export default function ControlCenter() {
               </button>
             )
           }
-          {/* {((gameStatus?.startTime && gameStatus.startTime > Date.now()) ||
-            gameStatus?.status === "END") && (
-            <div className="bg-noise">
-              <button
-                className={cn(
-                  "border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 ",
-                  !(parseFloat(betAmount) > 0) || hasBet
-                    ? "cursor-not-allowed"
-                    : "hover:bg-[#264234]/40 hover:cursor-pointer",
-                  hasBet && "bg-[#264234]/40"
-                )}
-                onClick={onSetBet}
-                disabled={!(parseFloat(betAmount) > 0) || hasBet}
-              >
-                Bet
-              </button>
+        </div>
+      </div>
+      <div className=" flex flex-col items-start justify-around px-2 gap-2">
+        <div className="flex flex-col gap-1 w-full">
+          <div className="flex flex-row justify-between px-4 py-2 border border-neutral-700 bg-neutral-800/20 bg-noise">
+            <span className="font-mono font-light">AUTO CASHOUT @</span>
+            <span className="font-mono opacity-50 flex flex-row justify-center items-center gap-0">
+              <input
+                className="bg-transparent border-none outline-none text-right max-w-[40px]"
+                value={autoCashoutAmount}
+                onChange={(e) => {
+                  setAutoCashout(false);
+                  setAutoCashoutAmount(e.target.value);
+                }}
+                placeholder="2.50"
+              ></input>
+              <span>x</span>
+            </span>
+          </div>
+          <div className="flex flex-row items-center text-xs">
+            <div
+              className={`text-center border px-2 py-1 cursor-pointer grow ${
+                parseFloat(autoCashoutAmount) === 1.01
+                  ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
+                  : "opacity-50 border-neutral-700"
+              }`}
+              onClick={() => {
+                setAutoCashout(false);
+                setAutoCashoutAmount("1.01");
+              }}
+            >
+              1.01x
             </div>
-          )}
-          {gameStatus?.status === "IN_PROGRESS" &&
-            gameStatus.startTime &&
-            gameStatus.startTime <= Date.now() && (
+            <div
+              className={`text-center border px-2 py-1 cursor-pointer grow ${
+                parseFloat(autoCashoutAmount) === 1.5
+                  ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
+                  : "opacity-50 border-neutral-700"
+              }`}
+              onClick={() => {
+                setAutoCashout(false);
+                setAutoCashoutAmount("1.5");
+              }}
+            >
+              1.5x
+            </div>
+            <div
+              className={`text-center border px-2 py-1 cursor-pointer grow ${
+                parseFloat(autoCashoutAmount) === 2
+                  ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
+                  : "opacity-50 border-neutral-700"
+              }`}
+              onClick={() => {
+                setAutoCashout(false);
+                setAutoCashoutAmount("2");
+              }}
+            >
+              2x
+            </div>
+            <div
+              className={`text-center border px-2 py-1 cursor-pointer grow ${
+                parseFloat(autoCashoutAmount) === 5
+                  ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
+                  : "opacity-50 border-neutral-700"
+              }`}
+              onClick={() => {
+                setAutoCashout(false);
+                setAutoCashoutAmount("5");
+              }}
+            >
+              5x
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-row items-baseline gap-2 w-full">
+          {
+            !account && (
+              <button
+                className="border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 cursor-not-allowed w-full"
+                disabled
+              >
+                Log in to set auto cash out
+              </button>
+            )
+          }
+          {
+            account && (
               <button
                 className={cn(
-                  "border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 ",
-                  !(parseFloat(betAmount) > 0) || hasCashOut
-                    ? "cursor-not-allowed"
-                    : "hover:bg-[#264234]/40 hover:cursor-pointer",
-                    hasCashOut && "bg-[#264234]/40"
+                  "border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 w-[250px]",
+                    autoCashout && "bg-[#264234]/40"
                 )}
-                onClick={onCashOut}
-                disabled={hasCashOut == true || hasBet == false}
+                onClick={() => setAutoCashout(!autoCashout)}
               >
-                Cash out
+                {
+                  autoCashout ? "Turn off auto cashout" : "Turn on auto cashout"
+                }
               </button>
-            )} */}
+            )
+          }
         </div>
       </div>
     </div>
