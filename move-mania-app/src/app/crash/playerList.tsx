@@ -8,7 +8,7 @@ import { GameStatus } from "./controlCenter";
 import { cn } from "@/lib/utils";
 
 import { socket } from "@/lib/socket";
-import { gameStatusContext } from "./page";
+import { gameStatusContext } from "./CrashProvider";
 
 export type PlayerState = {
   username: string;

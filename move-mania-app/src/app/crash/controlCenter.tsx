@@ -17,7 +17,7 @@ import { useContext, useEffect, useState } from "react";
 import { Socket, io } from "socket.io-client";
 
 import { socket } from "@/lib/socket";
-import { gameStatusContext } from "./page";
+import { gameStatusContext } from "./CrashProvider";
 
 export type GameStatus = {
   status: "COUNTDOWN" | "IN_PROGRESS" | "END";
