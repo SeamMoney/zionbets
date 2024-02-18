@@ -300,7 +300,7 @@ export async function getCurrentGame() {
   });
 
   // Get the first occurence of a game with status "IN_PROGRESS"
-  const game = await db.get('SELECT * FROM games WHERE status = "IN_PROGRESS"');
+  const game = await db.get('SELECT * FROM games ORDER BY start_time DESC LIMIT 1');
 
   await db.close();
 

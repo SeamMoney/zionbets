@@ -11,7 +11,7 @@ export type Game = {
   game_id: string;
   start_time: number;
   secret_crash_point: number;
-  status: "IN_PROGRESS" | "ENDED";
+  status: "IN_PROGRESS" | "END";
 };
 
 export type PlayerListEntry = {
