@@ -99,7 +99,7 @@ export default function GameScreen() {
     return (
       <div className="border-b border-l border-green-500 h-full w-full bg-neutral-950">
         <CountUp
-          start={0}
+          start={(Date.now() - gameStatus.startTime!) / 1000}
           end={gameStatus.crashPoint!}
           duration={gameStatus.crashPoint!}
           separator=""
