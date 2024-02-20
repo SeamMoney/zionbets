@@ -45,7 +45,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on(SOCKET_EVENTS.START_ROUND, async () => {
-    console.log(`[Server] Start round emitted at: ${new Date().toISOString()}`);
     await clearPlayerList();
     let crashPoint = Math.random() * 10;
     if (crashPoint < 1) {
@@ -85,7 +84,6 @@ io.on("connection", (socket) => {
 });
 
 async function cycleRounds() {
-  console.log(`[Server] Cycling rounds at: ${new Date().toISOString()}`);
   await clearPlayerList();
   let crashPoint = Math.random() * 10;
   if (crashPoint < 1) {
