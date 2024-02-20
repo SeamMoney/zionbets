@@ -45,18 +45,45 @@ export default function GameScreen() {
           suffix=" seconds"
           useEasing={false}
         />
+        <CrashChart startAnimation={true} />
       </div>
     );
   } else if (gameStatus.status === "IN_PROGRESS") {
     const hardcodedCrashPoint = 5000;
     console.log("Current gameStatus:", gameStatus);
     return (
-      <CrashChart startAnimation={true} crashPoint={gameStatus.crashPoint} />
+      <div className="border-b border-l border-green-500 h-full w-full bg-neutral-950">
+        <CountUp
+          start={(Date.now() - gameStatus.startTime!) / 1000}
+          end={gameStatus.crashPoint!}
+          duration={gameStatus.crashPoint!}
+          separator=""
+          decimals={2}
+          decimal="."
+          prefix=""
+          suffix="x"
+          useEasing={false}
+        />
+        <CrashChart startAnimation={true} crashPoint={gameStatus.crashPoint} />
+      </div>
     );
   } else if (gameStatus.status === "END") {
     return (
       <div className="border-b border-l border-green-500 h-full w-full bg-neutral-950">
-        <CrashChart startAnimation={false} crashPoint={gameStatus.crashPoint} />
+        <div>
+          <CountUp
+            start={gameStatus.crashPoint!}
+            end={gameStatus.crashPoint!}
+            duration={0}
+            separator=""
+            decimals={2}
+            decimal="."
+            prefix=""
+            suffix="x"
+            useEasing={false}
+          />
+          <CrashChart startAnimation={false} crashPoint={gameStatus.crashPoint} />
+        </div>
       </div>
     );
   }
