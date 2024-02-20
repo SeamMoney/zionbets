@@ -2,13 +2,14 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import "../app/globals.css";
+import { channel } from 'diagnostics_channel';
 
 interface CrashChartProps {
   startAnimation: boolean;
-  crashPoint: number;
+  crashPoint?: number;
 }
 
-const CrashChart: React.FC<CrashChartProps> = ({ startAnimation, crashPoint }) => {
+function EmptyCrashChart ({ startAnimation, crashPoint }: CrashChartProps) {
   const margin = { top: 20, right: 20, bottom: 30, left: 40 };
   const d3Container = useRef<SVGSVGElement | null>(null);
   const animationFrameId = useRef<number | null>(null);
@@ -25,11 +26,8 @@ const CrashChart: React.FC<CrashChartProps> = ({ startAnimation, crashPoint }) =
       .append('g')
       .attr('transform', `translate(${margin.left},${margin.top})`);
 
-    const num = 300;
-    let time = -0.1;
-
-    const xScale = d3.scaleLinear().range([0, width]).domain([0, num]);
-    const yScale = d3.scaleLinear().range([height, 0]).domain([0, crashPoint]);
+    const xScale = d3.scaleLinear().range([0, width]).domain([0, 40]);
+    const yScale = d3.scaleLinear().range([height, 0]).domain([0, 10]);
 
     const xAxis = d3.axisBottom(xScale).tickSize(-height).tickPadding(10).ticks(5);
     const yAxis = d3.axisLeft(yScale).tickSize(-width).tickPadding(10).ticks(5);
@@ -50,9 +48,16 @@ const CrashChart: React.FC<CrashChartProps> = ({ startAnimation, crashPoint }) =
       .x(d => xScale(d[0]))
       .y(d => yScale(d[1]));
 
+    let time = 0;
+
     const updateChart = () => {
+
+      if (crashPoint == null) return;
+
+      const base = 1.5;
+
       time += 0.001;
-      const newYValue = (Math.pow(1.01, time) - 1) * (crashPoint / (Math.pow(1.01, num) - 1));
+      const newYValue = (Math.pow(base, time) - 1) * (crashPoint / (Math.pow(base, 10) - 1));
       if (newYValue >= crashPoint) {
         console.log("Crash point reached at time:", time);
         return;
@@ -63,7 +68,7 @@ const CrashChart: React.FC<CrashChartProps> = ({ startAnimation, crashPoint }) =
 
       // if (data.length > num) data.shift();
 
-      xScale.domain([Math.max(time - num, 0), time]);
+      xScale.domain([Math.max(time - 10, 0), time]);
       yScale.domain([0, d3.max(data, d => d[1]) || crashPoint]);
 
       xAxisGroup.call(xAxis);
@@ -93,4 +98,4 @@ const CrashChart: React.FC<CrashChartProps> = ({ startAnimation, crashPoint }) =
   );
 };
 
-export default CrashChart;
+export default EmptyCrashChart;
