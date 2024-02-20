@@ -1,95 +1,95 @@
 "use client";
-import React, { useRef, useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import '../app/globals.css';
+import React, { useEffect, useRef } from 'react';
+import * as d3 from 'd3';
+import "../app/globals.css";
 
-const CrashChart = () => {
-  const [multiplierValues, setMultiplierValues] = useState<number[]>([]);
-  const [path, setPath] = useState<string>('M0,150');
-  const [timeLabels, setTimeLabels] = useState<string[]>([]);
-  const stopValueRef = useRef<number>(Math.random() * (10 - 1) + 1);
+interface CrashChartProps {
+  startAnimation: boolean;
+  crashPoint: number;
+}
+
+const CrashChart: React.FC<CrashChartProps> = ({ startAnimation, crashPoint }) => {
+  const margin = { top: 20, right: 20, bottom: 30, left: 40 };
+  const d3Container = useRef<SVGSVGElement | null>(null);
+  const animationFrameId = useRef<number | null>(null);
 
   useEffect(() => {
-    const startTime = Date.now();
-    let lastLabelTime = 0;
+    if (!startAnimation || !d3Container.current) return;
 
-    const update = () => {
-      const now = Date.now();
-      const elapsedTime = (now - startTime) / 1000;
-      const newValue = Math.exp(elapsedTime / 10) - 1;
+    const containerRect = d3Container.current.getBoundingClientRect();
+    const width = containerRect.width - margin.left - margin.right;
+    const height = containerRect.height - margin.top - margin.bottom;
 
-      // Stop the animation if crash point reached
-      if (newValue >= stopValueRef.current) {
+    const svg = d3.select(d3Container.current)
+      .attr('viewBox', `0 0 ${containerRect.width} ${containerRect.height}`)
+      .append('g')
+      .attr('transform', `translate(${margin.left},${margin.top})`);
+
+    const num = 300;
+    let time = -0.1;
+
+    const xScale = d3.scaleLinear().range([0, width]).domain([0, num]);
+    const yScale = d3.scaleLinear().range([height, 0]).domain([0, crashPoint]);
+
+    const xAxis = d3.axisBottom(xScale).tickSize(-height).tickPadding(10).ticks(5);
+    const yAxis = d3.axisLeft(yScale).tickSize(-width).tickPadding(10).ticks(5);
+
+    const xAxisGroup = svg.append('g')
+      .attr('class', 'x axis')
+      .attr('transform', `translate(0, ${height})`);
+
+    const yAxisGroup = svg.append('g')
+      .attr('class', 'y axis');
+
+    xAxisGroup.call(xAxis);
+    yAxisGroup.call(yAxis);
+
+    let data: [number, number][] = [];
+
+    const line = d3.line<[number, number]>()
+      .x(d => xScale(d[0]))
+      .y(d => yScale(d[1]));
+
+    const updateChart = () => {
+      time += 0.001;
+      const newYValue = (Math.pow(1.01, time) - 1) * (crashPoint / (Math.pow(1.01, num) - 1));
+      if (newYValue >= crashPoint) {
+        console.log("Crash point reached at time:", time);
         return;
       }
 
-      setMultiplierValues((prevValues) => [...prevValues, newValue]);
+      const newDataPoint: [number, number] = [time, newYValue];
+      data.push(newDataPoint);
 
-      const elapsedSinceLastLabel = now - lastLabelTime;
-      if (elapsedSinceLastLabel >= 1000) {
-        const newLabel = `${Math.floor(elapsedTime)}s`;
-        setTimeLabels((prevLabels) => [...prevLabels, newLabel]);
-        lastLabelTime = now;
-      }
+      // if (data.length > num) data.shift();
 
-      requestAnimationFrame(update);
+      xScale.domain([Math.max(time - num, 0), time]);
+      yScale.domain([0, d3.max(data, d => d[1]) || crashPoint]);
+
+      xAxisGroup.call(xAxis);
+      yAxisGroup.call(yAxis);
+
+      svg.selectAll('.line')
+        .data([data])
+        .join('path')
+        .attr('class', 'line')
+        .attr('d', line);
+
+      time += 0.1;
+      animationFrameId.current = requestAnimationFrame(updateChart);
     };
 
-    requestAnimationFrame(update);
-  }, []);
+    animationFrameId.current = requestAnimationFrame(updateChart);
 
-  useEffect(() => {
-    if (multiplierValues.length > 0) {
-      const maxValue = Math.max(...multiplierValues);
-      const scalingFactor = 150 / (maxValue * 1.1);
-
-      const newPath = multiplierValues.reduce((acc, currentValue, index) => {
-        const x = 50 + index * (350 / multiplierValues.length);
-        const y = 150 - currentValue * scalingFactor;
-        return `${acc} L${x},${y}`;
-      }, 'M50,150');
-
-      setPath(newPath);
-    }
-  }, [multiplierValues]);
-
-  const pathVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { delay: 0.5, duration: 1.5 }
-    }
-  };
+    return () => {
+      if (animationFrameId.current) cancelAnimationFrame(animationFrameId.current);
+    };
+  }, [startAnimation, crashPoint]);
 
   return (
-    <>
-      <svg width="400" height="200" style={{ border: '1px solid black' }}>
-        <line x1="50" y1="150" x2="400" y2="150" stroke="black" strokeWidth="2" />
-        <line x1="50" y1="0" x2="50" y2="150" stroke="black" strokeWidth="2" />
-        <text x="10" y="15" fontSize="12" fill="black">Max</text>
-        <text x="10" y="82.5" fontSize="12" fill="black">Mid</text>
-        <text x="10" y="150" fontSize="12" fill="black">0</text>
-        {timeLabels.map((label, index) => {
-          const totalWidth = 350;
-          const labelSpacing = totalWidth / (timeLabels.length - 1);
-          const labelXPosition = 50 + index * labelSpacing;
-
-          return (
-            <text key={index} x={labelXPosition} y="165" fontSize="12" fill="black">{label}</text>
-          );
-        })}
-        <motion.path
-          d={path}
-          fill="none"
-          stroke="red"
-          strokeWidth="2"
-          variants={pathVariants}
-          initial="hidden"
-          animate="visible"
-        />
-      </svg>
-      <div>Multiplier: {multiplierValues.at(-1)?.toFixed(2)}x</div>
-    </>
+    <svg ref={d3Container} className="border border-black" width="100%" height="100%">
+      <path className="line" fill="none" stroke="white" strokeWidth="4" />
+    </svg>
   );
 };
 

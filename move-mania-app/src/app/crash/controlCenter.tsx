@@ -23,7 +23,7 @@ export type GameStatus = {
   status: "COUNTDOWN" | "IN_PROGRESS" | "END";
   roundId: number;
   startTime: number;
-  crashPoint : number;
+  crashPoint: number;
 };
 
 export default function ControlCenter() {
@@ -32,6 +32,8 @@ export default function ControlCenter() {
     account,
     latestAction
   } = useContext(gameStatusContext);
+
+  console.log("gameStatus from context in ControlCenter:", gameStatus);
 
   const [betAmount, setBetAmount] = useState("");
 
@@ -42,9 +44,7 @@ export default function ControlCenter() {
   const [hasCashOut, setHasCashOut] = useState(false);
 
   useEffect(() => {
-    console.log('account', account)
     if (account) {
-      console.log('updating hasBet and hasCashOut')
       hasUserBet(account?.email || "").then((bet) => {
         setHasBet(bet);
       });
@@ -57,7 +57,6 @@ export default function ControlCenter() {
   }, [gameStatus, account, latestAction]);
 
   useEffect(() => {
-    console.log('gameStatus', gameStatus?.status)
     if (gameStatus?.status === "IN_PROGRESS") {
       console.log('setting bet and cashout to false')
       checkAutoCashout();
@@ -71,9 +70,7 @@ export default function ControlCenter() {
     console.log('hasBet', hasBet)
 
     if (hasBet && autoCashout && timeUntilCashout < timeUntilCrash && timeUntilCashout > 0) {
-      console.log('setting auto cashout')
       setTimeout(() => {
-        console.log('auto cashout')
         onCashOut();
       }, timeUntilCashout);
     }
@@ -133,41 +130,37 @@ export default function ControlCenter() {
           </div>
           <div className="flex flex-row items-center text-xs">
             <div
-              className={`border px-2 py-1 cursor-pointer ${
-                parseFloat(betAmount) === 1
+              className={`border px-2 py-1 cursor-pointer ${parseFloat(betAmount) === 1
                   ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
                   : "opacity-50 border-neutral-700"
-              }`}
+                }`}
               onClick={() => setBetAmount("1")}
             >
               1 APT
             </div>
             <div
-              className={`border px-2 py-1 cursor-pointer ${
-                parseFloat(betAmount) === 5
+              className={`border px-2 py-1 cursor-pointer ${parseFloat(betAmount) === 5
                   ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
                   : "opacity-50 border-neutral-700"
-              }`}
+                }`}
               onClick={() => setBetAmount("5")}
             >
               5 APT
             </div>
             <div
-              className={`border px-2 py-1 cursor-pointer ${
-                parseFloat(betAmount) === 10
+              className={`border px-2 py-1 cursor-pointer ${parseFloat(betAmount) === 10
                   ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
                   : "opacity-50 border-neutral-700"
-              }`}
+                }`}
               onClick={() => setBetAmount("10")}
             >
               10 APT
             </div>
             <div
-              className={`border px-2 py-1 cursor-pointer ${
-                parseFloat(betAmount) === 25
+              className={`border px-2 py-1 cursor-pointer ${parseFloat(betAmount) === 25
                   ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
                   : "opacity-50 border-neutral-700"
-              }`}
+                }`}
               onClick={() => setBetAmount("25")}
             >
               25 APT
@@ -205,7 +198,7 @@ export default function ControlCenter() {
             )
           }
           {
-            account && gameStatus?.status === "IN_PROGRESS" && hasBet &&  (
+            account && gameStatus?.status === "IN_PROGRESS" && hasBet && (
               <button
                 className={cn(
                   "border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 w-full ",
@@ -224,7 +217,7 @@ export default function ControlCenter() {
             )
           }
           {
-            account && gameStatus?.status === "IN_PROGRESS" && !hasBet &&  (
+            account && gameStatus?.status === "IN_PROGRESS" && !hasBet && (
               <button
                 className="border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 cursor-not-allowed w-full"
                 disabled
@@ -264,11 +257,10 @@ export default function ControlCenter() {
           </div>
           <div className="flex flex-row items-center text-xs">
             <div
-              className={`text-center border px-2 py-1 cursor-pointer grow ${
-                parseFloat(autoCashoutAmount) === 1.01
+              className={`text-center border px-2 py-1 cursor-pointer grow ${parseFloat(autoCashoutAmount) === 1.01
                   ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
                   : "opacity-50 border-neutral-700"
-              }`}
+                }`}
               onClick={() => {
                 setAutoCashout(false);
                 setAutoCashoutAmount("1.01");
@@ -277,11 +269,10 @@ export default function ControlCenter() {
               1.01x
             </div>
             <div
-              className={`text-center border px-2 py-1 cursor-pointer grow ${
-                parseFloat(autoCashoutAmount) === 1.5
+              className={`text-center border px-2 py-1 cursor-pointer grow ${parseFloat(autoCashoutAmount) === 1.5
                   ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
                   : "opacity-50 border-neutral-700"
-              }`}
+                }`}
               onClick={() => {
                 setAutoCashout(false);
                 setAutoCashoutAmount("1.5");
@@ -290,11 +281,10 @@ export default function ControlCenter() {
               1.5x
             </div>
             <div
-              className={`text-center border px-2 py-1 cursor-pointer grow ${
-                parseFloat(autoCashoutAmount) === 2
+              className={`text-center border px-2 py-1 cursor-pointer grow ${parseFloat(autoCashoutAmount) === 2
                   ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
                   : "opacity-50 border-neutral-700"
-              }`}
+                }`}
               onClick={() => {
                 setAutoCashout(false);
                 setAutoCashoutAmount("2");
@@ -303,11 +293,10 @@ export default function ControlCenter() {
               2x
             </div>
             <div
-              className={`text-center border px-2 py-1 cursor-pointer grow ${
-                parseFloat(autoCashoutAmount) === 5
+              className={`text-center border px-2 py-1 cursor-pointer grow ${parseFloat(autoCashoutAmount) === 5
                   ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
                   : "opacity-50 border-neutral-700"
-              }`}
+                }`}
               onClick={() => {
                 setAutoCashout(false);
                 setAutoCashoutAmount("5");
@@ -333,11 +322,11 @@ export default function ControlCenter() {
               <button
                 className={cn(
                   "border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 w-[250px]",
-                    autoCashout && "bg-[#264234]/40"
+                  autoCashout && "bg-[#264234]/40"
                 )}
                 onClick={() => {
                   setAutoCashout(!autoCashout);
-            
+
                 }}
               >
                 {

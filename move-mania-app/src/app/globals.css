@@ -8,7 +8,8 @@
 
 body {
   color: rgb(var(--foreground-rgb));
-  background-color: white; /* Directly set the background color to white */
+  background-color: white;
+  /* Directly set the background color to white */
 }
 
 @layer utilities {
@@ -24,7 +25,9 @@ table.scroll {
 }
 
 table.scroll tbody,
-table.scroll thead { display: block; }
+table.scroll thead {
+  display: block;
+}
 
 
 table.scroll tbody {
@@ -51,4 +54,29 @@ table.scroll tbody {
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   background: #22c55e;
+}
+
+.line {
+  fill: none;
+  stroke: white;
+  stroke-width: 2;
+}
+
+.border-black {
+  border-color: black;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #333;
+  shape-rendering: crispEdges;
+}
+
+.axis text {
+  fill: white;
+}
+
+.chart-background {
+  background-color: black;
 }
