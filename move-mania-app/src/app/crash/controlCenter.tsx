@@ -33,8 +33,6 @@ export default function ControlCenter() {
     latestAction
   } = useContext(gameStatusContext);
 
-  console.log("gameStatus from context in ControlCenter:", gameStatus);
-
   const [betAmount, setBetAmount] = useState("");
 
   const [autoCashout, setAutoCashout] = useState(false);

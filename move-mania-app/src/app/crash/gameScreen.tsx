@@ -1,64 +1,63 @@
 "use client";
-import React, { useContext, useEffect, useState } from "react";
-import moment from "moment";
+
+import { useContext, useEffect, useState } from "react";
+import { GameStatus } from "./controlCenter";
+import { SOCKET_EVENTS, RoundStart } from "@/lib/types";
+import { Socket, io } from "socket.io-client";
+import CountUp from "react-countup";
+import { getCurrentGame } from "@/lib/api";
+import { startRound } from "@/lib/socket";
+
+import { socket } from "@/lib/socket";
+
 import { gameStatusContext } from "./CrashProvider";
 import CrashChart from "@/components/CrashChart.client";
 
 export default function GameScreen() {
-  const { gameStatus, startCountdownManually } = useContext(gameStatusContext);
-  const [countdown, setCountdown] = useState({ seconds: '' });
+  const {
+    gameStatus,
+  } = useContext(gameStatusContext);
+  const [update, setUpdate] = useState(true);
 
-  useEffect(() => {
-    if (!gameStatus || gameStatus.status !== "COUNTDOWN") {
-      return;
-    }
+  const onStartRound = () => {
+    if (!socket) return;
 
-    const endTime = moment(gameStatus.startTime);
-    const updateCountdown = () => {
-      const now = moment();
-      const duration = moment.duration(endTime.diff(now));
-      const seconds = Math.ceil(duration.asSeconds());
-
-      if (seconds <= 0) {
-        startCountdownManually("IN_PROGRESS");
-        return;
-      }
-
-      setCountdown({ seconds: seconds.toString() });
-    };
-
-    const intervalId = setInterval(updateCountdown, 1000);
-    updateCountdown();
-
-    return () => clearInterval(intervalId);
-  }, [gameStatus]);
+    const success = startRound();
+  };
 
   if (gameStatus === null) {
     return (
-      <div>
-        <button onClick={() => startCountdownManually("COUNTDOWN")}>Start Button</button>
+      <div className="border-b border-l border-green-500 h-full w-full bg-neutral-950">
+        <span onClick={onStartRound}>No games yet - click here to admin start one</span>
       </div>
     );
   } else if (gameStatus.status === "COUNTDOWN") {
     return (
-      <div>
-        <h1>Countdown</h1>
-        <div>
-          {countdown.seconds} Seconds until the next game starts.
-        </div>
-        <button onClick={() => startCountdownManually("COUNTDOWN")}>Restart Countdown Manually</button>
+      <div className="border-b border-l border-green-500 h-full w-full bg-neutral-950">
+        <CountUp
+          start={(gameStatus.startTime! - Date.now()) / 1000}
+          end={0}
+          duration={(gameStatus.startTime! - Date.now()) / 1000}
+          separator=" "
+          decimals={0}
+          decimal="."
+          prefix="Game starts in "
+          suffix=" seconds"
+          useEasing={false}
+        />
       </div>
     );
   } else if (gameStatus.status === "IN_PROGRESS") {
-    // Hardcoded crashPoint
     const hardcodedCrashPoint = 5000;
     console.log("Current gameStatus:", gameStatus);
     return (
-      <CrashChart key={`crash-chart-${gameStatus.status}`} startAnimation={true} crashPoint={hardcodedCrashPoint} />
+      <CrashChart startAnimation={true} crashPoint={gameStatus.crashPoint} />
     );
   } else if (gameStatus.status === "END") {
     return (
-      <CrashChart startAnimation={false} crashPoint={gameStatus.crashPoint} />
+      <div className="border-b border-l border-green-500 h-full w-full bg-neutral-950">
+        <CrashChart startAnimation={false} crashPoint={gameStatus.crashPoint} />
+      </div>
     );
   }
 }
