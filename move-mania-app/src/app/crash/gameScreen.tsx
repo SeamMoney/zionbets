@@ -18,65 +18,6 @@ export default function GameScreen() {
   } = useContext(gameStatusContext);
   const [update, setUpdate] = useState(true);
 
-  // useEffect(() => {
-  //   socket.on("disconnect", () => {
-  //     console.log("DISCONNECTED - gameScreen.tsx"); 
-  //   });
-
-  //   socket.on(SOCKET_EVENTS.ROUND_START, (data: RoundStart) => {
-  //     setUpdate(true);
-  //   });
-
-  //   socket.on(SOCKET_EVENTS.ROUND_RESULT, (data: RoundStart) => {
-  //     setUpdate(true);
-  //   });
-  // }, []);
-
-  // useEffect(() => {
-  //   if (update) {
-  //     getCurrentGame().then((game) => {
-        
-  //       if (game == null) {
-  //         setGameStatus(null);
-  //       } else {
-  //         if (game.start_time > Date.now()) {
-  //           console.log("COUNTDOWN - gameScreen.tsx")
-  //           setGameStatus({
-  //             status: "COUNTDOWN",
-  //             roundId: game.round_id,
-  //             startTime: game.start_time,
-  //             crashPoint: game.secret_crash_point,
-  //           });
-  //           setTimeout(() => {
-  //             setUpdate(true);
-  //           }, game.start_time - Date.now());
-  //         } else if (game.start_time + game.secret_crash_point * 1000 > Date.now()) {
-  //           console.log("IN_PROGRESS - gameScreen.tsx")
-  //           setGameStatus({
-  //             status: "IN_PROGRESS",
-  //             roundId: game.round_id,
-  //             startTime: game.start_time,
-  //             crashPoint: game.secret_crash_point,
-  //           });
-  //           setTimeout(() => {
-  //             setUpdate(true);
-  //           }, game.start_time + game.secret_crash_point * 1000 - Date.now());
-  //         } else {
-  //           console.log("END - gameScreen.tsx")
-  //           setGameStatus({
-  //             status: "END",
-  //             roundId: game.round_id,
-  //             startTime: game.start_time,
-  //             crashPoint: game.secret_crash_point,
-  //           });
-  //         }
-  //       }
-  //     });
-
-  //     setUpdate(false);
-  //   }
-  // }, [update]);
-
   const onStartRound = () => {
     if (!socket) return;
 

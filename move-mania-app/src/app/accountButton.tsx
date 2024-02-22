@@ -20,6 +20,7 @@ import {
 import { User } from "@/lib/schema";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { getSession, signIn, signOut } from "next-auth/react";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 
 export default function AccountButton() {
@@ -74,10 +75,17 @@ export default function AccountButton() {
     <div>
       <Sheet>
         {account ? (
-          <SheetTrigger asChild>
-            <button className="bg-white px-6 py-2 font-mono font-bold text-neutral-950 hover:bg-neutral-300">
+          <SheetTrigger className="flex flex-col items-center justify-center">
+            <button className="hidden sm:block bg-white px-2 sm:px-6 py-1 sm:py-2 text-xs sm:text-base font-mono font-bold text-neutral-950 hover:bg-neutral-300">
               {account.username}
             </button>
+            <Image 
+              src={account.image}
+              alt="Profile picture"
+              width={36}
+              height={36}
+              className="block sm:hidden rounded-none hover:opacity-80"
+            />
           </SheetTrigger>
         ) : (
           <button
@@ -192,11 +200,11 @@ export default function AccountButton() {
                   </span>
                 </div>
               </div>
-              <SheetFooter>
+              <SheetFooter className="flex flex-col items-center gap-2 w-full">
                 <SheetClose asChild>
                   <button
                     type="submit"
-                    className="border border-neutral-700 hover:bg-neutral-800/80 hover:bg-noise px-6 py-1 text-neutral-500"
+                    className="border border-neutral-700 hover:bg-neutral-800/80 hover:bg-noise px-6 py-1 text-neutral-500 w-full"
                     onClick={() => signOut()}
                   >
                     Sign out
@@ -205,7 +213,7 @@ export default function AccountButton() {
                 <SheetClose asChild>
                   <button
                     type="submit"
-                    className="border border-green-700 hover:bg-[#264234]/40 hover:bg-noise px-6 py-1 text-green-500"
+                    className="border border-green-700 hover:bg-[#264234]/40 hover:bg-noise px-6 py-1 text-green-500 w-full"
                     onClick={onSubmit}
                   >
                     Save changes
