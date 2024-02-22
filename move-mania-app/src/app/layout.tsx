@@ -58,14 +58,14 @@ export default function RootLayout({
                 </div>
               </div>
             </nav>
-            <div className="flex flex-1 flex-col pt-20 mr-96">
+            <div className="flex flex-1 flex-col pt-20 lg:mr-96">
               <main className="flex-1 overflow-y-auto">
                 {children}
                 <Toaster />
               </main>
             </div>
 
-            <aside className="fixed inset-y-0 right-0 w-96 pt-20 z-20 bg-gray-800 text-white overflow-hidden">
+            <aside className="hidden lg:block lg:fixed lg:inset-y-0 lg:right-0 lg:w-96 lg:pt-20 bg-gray-800 text-white overflow-hidden">
               <ChatWindow />
             </aside>
           </div>
