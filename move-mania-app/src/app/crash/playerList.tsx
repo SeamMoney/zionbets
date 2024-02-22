@@ -166,7 +166,7 @@ export default function PlayerList() {
   // }, []);
 
   return (
-    <div className="border border-neutral-700 h-full flex flex-col items-left gap-2">
+    <div className="border border-neutral-700 h-full flex flex-col items-left gap-2 w-[350px] min-h-[200px] max-h-[700px]">
       <span className="font-semibold text-lg pt-1 ps-4">Live Bets</span>
       <table className="w-full scroll">
         <thead className="">

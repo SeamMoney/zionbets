@@ -113,10 +113,12 @@ export default function ControlCenter() {
   };
 
   return (
-    <div className="w-full h-full flex flex-row items-center justify-between gap-1">
-      <div className=" flex flex-col items-start justify-around px-2 gap-2">
-        <div className="flex flex-col gap-1">
-          <div className="flex flex-row justify-between px-4 py-2 border border-neutral-700 bg-neutral-800/20 bg-noise">
+    <div className="w-full h-full flex flex-col gap-4 min-[550px]:flex-row items-start min-[550px]:items-center min-[550px]:justify-between gap-1">
+
+
+      <div className=" flex flex-col items-start justify-around px-2 gap-2 w-full">
+        <div className="flex flex-col gap-1 w-full">
+          <div className="flex flex-row justify-between px-4 py-2 border border-neutral-700 bg-neutral-800/20 bg-noise w-full">
             <span className="font-mono font-light">BET</span>
             <span className="font-mono opacity-50 flex flex-row justify-center items-center gap-1">
               <input
@@ -131,9 +133,9 @@ export default function ControlCenter() {
               <span>APT</span>
             </span>
           </div>
-          <div className="flex flex-row items-center text-xs">
+          <div className="flex flex-row items-center text-xs w-full">
             <div
-              className={`border px-2 py-1 cursor-pointer ${
+              className={`border px-2 py-1 cursor-pointer grow text-center ${
                 parseFloat(betAmount) === 1
                   ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
                   : "opacity-50 border-neutral-700"
@@ -143,7 +145,7 @@ export default function ControlCenter() {
               1 APT
             </div>
             <div
-              className={`border px-2 py-1 cursor-pointer ${
+              className={`border px-2 py-1 cursor-pointer grow text-center ${
                 parseFloat(betAmount) === 5
                   ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
                   : "opacity-50 border-neutral-700"
@@ -153,7 +155,7 @@ export default function ControlCenter() {
               5 APT
             </div>
             <div
-              className={`border px-2 py-1 cursor-pointer ${
+              className={`border px-2 py-1 cursor-pointer grow text-center ${
                 parseFloat(betAmount) === 10
                   ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
                   : "opacity-50 border-neutral-700"
@@ -163,7 +165,7 @@ export default function ControlCenter() {
               10 APT
             </div>
             <div
-              className={`border px-2 py-1 cursor-pointer ${
+              className={`border px-2 py-1 cursor-pointer grow text-center ${
                 parseFloat(betAmount) === 25
                   ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
                   : "opacity-50 border-neutral-700"
@@ -245,7 +247,9 @@ export default function ControlCenter() {
           }
         </div>
       </div>
-      <div className=" flex flex-col items-start justify-around px-2 gap-2">
+
+
+      <div className=" flex flex-col items-start justify-around px-2 gap-2 w-full">
         <div className="flex flex-col gap-1 w-full">
           <div className="flex flex-row justify-between px-4 py-2 border border-neutral-700 bg-neutral-800/20 bg-noise">
             <span className="font-mono font-light">AUTO CASHOUT @</span>
@@ -332,7 +336,7 @@ export default function ControlCenter() {
             account && (
               <button
                 className={cn(
-                  "border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 w-[250px]",
+                  "border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 w-full",
                     autoCashout && "bg-[#264234]/40"
                 )}
                 onClick={() => {
@@ -348,6 +352,8 @@ export default function ControlCenter() {
           }
         </div>
       </div>
+
+
     </div>
   );
 }
