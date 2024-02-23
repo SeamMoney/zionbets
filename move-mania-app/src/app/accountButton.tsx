@@ -76,7 +76,7 @@ export default function AccountButton() {
       <Sheet>
         {account ? (
           <SheetTrigger className="flex flex-col items-center justify-center">
-            <button className="hidden sm:block bg-white px-2 sm:px-6 py-1 sm:py-2 text-xs sm:text-base font-mono font-bold text-neutral-950 hover:bg-neutral-300">
+            <button className="hidden lg:block bg-white px-2 lg:px-6 py-1 lg:py-2 text-xs lg:text-base font-mono font-bold text-neutral-950 hover:bg-neutral-300">
               {account.username}
             </button>
             <Image 
@@ -84,7 +84,7 @@ export default function AccountButton() {
               alt="Profile picture"
               width={36}
               height={36}
-              className="block sm:hidden rounded-none hover:opacity-80"
+              className="block lg:hidden rounded-none hover:opacity-80"
             />
           </SheetTrigger>
         ) : (
@@ -95,7 +95,7 @@ export default function AccountButton() {
             Sign in
           </button>
         )}
-        <SheetContent className="w-96">
+        <SheetContent className="w-full bg-neutral-950 lg:border-neutral-700 border-none">
           {!account ? (
             <div className="flex items-center justify-center h-32">
               <button onClick={onSignIn}>Sign in</button>

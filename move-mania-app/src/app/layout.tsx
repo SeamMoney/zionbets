@@ -23,15 +23,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"></meta>
       <body className={inter.className + " text-white"}>
         
           <div className="flex h-screen overflow-hidden">
-            <nav className="fixed w-full h-12 sm:h-20 z-30 px-2 sm:px-4 border-b border-neutral-700 bg-[#020202] bg-noise">
+            <nav className="fixed w-full h-12 lg:h-20 z-30 px-2 lg:px-4 border-b border-neutral-700 bg-[#020202] bg-noise">
               <div className="flex flex-row items-center justify-between w-full h-full">
                 <div className="flex flex-row gap-4 items-center ">
                   <HamburgerNavigation />
                   <Link href='/' className="text-white text-2xl font-bold font-TheNeue">ZION</Link>
-                  <div className="hidden sm:flex flex-row items-center justify-start gap-2">
+                  <div className="hidden lg:flex flex-row items-center justify-start gap-2">
                     <Link href='/crash' className="text-xl">
                       Crash
                     </Link>
@@ -61,7 +62,7 @@ export default function RootLayout({
                 </div>
               </div>
             </nav>
-            <div className="flex flex-1 flex-col pt-12 sm:pt-20 xl:mr-96">
+            <div className="flex flex-1 flex-col pt-12 lg:pt-20 xl:mr-96">
               <main className="flex-1 overflow-y-auto">
                 {children}
                 <Toaster />
@@ -81,7 +82,7 @@ function HamburgerNavigation() {
   return (
     <Sheet>
       <SheetTrigger>
-        <MenuIcon className="sm:hidden cursor-pointer text-green-500 hover:opacity-80" />
+        <MenuIcon className="lg:hidden cursor-pointer text-green-500 hover:opacity-80" />
       </SheetTrigger>
       <SheetContent className="w-[30%] bg-neutral-950 border-neutral-700 flex flex-col items-start gap-2 pt-8" side={"left"}>
         <SheetClose asChild>
