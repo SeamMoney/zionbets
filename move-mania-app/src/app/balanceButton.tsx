@@ -58,7 +58,7 @@ export default function BalanceButton() {
     return (
       <Dialog>
       <DialogTrigger asChild>
-        <button className="bg-neutral-800 hover:bg-neutral-700 px-2 sm:px-6 py-1 sm:py-2 text-xs sm:text-base font-mono text-white font-semibold">
+        <button className="bg-neutral-800 hover:bg-neutral-700 px-2 lg:px-6 py-1 lg:py-2 text-xs lg:text-base font-mono text-white font-semibold">
           {account.balance.toFixed(2)} APT
         </button>
       </DialogTrigger>

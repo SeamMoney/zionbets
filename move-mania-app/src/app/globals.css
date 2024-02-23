@@ -8,6 +8,7 @@
 
 body {
   color: rgb(var(--foreground-rgb));
+  background-color: black;
   /* background-color: white; Directly set the background color to white */
 }
 
@@ -24,7 +25,7 @@ table.scroll {
 }
 
 table.scroll tbody,
-table.scroll thead { display: block; }
+/* table.scroll thead { display: block; } */
 
 
 table.scroll tbody {
