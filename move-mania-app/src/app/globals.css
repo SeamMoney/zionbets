@@ -8,7 +8,7 @@
 
 body {
   color: rgb(var(--foreground-rgb));
-  background-color: white; /* Directly set the background color to white */
+  /* background-color: white; Directly set the background color to white */
 }
 
 @layer utilities {
@@ -39,7 +39,7 @@ table.scroll tbody {
 
 /* Track */
 ::-webkit-scrollbar-track {
-  /* background: #ff0000; */
+  background: #000000;
 }
 
 /* Handle */
