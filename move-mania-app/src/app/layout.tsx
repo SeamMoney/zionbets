@@ -84,7 +84,7 @@ function HamburgerNavigation() {
       <SheetTrigger>
         <MenuIcon className="lg:hidden cursor-pointer text-green-500 hover:opacity-80" />
       </SheetTrigger>
-      <SheetContent className="w-[30%] bg-neutral-950 border-neutral-700 flex flex-col items-start gap-2 pt-8" side={"left"}>
+      <SheetContent className="w-[70%] bg-neutral-950 border-neutral-700 flex flex-col items-start gap-2 pt-8" side={"left"}>
         <SheetClose asChild>
           <Link href='/' className="text-white text-2xl font-bold">Home</Link>  
         </SheetClose>
