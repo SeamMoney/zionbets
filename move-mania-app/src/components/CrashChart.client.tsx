@@ -17,6 +17,8 @@ function CrashChart({ startAnimation, crashPoint }: CrashChartProps) {
   useEffect(() => {
     if (!startAnimation || !d3Container.current) return;
 
+    d3.select(d3Container.current).selectAll('*').remove();
+
     const containerRect = d3Container.current.getBoundingClientRect();
     const width = containerRect.width - margin.left - margin.right;
     const height = containerRect.height - margin.top - margin.bottom;
@@ -29,10 +31,10 @@ function CrashChart({ startAnimation, crashPoint }: CrashChartProps) {
       .attr('transform', `translate(${margin.left},${margin.top})`);
 
     const xScale = d3.scaleLinear().range([0, width]).domain([0, 40]);
-    const yScale = d3.scaleLinear().range([height, 0]).domain([0, 10]);
+    const yScale = d3.scaleLinear().range([height, 0]).domain([1, 10]);
 
     const xAxis = d3.axisBottom(xScale).tickSize(-height).tickPadding(10).ticks(5);
-    const yAxis = d3.axisLeft(yScale).tickSize(-width).tickPadding(10).ticks(5);
+    const yAxis = d3.axisLeft(yScale).tickSize(-width).tickPadding(10).ticks(5).tickFormat(d3.format(".0f"));;
 
     const xAxisGroup = svg.append('g')
       .attr('class', 'x axis')
@@ -48,24 +50,42 @@ function CrashChart({ startAnimation, crashPoint }: CrashChartProps) {
       .x(d => xScale(d[0]))
       .y(d => yScale(d[1]));
 
+    let timeIncrement = 0.00001;
     let time = 0;
 
     const updateChart = () => {
       if (crashPoint == null) return;
 
-      const base = 1.5;
-      time += 0.001;
-      const newYValue = (Math.pow(base, time) - 1) * (crashPoint / (Math.pow(base, 10) - 1));
+      const initialOffset = 1;
+      const dynamicGrowthRate = Math.max(3, 10 - time);
+
+      if (time < 1) {
+        time += 0.000005;
+      } else {
+        time += 0.0001;
+      }
+      const newYValue = initialOffset + (Math.pow(dynamicGrowthRate, time * 2) - 1) * (crashPoint / (Math.pow(dynamicGrowthRate, 10) - 1));
+
       if (newYValue >= crashPoint) {
         console.log("Crash point reached at time:", time);
         return;
       }
 
+      console.log("Time:", time, "New Y Value:", newYValue);
+
       const newDataPoint: [number, number] = [time, newYValue];
       data.push(newDataPoint);
 
-      xScale.domain([Math.max(time - 10, 0), time]);
-      yScale.domain([0, d3.max(data, d => d[1]) || crashPoint]);
+      xScale.domain([Math.max(time - 40, 0), time]);
+
+      if (data.length > 1) {
+        yScale.domain([1, d3.max(data, d => d[1]) || crashPoint]);
+      }
+
+      if (data.length > 0) {
+        const maxY = d3.max(data, d => d[1]) || crashPoint || 10;
+        yScale.domain([1, maxY]);
+      }
 
       xAxisGroup.call(xAxis);
       yAxisGroup.call(yAxis);
@@ -77,7 +97,6 @@ function CrashChart({ startAnimation, crashPoint }: CrashChartProps) {
         .attr('d', line);
 
       if (data.length === 1) {
-        // Append the rocket image when the first data point is created
         const rocketUrl = '/rocket.png';
         const rocketWidth = 100;
         const rocketHeight = 100;
@@ -97,12 +116,16 @@ function CrashChart({ startAnimation, crashPoint }: CrashChartProps) {
         const deltaX = xScale(secondLastPoint[0]) - xScale(lastPoint[0]);
         let angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
 
+        const safeMargin = Math.max(rocketWidth, rocketHeight);
+
         angle += 245;
 
-        // Update the rocket's position and rotation
+        const offset = 5;
+        const offsetPoint = data.length > offset ? data[data.length - 1 - offset] : secondLastPoint;
+
         if (rocketRef.current) {
-          const rocketX = xScale(lastPoint[0]) - rocketWidth / 2;
-          const rocketY = yScale(lastPoint[1]) - rocketHeight / 2;
+          const rocketX = xScale(offsetPoint[0]) - rocketWidth / 2;
+          const rocketY = yScale(offsetPoint[1]) - rocketHeight / 2;
 
           const rotateX = rocketX + rocketWidth / 2;
           const rotateY = rocketY + rocketHeight / 2;
@@ -114,7 +137,7 @@ function CrashChart({ startAnimation, crashPoint }: CrashChartProps) {
         }
       }
 
-      time += 0.1;
+      time += 0.001;
       animationFrameId.current = requestAnimationFrame(updateChart);
     };
 
