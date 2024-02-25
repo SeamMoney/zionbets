@@ -3,7 +3,7 @@
 import { Socket, io } from "socket.io-client";
 import { BetData, CashOutData, ChatMessage, SOCKET_EVENTS } from "./types";
 
-export const socket = io(`${process.env.API_URL}:8080` || "http://localhost:3008");
+export const socket = io( process.env.API_URL ? `${process.env.API_URL}:8080` : "http://localhost:8080");
 
 export function startRound(): boolean {
   if (socket.disconnected || !socket.connected) {

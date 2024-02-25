@@ -76,7 +76,7 @@ export default function AccountButton() {
       <Sheet>
         {account ? (
           <SheetTrigger className="flex flex-col items-center justify-center">
-            <button className="hidden lg:block bg-white px-2 lg:px-6 py-1 lg:py-2 text-xs lg:text-base font-mono font-bold text-neutral-950 hover:bg-neutral-300">
+            <button className="hidden lg:block bg-white px-2 lg:px-6 py-1 lg:py-2 text-xs lg:text-base font-bold text-neutral-950 hover:bg-neutral-300">
               {account.username}
             </button>
             <Image 
@@ -89,7 +89,7 @@ export default function AccountButton() {
           </SheetTrigger>
         ) : (
           <button
-            className="bg-white px-6 py-1 font-mono text-neutral-950"
+            className="bg-white px-6 py-1  text-neutral-950"
             onClick={onSignIn}
           >
             Sign in
@@ -111,10 +111,10 @@ export default function AccountButton() {
               </SheetHeader>
               <div className="grid gap-4 py-4">
                 <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
-                  <label htmlFor="username" className="text-left font-mono">
+                  <label htmlFor="username" className="text-left ">
                     Username
                   </label>
-                  <span className="font-mono opacity-50 flex flex-row justify-center items-center gap-1">
+                  <span className=" opacity-50 flex flex-row justify-center items-center gap-1">
                     <input
                       id="username"
                       value={username}
@@ -127,10 +127,10 @@ export default function AccountButton() {
                   </span>
                 </div>
                 <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
-                  <label htmlFor="profile_pic" className="text-left font-mono">
+                  <label htmlFor="profile_pic" className="text-left ">
                     Profile picture
                   </label>
-                  <span className="font-mono opacity-50 flex flex-row justify-center items-center gap-1">
+                  <span className=" opacity-50 flex flex-row justify-center items-center gap-1">
                     <input
                       id="profile_pic"
                       value={image}
@@ -143,10 +143,10 @@ export default function AccountButton() {
                   </span>
                 </div>
                 <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
-                  <label htmlFor="email" className="text-left font-mono">
+                  <label htmlFor="email" className="text-left ">
                     Email
                   </label>
-                  <span className="font-mono opacity-50 flex flex-row justify-end items-center gap-1">
+                  <span className=" opacity-50 flex flex-row justify-end items-center gap-1">
                     <input
                       id="email"
                       disabled
@@ -158,11 +158,11 @@ export default function AccountButton() {
                 <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
                   <label
                     htmlFor="public_address"
-                    className="text-left font-mono"
+                    className="text-left "
                   >
                     Public address
                   </label>
-                  <span className="font-mono opacity-50 flex flex-row justify-center items-center gap-1">
+                  <span className=" opacity-50 flex flex-row justify-center items-center gap-1">
                     <input
                       id="public_address"
                       disabled
@@ -174,11 +174,11 @@ export default function AccountButton() {
                 <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
                   <label
                     htmlFor="private_key"
-                    className="font-mono font-light w-[100px]"
+                    className=" font-light w-[100px]"
                   >
                     Private key
                   </label>
-                  <span className="font-mono opacity-50 flex flex-row justify-center items-center gap-1">
+                  <span className=" opacity-50 flex flex-row justify-center items-center gap-1">
                     <input
                       id="private_key"
                       hidden={!privateKeyVisible}
