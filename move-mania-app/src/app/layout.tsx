@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Bai_Jamjuree, Inter } from "next/font/google";
 import "./globals.css";
 import ChatWindow from "./crash/chatWindow";
 import Link from "next/link";
@@ -10,6 +10,10 @@ import { MenuIcon } from "lucide-react";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Analytics } from "@vercel/analytics/react"
 
+const baijamjuree = Bai_Jamjuree({
+  weight: ['200', '300', '400', '500', '600'],
+  subsets: ['latin'],
+});
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -26,7 +30,7 @@ export default function RootLayout({
     <html lang="en">
       <Analytics/>
       <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"></meta>
-      <body className={inter.className + " text-white"}>
+      <body className={baijamjuree.className + " text-white"}>
         
           <div className="flex h-screen overflow-hidden">
             <nav className="fixed w-full h-12 lg:h-20 z-30 px-2 lg:px-4 border-b border-neutral-700 bg-[#020202] bg-noise">

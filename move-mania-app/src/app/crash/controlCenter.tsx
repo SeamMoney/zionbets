@@ -119,8 +119,8 @@ export default function ControlCenter() {
       <div className=" flex flex-col items-start justify-around px-2 gap-2 w-full">
         <div className="flex flex-col gap-1 w-full">
           <div className="flex flex-row justify-between px-4 py-2 border border-neutral-700 bg-neutral-800/20 bg-noise w-full">
-            <span className="font-mono font-light">BET</span>
-            <span className="font-mono opacity-50 flex flex-row justify-center items-center gap-1">
+            <span className="font-light">BET</span>
+            <span className="opacity-50 flex flex-row justify-center items-center gap-1">
               <input
                 className="bg-transparent border-none outline-none text-right max-w-[40px]"
                 value={betAmount}
@@ -252,8 +252,8 @@ export default function ControlCenter() {
       <div className=" flex flex-col items-start justify-around px-2 gap-2 w-full">
         <div className="flex flex-col gap-1 w-full">
           <div className="flex flex-row justify-between px-4 py-2 border border-neutral-700 bg-neutral-800/20 bg-noise">
-            <span className="font-mono font-light">AUTO CASHOUT @</span>
-            <span className="font-mono opacity-50 flex flex-row justify-center items-center gap-0">
+            <span className="font-light">AUTO CASHOUT @</span>
+            <span className="opacity-50 flex flex-row justify-center items-center gap-0">
               <input
                 className="bg-transparent border-none outline-none text-right max-w-[40px]"
                 value={autoCashoutAmount}
