@@ -58,7 +58,7 @@ export default function BalanceButton() {
     return (
       <Dialog>
       <DialogTrigger asChild>
-        <button className="bg-neutral-800 hover:bg-neutral-700 px-2 lg:px-6 py-1 lg:py-2 text-xs lg:text-base font-mono text-white font-semibold">
+        <button className="bg-neutral-800 hover:bg-neutral-700 px-2 lg:px-6 py-1 lg:py-2 text-xs lg:text-base text-white font-semibold">
           {account.balance.toFixed(2)} APT
         </button>
       </DialogTrigger>
@@ -70,11 +70,11 @@ export default function BalanceButton() {
           <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
             <label
               htmlFor="public_address"
-              className="text-left font-mono"
+              className="text-left "
             >
               Public address
             </label>
-            <span className="font-mono opacity-50 flex flex-row justify-center items-center gap-1">
+            <span className=" opacity-50 flex flex-row justify-center items-center gap-1">
               <input
                 id="public_address"
                 disabled
@@ -98,11 +98,11 @@ export default function BalanceButton() {
             <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2 w-full">
               <label
                 htmlFor="public_address"
-                className="text-left font-mono"
+                className="text-left "
               >
                 Recipient address
               </label>
-              <span className="font-mono opacity-50 flex flex-row justify-center items-center gap-1">
+              <span className=" opacity-50 flex flex-row justify-center items-center gap-1">
                 <input
                   id="public_address"
                   placeholder={account.public_address}
