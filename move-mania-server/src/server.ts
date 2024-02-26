@@ -74,7 +74,7 @@ io.on("connection", (socket) => {
       setTimeout(async () => {
         await cycleRounds();
       }, SUMMARY);
-    }, COUNTDOWN + (crashPoint - 1) * 1000);
+    }, COUNTDOWN + (crashPoint == 0 ? 0 : crashPoint - 1) * 1000);
   });
 
   socket.on(SOCKET_EVENTS.CHAT_MESSAGE, async (message) => {
@@ -113,5 +113,5 @@ async function cycleRounds() {
     setTimeout(async () => {
       await cycleRounds();
     }, SUMMARY);
-  }, COUNTDOWN + (crashPoint - 1) * 1000);
+  }, COUNTDOWN + (crashPoint == 0 ? 0 : crashPoint - 1) * 1000);
 }
