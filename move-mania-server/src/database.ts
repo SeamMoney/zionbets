@@ -391,6 +391,12 @@ export async function addBetToPlayerList(bet: BetData) {
     bet.playerEmail
   );
 
+  await db.run(
+    'UPDATE users SET balance = balance - ? WHERE email = ?',
+    bet.betAmount,
+    bet.playerEmail
+  );
+
   await db.close();
 }
 
@@ -436,7 +442,7 @@ export async function payOutPlayers() {
     );
 
     if (user !== undefined) {
-      let newBalance = user.balance - player.bet_amount;
+      let newBalance = user.balance;
 
       if (player.crash_point != null && player.crash_point > 0) {
         newBalance += player.bet_amount * player.crash_point;
