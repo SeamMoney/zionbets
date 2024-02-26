@@ -16,7 +16,6 @@ export default function GameScreen() {
   const {
     gameStatus,
   } = useContext(gameStatusContext);
-  const [update, setUpdate] = useState(true);
 
   const onStartRound = () => {
     if (!socket) return;
@@ -50,9 +49,9 @@ export default function GameScreen() {
     return (
       <div className="border-b border-l border-green-500 h-full w-full bg-neutral-950">
         <CountUp
-          start={(Date.now() - gameStatus.startTime!) / 1000}
+          start={(Date.now() - gameStatus.startTime!) / 1000 + 1}
           end={gameStatus.crashPoint!}
-          duration={gameStatus.crashPoint!}
+          duration={gameStatus.crashPoint! - ((Date.now() - gameStatus.startTime!) / 1000 + 1)}
           separator=""
           decimals={2}
           decimal="."

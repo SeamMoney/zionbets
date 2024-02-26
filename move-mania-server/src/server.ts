@@ -13,6 +13,9 @@ import {
   payOutPlayers,
 } from "./database";
 
+import crypto from 'crypto';
+import { calculateCrashPoint } from "./crashPoint";
+
 const COUNTDOWN = 20 * 1000;
 const SUMMARY = 5 * 1000;
 
@@ -46,8 +49,8 @@ io.on("connection", (socket) => {
 
   socket.on(SOCKET_EVENTS.START_ROUND, async () => {
     await clearPlayerList();
-    let crashPoint = Math.random() * 10;
-    if (crashPoint < 1) {
+    let crashPoint = calculateCrashPoint(crypto.randomInt(0, 100), crypto.randomBytes(16).toString('hex'));
+    if (crashPoint <= 1) {
       crashPoint = 0;
     }
     const startTime = Date.now() + COUNTDOWN;
@@ -71,7 +74,7 @@ io.on("connection", (socket) => {
       setTimeout(async () => {
         await cycleRounds();
       }, SUMMARY);
-    }, COUNTDOWN + crashPoint * 1000);
+    }, COUNTDOWN + (crashPoint - 1) * 1000);
   });
 
   socket.on(SOCKET_EVENTS.CHAT_MESSAGE, async (message) => {
@@ -85,8 +88,8 @@ io.on("connection", (socket) => {
 
 async function cycleRounds() {
   await clearPlayerList();
-  let crashPoint = Math.random() * 10;
-  if (crashPoint < 1) {
+  let crashPoint = calculateCrashPoint(crypto.randomInt(0, 100), crypto.randomBytes(16).toString('hex'));
+  if (crashPoint <= 1) {
     crashPoint = 0;
   }
   const startTime = Date.now() + COUNTDOWN;
@@ -110,5 +113,5 @@ async function cycleRounds() {
     setTimeout(async () => {
       await cycleRounds();
     }, SUMMARY);
-  }, COUNTDOWN + crashPoint * 1000);
+  }, COUNTDOWN + (crashPoint - 1) * 1000);
 }
