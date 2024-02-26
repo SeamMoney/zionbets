@@ -15,6 +15,8 @@ function CrashChart({ startAnimation, crashPoint }: CrashChartProps) {
   const rocketRef = useRef<SVGImageElement | null>(null);
 
   useEffect(() => {
+    const startTime = Date.now();
+
     if (!startAnimation || !d3Container.current) return;
 
     d3.select(d3Container.current).selectAll('*').remove();
@@ -30,11 +32,11 @@ function CrashChart({ startAnimation, crashPoint }: CrashChartProps) {
       .append('g')
       .attr('transform', `translate(${margin.left},${margin.top})`);
 
-    const xScale = d3.scaleLinear().range([0, width]).domain([0, 40]);
-    const yScale = d3.scaleLinear().range([height, 0]).domain([1, 10]);
+    const xScale = d3.scaleLinear().range([0, width]).domain([0, 10]);
+    const yScale = d3.scaleLinear().range([height, 0]).domain([1, crashPoint || 10]);
 
-    const xAxis = d3.axisBottom(xScale).tickSize(-height).tickPadding(10).ticks(5);
-    const yAxis = d3.axisLeft(yScale).tickSize(-width).tickPadding(10).ticks(5).tickFormat(d3.format(".0f"));;
+    const xAxis = d3.axisBottom(xScale).ticks(10);
+    let yAxis = d3.axisLeft(yScale).tickFormat(d => (+d).toFixed(1)).ticks(10);
 
     const xAxisGroup = svg.append('g')
       .attr('class', 'x axis')
@@ -50,21 +52,19 @@ function CrashChart({ startAnimation, crashPoint }: CrashChartProps) {
       .x(d => xScale(d[0]))
       .y(d => yScale(d[1]));
 
-    let timeIncrement = 0.00001;
-    let time = 0;
+    let timeIncrement = 0.1;
 
     const updateChart = () => {
+      const elapsedTime = Date.now() - startTime;
+      let time = (elapsedTime / 10000) * 10;
       if (crashPoint == null) return;
 
       const initialOffset = 1;
       const dynamicGrowthRate = Math.max(3, 10 - time);
 
-      if (time < 1) {
-        time += 0.000005;
-      } else {
-        time += 0.0001;
-      }
-      const newYValue = initialOffset + (Math.pow(dynamicGrowthRate, time * 2) - 1) * (crashPoint / (Math.pow(dynamicGrowthRate, 10) - 1));
+      time += (time < 1) ? 0.0001 : 0.002;
+
+      const newYValue = Math.pow(2, time);
 
       if (newYValue >= crashPoint) {
         console.log("Crash point reached at time:", time);
@@ -78,16 +78,14 @@ function CrashChart({ startAnimation, crashPoint }: CrashChartProps) {
 
       xScale.domain([Math.max(time - 40, 0), time]);
 
-      if (data.length > 1) {
-        yScale.domain([1, d3.max(data, d => d[1]) || crashPoint]);
-      }
 
-      if (data.length > 0) {
+      if (data.length > 1) {
         const maxY = d3.max(data, d => d[1]) || crashPoint || 10;
-        yScale.domain([1, maxY]);
+        yScale.domain([1, maxY + (maxY * 0.1)]); // Adding a 10% buffer
       }
 
       xAxisGroup.call(xAxis);
+      yAxis.scale(yScale).ticks(10);
       yAxisGroup.call(yAxis);
 
       svg.selectAll('.line')
@@ -137,7 +135,6 @@ function CrashChart({ startAnimation, crashPoint }: CrashChartProps) {
         }
       }
 
-      time += 0.001;
       animationFrameId.current = requestAnimationFrame(updateChart);
     };
 
