@@ -65,7 +65,7 @@ export default function ControlCenter() {
   }, [gameStatus]);
 
   const checkAutoCashout = () => {
-    const timeUntilCrash = gameStatus?.startTime! + gameStatus?.crashPoint! * 1000 - Date.now();
+    const timeUntilCrash = gameStatus?.startTime! + (gameStatus?.crashPoint!) * 1000 - Date.now();
     const timeUntilCashout = gameStatus?.startTime! + parseFloat(autoCashoutAmount)! * 1000 - Date.now();
 
     console.log('hasBet', hasBet)
@@ -75,7 +75,7 @@ export default function ControlCenter() {
       setTimeout(() => {
         console.log('auto cashout')
         onCashOut();
-      }, timeUntilCashout);
+      }, timeUntilCashout - 1000);
     }
   }
 
@@ -101,7 +101,7 @@ export default function ControlCenter() {
 
     if (!gameStatus?.startTime) return;
 
-    const cashoutMultipler = (Date.now() - gameStatus.startTime) / 1000;
+    const cashoutMultipler = (Date.now() - gameStatus.startTime) / 1000 + 1;
 
     const data = {
       roundId: 1,

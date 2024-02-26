@@ -46,6 +46,21 @@ export default function BalanceButton() {
     });
   }, []);
 
+  useEffect(() => {
+    if (account) {
+      const interval = setInterval(() => {
+        // console.log('Checking for updates')
+        getUser(account.email).then((user) => {
+          if (user) {
+            // console.log('balance: ', user.balance)
+            setAccount(user);
+          }
+        });
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  });
+
   const onWithdraw = async () => {
     // withdraw funds
     toast({
