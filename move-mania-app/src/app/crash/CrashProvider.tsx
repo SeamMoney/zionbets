@@ -105,7 +105,7 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
             console.log("COUNTDOWN - page.tsx")
             setGameStatus({
               status: "COUNTDOWN",
-              roundId: game.round_id,
+              roundId: game.game_id,
               startTime: game.start_time,
               crashPoint: game.secret_crash_point,
             });
@@ -116,7 +116,7 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
             console.log("IN_PROGRESS - page.tsx")
             setGameStatus({
               status: "IN_PROGRESS",
-              roundId: game.round_id,
+              roundId: game.game_id,
               startTime: game.start_time,
               crashPoint: game.secret_crash_point,
             });
@@ -127,7 +127,7 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
             console.log("END - page.tsx")
             setGameStatus({
               status: "END",
-              roundId: game.round_id,
+              roundId: game.game_id,
               startTime: game.start_time,
               crashPoint: game.secret_crash_point,
             });
