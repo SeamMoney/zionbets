@@ -123,19 +123,31 @@ function generateChartData(gameRoundId: string) {
   const gameRoundHash = hasher.update(gameRoundId).digest("hex");
   console.log("gameRoundHash:", gameRoundHash);
 
+  return gameRoundHash.split("");
+
   const dataPoints = [];
   let currentDate = new Date("2021-01-01T00:00:00Z");
 
   for (let i = 0; i < gameRoundHash.length; i++) {
     const hexChar = gameRoundHash[i];
     const hexValue = parseInt(hexChar, 16);
-    const open: number = i === 0 ? 50 : dataPoints[i - 1].close;
-    const close = open + hexValue;
-    const high = close + Math.random() * 0.2;
-    const low = open - Math.random() * 0.2;
-    const timeString = currentDate.toISOString().split("T")[0];
-    dataPoints.push({ time: timeString as unknown as UTCTimestamp, open, high, low, close });
-    currentDate = new Date(currentDate.getTime() + 1000);
+    if (![1, 3, 5, 7, 9, 13].includes(hexValue)) {
+      const open: number = i === 0 ? 50 : dataPoints[i - 1].close ;
+      const close = open + hexValue;
+      const high = close + (Math.random() * 5);
+      const low = open - (Math.random() * 5);
+      const timeString = currentDate.toISOString().split('T')[0];
+      dataPoints.push({ time: timeString, open, high, low, close });
+      currentDate = new Date(currentDate.getTime() + (24 * 60 * 60 * 1000));
+    } else {
+      const open: number = i === 0 ? 50 : dataPoints[i - 1].close ;
+      const close = open - hexValue;
+      const high = close + (Math.random() * 5);
+      const low = open - (Math.random() * 5);
+      const timeString = currentDate.toISOString().split('T')[0];
+      dataPoints.push({ time: timeString, open, high, low, close });
+      currentDate = new Date(currentDate.getTime() + (24 * 60 * 60 * 1000));
+    }
   }
 
   return dataPoints;
