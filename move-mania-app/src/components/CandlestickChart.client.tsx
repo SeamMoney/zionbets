@@ -59,7 +59,7 @@ function CandlestickChart ({
                 // },
             },
             timeScale: {
-                // visible: false,
+                visible: false,
                 borderVisible: true,
                 secondsVisible: false,
                 timeVisible: false,
@@ -68,7 +68,7 @@ function CandlestickChart ({
                 barSpacing: 15,
             },
             rightPriceScale: {  
-                // visible: false,
+                visible: false,
             },
 
         });
@@ -89,11 +89,7 @@ function CandlestickChart ({
         const tickMs = 100;
         const elapsedTicks = Math.floor(elapsedMs / tickMs);
 
-        setChartData(data.slice(-elapsedTicks));
-
         const dataToShow = data.slice(0, elapsedTicks);
-
-        console.log('elapsedTicks:', elapsedTicks);
 
         candleSeries.setData(dataToShow);
         // candleSeries.setData(data);
@@ -101,12 +97,14 @@ function CandlestickChart ({
         // Set timeout to update the chart every 100ms with the next data point
         const updateChart = () => {
             setTimeout(() => {
-                if (chartData.length === 0) return;
-                // const elapsedMs = Date.now() - startTime;
-                // const tickMs = 100;
-                // const elapsedTicks = Math.floor(elapsedMs / tickMs);
-                console.log('elapsedTicks:', elapsedTicks);
-                candleSeries.update(chartData.shift() as DataPoint);
+                const elapsedMs = Date.now() - (startTime - 20 * 1000);
+                const tickMs = 100;
+                const elapsedTicks = Math.floor(elapsedMs / tickMs);
+
+                const dataToShow = data.slice(0, elapsedTicks);
+
+                candleSeries.setData(dataToShow);
+
                 updateChart();
             }, tickMs);
         };
