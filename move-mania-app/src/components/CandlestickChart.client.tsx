@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { createChart, IChartApi, ISeriesApi, UTCTimestamp, isUTCTimestamp, CrosshairMode } from 'lightweight-charts';
 import "../app/globals.css";
 import { start } from 'repl';
@@ -25,6 +25,9 @@ function CandlestickChart ({
 }) {
     const chartContainerRef = useRef<HTMLDivElement>(null);
     const chart = useRef<IChartApi | null>(null);
+
+    const [update, setUpdate] = useState(false);
+    const [chartSeries, setChartSeries] = useState<ISeriesApi<"Candlestick"> | null>(null);
     
     useEffect(() => {
 
@@ -80,7 +83,14 @@ function CandlestickChart ({
             borderVisible: true,
             borderColor: '#39FF14'
         });
+        setChartSeries(candleSeries);
 
+        const elapsedMs = Date.now() - startTime;
+        const tickMs = 100;
+        const elapsedTicks = Math.floor(elapsedMs / tickMs);
+        const dataToShow = data.slice(0, elapsedTicks);
+
+        // candleSeries.setData(dataToShow);
         candleSeries.setData(data);
     }, [])
 

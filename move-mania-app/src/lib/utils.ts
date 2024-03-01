@@ -6,16 +6,20 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+const EXPONENTIAL_FACTOR = 1.06;
 
 export function generateChartData(gameRoundId: string, crashPoint: number): any[] {
 
   const startingPrice = 50;
-  const exponentialBase = 1.06;
+  const exponentialBase = EXPONENTIAL_FACTOR;
   const tickMs = 100;
   const countdownMs = 20 * 1000;
   const gameLengthMs = log(exponentialBase, crashPoint) * 1000;
   const gameEndMs = 5 * 1000;
   const gameTicks = (countdownMs + gameLengthMs) / tickMs;
+
+  console.log('number of ticks for countdown:', countdownMs / tickMs)
+  console.log('number of ticks for game:', gameLengthMs / tickMs)
 
   const hasher = crypto.createHash("sha256");
   if (hasher === undefined) {
@@ -58,12 +62,12 @@ export function generateChartData(gameRoundId: string, crashPoint: number): any[
     const timeString = currentDate.toISOString().split('T')[0];
     dataPoints.push({ time: timeString, open, high, low, close });
     currentDate = new Date(currentDate.getTime() + (24 * 60 * 60 * 1000));
-    console.log("dataPoints[currentElapsedTimeMs / tickMs]:", dataPoints[currentElapsedTimeMs / tickMs]);
+    // console.log("dataPoints[currentElapsedTimeMs / tickMs]:", dataPoints[currentElapsedTimeMs / tickMs]);
   }
 
   for (currentElapsedTimeMs; currentElapsedTimeMs < gameLengthMs; currentElapsedTimeMs += tickMs) {
     const hexValue = parseInt(gameRoundHash[currentElapsedTimeMs / tickMs], 16);
-    const currentCrashPoint = calculateCurrentCrashPoint(currentElapsedTimeMs / 1000 - countdownMs / 1000)
+    const currentCrashPoint = calculateCurrentCrashPoint(currentElapsedTimeMs / 1000 - countdownMs / 1000) * 5
     const sineValue = .3 * sin(currentElapsedTimeMs / 1000) + .05;
     // console.log("hexValue:", hexValue);
     // console.log("currentCrashPoint:", currentCrashPoint);
@@ -80,9 +84,15 @@ export function generateChartData(gameRoundId: string, crashPoint: number): any[
     currentDate = new Date(currentDate.getTime() + (24 * 60 * 60 * 1000));
   }
 
-  for (currentElapsedTimeMs; currentElapsedTimeMs < gameEndMs; currentElapsedTimeMs += tickMs) {
-    
-  }
+  // for (currentElapsedTimeMs; currentElapsedTimeMs < gameEndMs; currentElapsedTimeMs += tickMs) {
+  const open = dataPoints[currentElapsedTimeMs / tickMs - 1].close;
+  const close = 0;
+  const high = open + (Math.random() * 5);
+  const low = 0;
+  const timeString = currentDate.toISOString().split('T')[0];
+  dataPoints.push({ time: timeString, open, high, low, close });
+  currentDate = new Date(currentDate.getTime() + (24 * 60 * 60 * 1000));
+  // }
 
   return dataPoints;
 
@@ -136,5 +146,5 @@ function sin(x: number): number {
 }
 
 function calculateCurrentCrashPoint(seconds_elapsed: number): number {
-  return 1.06 ** seconds_elapsed;
+  return EXPONENTIAL_FACTOR ** seconds_elapsed;
 }
