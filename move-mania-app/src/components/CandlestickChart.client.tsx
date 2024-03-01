@@ -26,7 +26,7 @@ function CandlestickChart ({
     const chartContainerRef = useRef<HTMLDivElement>(null);
     const chart = useRef<IChartApi | null>(null);
 
-    const [update, setUpdate] = useState(false);
+    const [chartData, setChartData] = useState<DataPoint[]>(data);
     const [chartSeries, setChartSeries] = useState<ISeriesApi<"Candlestick"> | null>(null);
     
     useEffect(() => {
@@ -85,13 +85,32 @@ function CandlestickChart ({
         });
         setChartSeries(candleSeries);
 
-        const elapsedMs = Date.now() - startTime;
+        const elapsedMs = Date.now() - (startTime - 20 * 1000);
         const tickMs = 100;
         const elapsedTicks = Math.floor(elapsedMs / tickMs);
+
+        setChartData(data.slice(-elapsedTicks));
+
         const dataToShow = data.slice(0, elapsedTicks);
 
-        // candleSeries.setData(dataToShow);
-        candleSeries.setData(data);
+        console.log('elapsedTicks:', elapsedTicks);
+
+        candleSeries.setData(dataToShow);
+        // candleSeries.setData(data);
+
+        // Set timeout to update the chart every 100ms with the next data point
+        const updateChart = () => {
+            setTimeout(() => {
+                if (chartData.length === 0) return;
+                // const elapsedMs = Date.now() - startTime;
+                // const tickMs = 100;
+                // const elapsedTicks = Math.floor(elapsedMs / tickMs);
+                console.log('elapsedTicks:', elapsedTicks);
+                candleSeries.update(chartData.shift() as DataPoint);
+                updateChart();
+            }, tickMs);
+        };
+        updateChart();
     }, [])
 
     // const generateData = (): DataPoint[] => {
