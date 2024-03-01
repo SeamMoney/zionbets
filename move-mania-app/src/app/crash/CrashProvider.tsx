@@ -76,6 +76,10 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
       setLatestAction(Date.now());
     }
 
+    // function onFooEvent(value) {
+    //   // setFooEvents(previous => [...previous, value]);
+    // }
+
     socket.on('connect', onConnect);
     socket.on('disconnect', onDisconnect);
     socket.on(SOCKET_EVENTS.ROUND_START, onRoundStart);
@@ -112,7 +116,7 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
             setTimeout(() => {
               setUpdate(true);
             }, game.start_time - Date.now());
-          } else if (game.start_time + game.secret_crash_point * 1000 > Date.now()) {
+          } else if (game.start_time + (game.secret_crash_point == 0 ? 0 : game.secret_crash_point - 1) * 1000 > Date.now()) {
             console.log("IN_PROGRESS - page.tsx")
             setGameStatus({
               status: "IN_PROGRESS",
@@ -122,7 +126,7 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
             });
             setTimeout(() => {
               setUpdate(true);
-            }, game.start_time + game.secret_crash_point * 1000 - Date.now());
+            }, game.start_time + (game.secret_crash_point == 0 ? 0 : game.secret_crash_point - 1) * 1000 - Date.now());
           } else {
             console.log("END - page.tsx")
             setGameStatus({
