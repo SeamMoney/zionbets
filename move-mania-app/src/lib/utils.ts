@@ -16,7 +16,7 @@ export function generateChartData(gameRoundId: string, crashPoint: number): any[
   const countdownMs = 20 * 1000;
   const gameLengthMs = log(exponentialBase, crashPoint) * 1000;
   const gameEndMs = 5 * 1000;
-  const gameTicks = (countdownMs + gameLengthMs) / tickMs;
+  const gameTicks = (countdownMs + gameLengthMs + gameEndMs) / tickMs;
 
   console.log('number of ticks for countdown:', countdownMs / tickMs)
   console.log('number of ticks for game:', gameLengthMs / tickMs)
@@ -68,7 +68,7 @@ export function generateChartData(gameRoundId: string, crashPoint: number): any[
   for (currentElapsedTimeMs; currentElapsedTimeMs < gameLengthMs; currentElapsedTimeMs += tickMs) {
     const hexValue = parseInt(gameRoundHash[currentElapsedTimeMs / tickMs], 16);
     const currentCrashPoint = calculateCurrentCrashPoint(currentElapsedTimeMs / 1000 - countdownMs / 1000) * 5
-    const sineValue = .3 * sin(currentElapsedTimeMs / 1000) + .05;
+    const sineValue = .3 * sin(currentElapsedTimeMs / 1000) + .08;
     // console.log("hexValue:", hexValue);
     // console.log("currentCrashPoint:", currentCrashPoint);
     // console.log("sineValue:", sineValue);
@@ -85,13 +85,13 @@ export function generateChartData(gameRoundId: string, crashPoint: number): any[
   }
 
   // for (currentElapsedTimeMs; currentElapsedTimeMs < gameEndMs; currentElapsedTimeMs += tickMs) {
-  const open = dataPoints[currentElapsedTimeMs / tickMs - 1].close;
-  const close = 0;
-  const high = open + (Math.random() * 5);
-  const low = 0;
-  const timeString = currentDate.toISOString().split('T')[0];
-  dataPoints.push({ time: timeString, open, high, low, close });
-  currentDate = new Date(currentDate.getTime() + (24 * 60 * 60 * 1000));
+    const open: number = currentElapsedTimeMs === 0 ? startingPrice : dataPoints[currentElapsedTimeMs / tickMs - 1].close ;
+    const close = 0;
+    const high = open;
+    const low = 0;
+    const timeString = currentDate.toISOString().split('T')[0];
+    dataPoints.push({ time: timeString, open, high, low, close });
+    currentDate = new Date(currentDate.getTime() + (24 * 60 * 60 * 1000));
   // }
 
   return dataPoints;
