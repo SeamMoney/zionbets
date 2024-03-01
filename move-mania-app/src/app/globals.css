@@ -8,8 +8,8 @@
 
 body {
   color: rgb(var(--foreground-rgb));
-  background-color: white;
-  /* Directly set the background color to white */
+  background-color: black;
+  /* background-color: white; Directly set the background color to white */
 }
 
 @layer utilities {
@@ -25,9 +25,7 @@ table.scroll {
 }
 
 table.scroll tbody,
-table.scroll thead {
-  display: block;
-}
+/* table.scroll thead { display: block; } */
 
 
 table.scroll tbody {
@@ -42,7 +40,7 @@ table.scroll tbody {
 
 /* Track */
 ::-webkit-scrollbar-track {
-  /* background: #ff0000; */
+  background: #000000;
 }
 
 /* Handle */
@@ -54,112 +52,4 @@ table.scroll tbody {
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   background: #22c55e;
-}
-
-.line {
-  fill: none;
-  stroke: white;
-  stroke-width: 2;
-}
-
-.border-black {
-  border-color: black;
-}
-
-.axis path,
-.axis line {
-  fill: none;
-  stroke: #333;
-  shape-rendering: crispEdges;
-}
-
-.axis text {
-  fill: white;
-}
-
-.chart-background {
-  background-color: black;
-}
-
-#viewport {
-  margin: 20px auto;
-  background: black;
-  overflow: hidden;
-  /* Remove perspective and transform-style for 2D presentation */
-}
-
-@keyframes camera-path {
-  from {
-    /* Minimize the X rotation to reduce the "looking up" effect, adjust Y for slight depth */
-    transform: rotateX(1deg) rotateY(1deg) translate3d(165px, -4px, 26px);
-  }
-
-  to {
-    /* Keep the adjustments consistent for a subtle 3D effect */
-    transform: rotateX(1deg) rotateY(1deg) translate3d(165px, -4px, 52px);
-  }
-}
-
-#camera {
-  padding-bottom: 56.25%;
-  /* Disable or remove animation for a static 2D view */
-}
-
-#background,
-#midground,
-#foreground {
-  position: absolute;
-}
-
-#foreground {
-  transform: translateZ(20px);
-}
-
-.annotation>line {
-  stroke: rgb(255, 255, 51);
-  stroke-dasharray: 0;
-  stroke-opacity: 0.5;
-}
-
-.gridline {
-  stroke: white;
-  stroke-dasharray: 1, 2;
-}
-
-.candlestick>.up {
-  fill: white;
-  stroke: rgba(77, 175, 74, 1);
-}
-
-.candlestick>.down {
-  fill: black;
-  stroke: rgba(77, 175, 74, 1);
-}
-
-.bollinger-bands>.area,
-.bollinger-bands>.average {
-  visibility: hidden;
-}
-
-.bollinger-bands>.upper>path,
-.bollinger-bands>.lower>path {
-  stroke-width: 1px;
-}
-
-.bollinger-bands>.upper>path {
-  stroke: rgba(55, 126, 184, 1);
-}
-
-.bollinger-bands>.lower>path {
-  stroke: rgba(77, 175, 74, 1);
-}
-
-.ema>path {
-  stroke: rgba(228, 26, 28, 1);
-  stroke-width: 1px;
-}
-
-.label {
-  stroke: white;
-  text-anchor: initial;
 }

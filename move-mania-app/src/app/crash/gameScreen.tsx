@@ -1,6 +1,5 @@
 "use client";
 
-import crypto from "crypto";
 import { useContext, useEffect, useState } from "react";
 import { GameStatus } from "./controlCenter";
 import { SOCKET_EVENTS, RoundStart } from "@/lib/types";
@@ -12,16 +11,13 @@ import { startRound } from "@/lib/socket";
 import { socket } from "@/lib/socket";
 
 import { gameStatusContext } from "./CrashProvider";
-import CrashChart from "@/components/CrashChart.client";
 import CandlestickChart from "@/components/CandlestickChart.client";
-import { UTCTimestamp } from "lightweight-charts";
 import { generateChartData } from "@/lib/utils";
 
 export default function GameScreen() {
   const {
     gameStatus,
   } = useContext(gameStatusContext);
-  const [update, setUpdate] = useState(true);
 
   const onStartRound = () => {
     if (!socket) return;
@@ -53,14 +49,12 @@ export default function GameScreen() {
       </div>
     );
   } else if (gameStatus.status === "IN_PROGRESS") {
-    const hardcodedCrashPoint = 5000;
-    console.log("Current gameStatus:", gameStatus);
     return (
       <div className="border-b border-l border-green-500 h-full w-full bg-neutral-950">
         <CountUp
-          start={(Date.now() - gameStatus.startTime!) / 1000}
+          start={(Date.now() - gameStatus.startTime!) / 1000 + 1}
           end={gameStatus.crashPoint!}
-          duration={gameStatus.crashPoint!}
+          duration={gameStatus.crashPoint! - ((Date.now() - gameStatus.startTime!) / 1000 + 1)}
           separator=""
           decimals={2}
           decimal="."
@@ -92,4 +86,3 @@ export default function GameScreen() {
     );
   }
 }
-
