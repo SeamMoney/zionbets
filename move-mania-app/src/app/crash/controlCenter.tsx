@@ -21,7 +21,7 @@ import { gameStatusContext } from "./CrashProvider";
 
 export type GameStatus = {
   status: "COUNTDOWN" | "IN_PROGRESS" | "END";
-  roundId: number;
+  roundId: string;
   startTime: number;
   crashPoint : number;
 };
