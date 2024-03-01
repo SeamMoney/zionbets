@@ -11,6 +11,8 @@ import { startRound } from "@/lib/socket";
 import { socket } from "@/lib/socket";
 
 import { gameStatusContext } from "./CrashProvider";
+import CandlestickChart from "@/components/CandlestickChart.client";
+import { generateChartData } from "@/lib/utils";
 
 export default function GameScreen() {
   const {
@@ -43,6 +45,7 @@ export default function GameScreen() {
           suffix=" seconds"
           useEasing={false}
         />
+        <CandlestickChart startTime={gameStatus.startTime!} crashPoint={gameStatus.crashPoint} data={generateChartData(gameStatus.roundId, gameStatus.crashPoint)} />
       </div>
     );
   } else if (gameStatus.status === "IN_PROGRESS") {
@@ -59,6 +62,7 @@ export default function GameScreen() {
           suffix="x"
           useEasing={false}
         />
+        <CandlestickChart startTime={gameStatus.startTime!} crashPoint={gameStatus.crashPoint} data={generateChartData(gameStatus.roundId, gameStatus.crashPoint)} />
       </div>
     );
   } else if (gameStatus.status === "END") {
@@ -76,6 +80,7 @@ export default function GameScreen() {
             suffix="x"
             useEasing={false}
           />
+          <CandlestickChart startTime={gameStatus.startTime!} crashPoint={gameStatus.crashPoint} data={generateChartData(gameStatus.roundId, gameStatus.crashPoint)} />
         </div>
       </div>
     );
