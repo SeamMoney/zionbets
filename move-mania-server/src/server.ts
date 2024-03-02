@@ -19,6 +19,8 @@ import { calculateCrashPoint } from "./crashPoint";
 const COUNTDOWN = 20 * 1000;
 const SUMMARY = 5 * 1000;
 
+const EXPONENTIAL_FACTOR = 1.06;
+
 const httpServer = http.createServer();
 
 const PORT = 8080,
@@ -61,6 +63,7 @@ io.on("connection", (socket) => {
       secret_crash_point: crashPoint,
       status: "IN_PROGRESS",
     });
+    console.log("start rounded")
     io.emit(SOCKET_EVENTS.ROUND_START, {
       roundId: 1,
       startTime: Date.now() + COUNTDOWN,
@@ -70,11 +73,12 @@ io.on("connection", (socket) => {
     setTimeout(async () => {
       await endGame(gameId);
       await payOutPlayers();
+      console.log("end rounded")
       io.emit(SOCKET_EVENTS.ROUND_RESULT, { roundId: 1, crashPoint });
       setTimeout(async () => {
         await cycleRounds();
       }, SUMMARY);
-    }, COUNTDOWN + (crashPoint == 0 ? 0 : crashPoint - 1) * 1000);
+    }, COUNTDOWN + (crashPoint == 0 ? 0 : log(EXPONENTIAL_FACTOR, crashPoint)) * 1000);
   });
 
   socket.on(SOCKET_EVENTS.CHAT_MESSAGE, async (message) => {
@@ -100,6 +104,7 @@ async function cycleRounds() {
     secret_crash_point: crashPoint,
     status: "IN_PROGRESS",
   });
+  console.log("start rounded")
   io.emit(SOCKET_EVENTS.ROUND_START, {
     roundId: 1,
     startTime: Date.now() + COUNTDOWN,
@@ -109,9 +114,25 @@ async function cycleRounds() {
   setTimeout(async () => {
     await endGame(gameId);
     await payOutPlayers();
+    console.log("end rounded")
     io.emit(SOCKET_EVENTS.ROUND_RESULT, { roundId: 1, crashPoint });
     setTimeout(async () => {
       await cycleRounds();
     }, SUMMARY);
-  }, COUNTDOWN + (crashPoint == 0 ? 0 : crashPoint - 1) * 1000);
+  }, COUNTDOWN + (crashPoint == 0 ? 0 : log(EXPONENTIAL_FACTOR, crashPoint)) * 1000);
+}
+
+
+/**
+ * 
+ * @param base The base of the logarithm
+ * @param value The value to take the logarithm of
+ * 
+ * @returns The logarithm of the value with the given base
+ */
+function log(base: number, value: number): number {
+  console.log("log base:", base)
+  console.log("log value:", value)
+  console.log("log result:", Math.log(value) / Math.log(base))
+  return Math.log(value) / Math.log(base);
 }

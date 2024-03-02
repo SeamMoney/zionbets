@@ -6,7 +6,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-const EXPONENTIAL_FACTOR = 1.06;
+export const EXPONENTIAL_FACTOR = 1.06;
 
 export function generateChartData(gameRoundId: string, crashPoint: number): any[] {
 
@@ -17,13 +17,11 @@ export function generateChartData(gameRoundId: string, crashPoint: number): any[
   const gameLengthMs = log(exponentialBase, crashPoint) * 1000;
   const gameEndMs = 5 * 1000;
   const gameTicks = (countdownMs + gameLengthMs + gameEndMs) / tickMs;
+  console.log("gameTicks:", gameTicks)
 
-  console.log('number of ticks for countdown:', countdownMs / tickMs)
-  console.log('number of ticks for game:', gameLengthMs / tickMs)
 
   const hasher = crypto.createHash("sha256");
   if (hasher === undefined) {
-    console.log("Hasher is undefined")
     return [];
   }
   let gameRoundHash = hasher.update(gameRoundId).digest("hex");
@@ -55,17 +53,23 @@ export function generateChartData(gameRoundId: string, crashPoint: number): any[
     const candleStickValue = sineValue * hexValue;
     // console.log("candleStickValue:", candleStickValue);
 
-    const open: number = currentElapsedTimeMs === 0 ? startingPrice : dataPoints[currentElapsedTimeMs / tickMs - 1].close ;
+    const open: number = currentElapsedTimeMs === 0 ? startingPrice : dataPoints[currentElapsedTimeMs / tickMs - 1].dataPoint.close ;
     const close = open + candleStickValue;
     const high = close + (Math.random() * 5);
     const low = open - (Math.random() * 5);
     const timeString = currentDate.toISOString().split('T')[0];
-    dataPoints.push({ time: timeString, open, high, low, close });
+    dataPoints.push({
+      elapsedTime: currentElapsedTimeMs,
+      dataPoint: { time: timeString, open, high, low, close }
+    });
     currentDate = new Date(currentDate.getTime() + (24 * 60 * 60 * 1000));
     // console.log("dataPoints[currentElapsedTimeMs / tickMs]:", dataPoints[currentElapsedTimeMs / tickMs]);
   }
 
-  for (currentElapsedTimeMs; currentElapsedTimeMs < gameLengthMs; currentElapsedTimeMs += tickMs) {
+  // console.log("dataPoints:", dataPoints)
+  // console.log("currentElapsedTimeMs:", currentElapsedTimeMs)
+  // console.log("gameLengthMs:", gameLengthMs)
+  for (currentElapsedTimeMs; currentElapsedTimeMs < gameLengthMs + countdownMs; currentElapsedTimeMs += tickMs) {
     const hexValue = parseInt(gameRoundHash[currentElapsedTimeMs / tickMs], 16);
     const currentCrashPoint = calculateCurrentCrashPoint(currentElapsedTimeMs / 1000 - countdownMs / 1000) * 5
     const sineValue = .3 * sin(currentElapsedTimeMs / 1000) + .08;
@@ -75,51 +79,34 @@ export function generateChartData(gameRoundId: string, crashPoint: number): any[
     const candleStickValue = sineValue * hexValue * currentCrashPoint * 5;
     // console.log("candleStickValue:", candleStickValue);
 
-    const open: number = currentElapsedTimeMs === 0 ? startingPrice : dataPoints[currentElapsedTimeMs / tickMs - 1].close ;
+    const open: number = currentElapsedTimeMs === 0 ? startingPrice : dataPoints[currentElapsedTimeMs / tickMs - 1].dataPoint.close ;
     const close = open + candleStickValue;
     const high = close + (Math.random() * 5) * currentCrashPoint;
     const low = open - (Math.random() * 5) * currentCrashPoint;
     const timeString = currentDate.toISOString().split('T')[0];
-    dataPoints.push({ time: timeString, open, high, low, close });
+    dataPoints.push({
+      elapsedTime: currentElapsedTimeMs,
+      dataPoint: { time: timeString, open, high, low, close }
+    });
     currentDate = new Date(currentDate.getTime() + (24 * 60 * 60 * 1000));
   }
 
-  // for (currentElapsedTimeMs; currentElapsedTimeMs < gameEndMs; currentElapsedTimeMs += tickMs) {
-    const open: number = currentElapsedTimeMs === 0 ? startingPrice : dataPoints[currentElapsedTimeMs / tickMs - 1].close ;
+  // for (currentElapsedTimeMs; currentElapsedTimeMs < gameEndMs + gameLengthMs + countdownMs ; currentElapsedTimeMs += tickMs) {
+    const open: number = currentElapsedTimeMs === 0 ? startingPrice : dataPoints[currentElapsedTimeMs / tickMs - 1].dataPoint.close ;
     const close = 0;
     const high = open;
     const low = 0;
     const timeString = currentDate.toISOString().split('T')[0];
-    dataPoints.push({ time: timeString, open, high, low, close });
+    dataPoints.push({
+      elapsedTime: currentElapsedTimeMs,
+      dataPoint: { time: timeString, open, high, low, close }
+    });
     currentDate = new Date(currentDate.getTime() + (24 * 60 * 60 * 1000));
   // }
 
-  return dataPoints;
 
-
-  console.log("gameRoundHash:", gameRoundHash);
-
-  for (let i = 0; i < gameRoundHash.length; i++) {
-    const hexChar = gameRoundHash[i];
-    const hexValue = parseInt(hexChar, 16);
-    if (![1, 3, 5, 7, 9, 13].includes(hexValue)) {
-      const open: number = i === 0 ? 50 : dataPoints[i - 1].close ;
-      const close = open + hexValue;
-      const high = close + (Math.random() * 5);
-      const low = open - (Math.random() * 5);
-      const timeString = currentDate.toISOString().split('T')[0];
-      dataPoints.push({ time: timeString, open, high, low, close });
-      currentDate = new Date(currentDate.getTime() + (24 * 60 * 60 * 1000));
-    } else {
-      const open: number = i === 0 ? 50 : dataPoints[i - 1].close ;
-      const close = open - hexValue;
-      const high = close + (Math.random() * 5);
-      const low = open - (Math.random() * 5);
-      const timeString = currentDate.toISOString().split('T')[0];
-      dataPoints.push({ time: timeString, open, high, low, close });
-      currentDate = new Date(currentDate.getTime() + (24 * 60 * 60 * 1000));
-    }
-  }
+  // console.log("dataPoints:", dataPoints)
+  // console.log("equal lengths", gameTicks === dataPoints.length)
 
   return dataPoints;
 }
@@ -131,7 +118,10 @@ export function generateChartData(gameRoundId: string, crashPoint: number): any[
  * 
  * @returns The logarithm of the value with the given base
  */
-function log(base: number, value: number): number {
+export function log(base: number, value: number): number {
+  // console.log("log base:", base)
+  // console.log("log value:", value)
+  // console.log('result', Math.log(value) / Math.log(base))
   return Math.log(value) / Math.log(base);
 }
 
@@ -145,6 +135,6 @@ function sin(x: number): number {
   return Math.sin(x * 5);
 }
 
-function calculateCurrentCrashPoint(seconds_elapsed: number): number {
+export function calculateCurrentCrashPoint(seconds_elapsed: number): number {
   return EXPONENTIAL_FACTOR ** seconds_elapsed;
 }
