@@ -42,9 +42,7 @@ export default function ControlCenter() {
   const [hasCashOut, setHasCashOut] = useState(false);
 
   useEffect(() => {
-    console.log('account', account)
     if (account) {
-      console.log('updating hasBet and hasCashOut')
       hasUserBet(account?.email || "").then((bet) => {
         setHasBet(bet);
       });
@@ -57,9 +55,7 @@ export default function ControlCenter() {
   }, [gameStatus, account, latestAction]);
 
   useEffect(() => {
-    console.log('gameStatus', gameStatus?.status)
     if (gameStatus?.status === "IN_PROGRESS") {
-      console.log('setting bet and cashout to false')
       checkAutoCashout();
     }
   }, [gameStatus]);
@@ -67,13 +63,8 @@ export default function ControlCenter() {
   const checkAutoCashout = () => {
     const timeUntilCrash = gameStatus?.startTime! + (gameStatus?.crashPoint!) * 1000 - Date.now();
     const timeUntilCashout = gameStatus?.startTime! + parseFloat(autoCashoutAmount)! * 1000 - Date.now();
-
-    console.log('hasBet', hasBet)
-
     if (hasBet && autoCashout && timeUntilCashout < timeUntilCrash && timeUntilCashout > 0) {
-      console.log('setting auto cashout')
       setTimeout(() => {
-        console.log('auto cashout')
         onCashOut();
       }, timeUntilCashout - 1000);
     }

@@ -12,7 +12,7 @@ import { socket } from "@/lib/socket";
 
 import { gameStatusContext } from "./CrashProvider";
 import CandlestickChart from "@/components/CandlestickChart.client";
-import { generateChartData } from "@/lib/utils";
+import { calculateCurrentCrashPoint, generateChartData } from "@/lib/utils";
 
 export default function GameScreen() {
   const {
@@ -24,6 +24,20 @@ export default function GameScreen() {
 
     const success = startRound();
   };
+
+  const [currentMultiplier, setCurrentMultiplier] = useState(1);
+
+  useEffect(() => {
+    if (gameStatus?.status === "IN_PROGRESS") {
+      const interval = setInterval(() => {
+        const elapsedTime = (Date.now() - gameStatus.startTime!) / 1000;
+        const multiplier = calculateCurrentCrashPoint(elapsedTime);
+        setCurrentMultiplier(multiplier);
+      }, 10);
+
+      return () => clearInterval(interval);
+    }
+  }, [gameStatus]);
 
   if (gameStatus === null) {
     return (
@@ -53,7 +67,8 @@ export default function GameScreen() {
     return (
       <div className=" w-full -mt-8">
         <div>
-          <CountUp
+          <span className="relative z-10 top-8 left-5 text-green-500 text-xl">Your portfolio is up: {currentMultiplier.toFixed(2)}x</span>
+          {/* <CountUp
             className="relative z-10 top-8 left-5 text-green-500 text-xl"
             start={(Date.now() - gameStatus.startTime!) / 1000 + 1}
             end={gameStatus.crashPoint!}
@@ -64,7 +79,11 @@ export default function GameScreen() {
             prefix="Your portfolio is up: "
             suffix="x"
             useEasing={false}
-          />
+            // easingFn={(t: number, b: number, c: number, d: number) => {
+            //   console.log(t, b, c, d)
+            //   return (t==0) ? b : c * Math.pow(1.06, 10 * (t/d - 1)) + b;
+            // }}
+          /> */}
           <CandlestickChart startTime={gameStatus.startTime!} crashPoint={gameStatus.crashPoint} data={generateChartData(gameStatus.roundId, gameStatus.crashPoint)} />
         </div>
       </div>
