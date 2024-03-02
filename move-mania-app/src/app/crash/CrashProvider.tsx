@@ -7,6 +7,7 @@ import { socket } from "@/lib/socket";
 import { getSession } from "next-auth/react";
 import { getCurrentGame, setUpAndGetUser } from "@/lib/api";
 import { SOCKET_EVENTS } from "@/lib/types";
+import { EXPONENTIAL_FACTOR, log } from "@/lib/utils";
 
 interface CrashPageProps {
   gameStatus: GameStatus | null;
@@ -46,12 +47,10 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
     });
 
     function onConnect() {
-      console.log('Connected', socket.connected)
       setIsConnected(true);
     }
 
     function onDisconnect() {
-      console.log('Disconnected', socket.connected)
       setIsConnected(false);
     }
 
@@ -63,6 +62,7 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
 
     function onRoundResult() {
       console.log('Round Result')
+      setUpdate(true);
       setLatestAction(Date.now());
     }
 
@@ -101,12 +101,10 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
 
     if (update) {
       getCurrentGame().then((game) => {
-        console.log("game", game)
         if (game == null) {
           setGameStatus(null);
         } else {
           if (game.start_time > Date.now()) {
-            console.log("COUNTDOWN - page.tsx")
             setGameStatus({
               status: "COUNTDOWN",
               roundId: game.game_id,
@@ -114,9 +112,10 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
               crashPoint: game.secret_crash_point,
             });
             setTimeout(() => {
+              console.log("COUNTDOWN - setTimeout")
               setUpdate(true);
             }, game.start_time - Date.now());
-          } else if (game.start_time + (game.secret_crash_point == 0 ? 0 : game.secret_crash_point - 1) * 1000 > Date.now()) {
+          } else if (game.start_time + (game.secret_crash_point == 0 ? 0 : log(EXPONENTIAL_FACTOR, game.secret_crash_point)) * 1000 > Date.now()) {
             console.log("IN_PROGRESS - page.tsx")
             setGameStatus({
               status: "IN_PROGRESS",
@@ -124,9 +123,10 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
               startTime: game.start_time,
               crashPoint: game.secret_crash_point,
             });
-            setTimeout(() => {
-              setUpdate(true);
-            }, game.start_time + (game.secret_crash_point == 0 ? 0 : game.secret_crash_point - 1) * 1000 - Date.now());
+            // setTimeout(() => {
+            //   console.log("IN_PROGRESS - setTimeout")
+            //   setUpdate(true);
+            // }, game.start_time + (game.secret_crash_point == 0 ? 0 : log(EXPONENTIAL_FACTOR, game.secret_crash_point)) * 1000 - Date.now());
           } else {
             console.log("END - page.tsx")
             setGameStatus({

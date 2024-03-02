@@ -21,11 +21,13 @@ function CandlestickChart ({
 }: {
     startTime: number;
     crashPoint: number;
-    data: DataPoint[];
+    data: any[];
 }) {
     const chartContainerRef = useRef<HTMLDivElement>(null);
     
     useEffect(() => {
+
+        console.log("data:", data)
 
         if (!chartContainerRef.current) return;
 
@@ -129,46 +131,28 @@ function CandlestickChart ({
         //     return { time: dataPoint.time, value: Math.abs(dataPoint.close - dataPoint.open)  };
         // });
 
-
+        // console.log("startTime:", (startTime - 20 * 1000))
+        // console.log('date.now()', Date.now())
         const elapsedMs = Date.now() - (startTime - 20 * 1000);
-        const tickMs = 100;
-        const elapsedTicks = Math.floor(elapsedMs / tickMs);
+        // console.log("elapsedMs:", elapsedMs)
 
-        const dataToShow = data.slice(0, elapsedTicks);
-        // const movingAverage50DataToShow = movingAverage50Data.slice(0, elapsedTicks);
-        // const movingAverage10DataToShow = movingAverage10Data.slice(0, elapsedTicks);
-        // const movingAverage1DataToShow = movingAverage2Data.slice(0, elapsedTicks);
+        const dataToShow = data.filter((point) => point.elapsedTime <= elapsedMs).map((point) => point.dataPoint);
+        // console.log("dataToShow:", dataToShow)
 
         candleSeries.setData(dataToShow);
-        // movingAverage50.setData(movingAverage50DataToShow);
-        // movingAverage10.setData(movingAverage10DataToShow);
-        // movingAverage2.setData(movingAverage1DataToShow);
-        // volumeSeries.setData(volumeData);
-        // candleSeries.setData(data);
 
         // Set timeout to update the chart every 100ms with the next data point
-        const updateChart = () => {
-            setTimeout(() => {
-                const elapsedMs = Date.now() - (startTime - 20 * 1000);
-                const tickMs = 100;
-                const elapsedTicks = Math.floor(elapsedMs / tickMs);
+        const interval = setInterval(() => {
+            const elapsedMs = Date.now() - (startTime - 20 * 1000);
+            console.log("elapsedMs:", elapsedMs)
+            const dataToShow = data.filter((point) => point.elapsedTime <= elapsedMs).map((point) => point.dataPoint);
 
-                const dataToShow = data.slice(0, elapsedTicks);
-                // const movingAverage50DataToShow = movingAverage50Data.slice(0, elapsedTicks);
-                // const movingAverage10DataToShow = movingAverage10Data.slice(0, elapsedTicks);
-                // const movingAverage1DataToShow = movingAverage2Data.slice(0, elapsedTicks);
-                // const volumeDataToShow = volumeData.slice(0, elapsedTicks);
+            console.log("dataToShow.length:", dataToShow.length)
 
-                candleSeries.setData(dataToShow);
-                // movingAverage50.setData(movingAverage50DataToShow);
-                // movingAverage10.setData(movingAverage10DataToShow);
-                // movingAverage2.setData(movingAverage1DataToShow);
-                // volumeSeries.setData(volumeDataToShow);
+            candleSeries.setData(dataToShow);
+        }, 100);
 
-                updateChart();
-            }, tickMs);
-        };
-        updateChart();
+        return () => clearInterval(interval);
     }, [])
 
     return <div ref={chartContainerRef} className="h-full w-full border-l border-b border-green-500" style={{height: '100%'}} />
