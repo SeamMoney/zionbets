@@ -141,7 +141,7 @@ function CandlestickChart ({
         candleSeries.setData(dataToShow);
 
         newChart.timeScale().setVisibleLogicalRange({
-            from: 0, 
+            from: dataToShow.length > 200 ? dataToShow.length > 250 ? 200 : dataToShow.length - 50 : dataToShow.length - 50,  
             to: dataToShow.length
         })
 
@@ -156,7 +156,7 @@ function CandlestickChart ({
             candleSeries.setData(dataToShow);
 
             newChart.timeScale().setVisibleLogicalRange({
-                from: 0, 
+                from: dataToShow.length > 200 ? dataToShow.length > 250 ? 200 : dataToShow.length - 50 : dataToShow.length - 50,  
                 to: dataToShow.length
             })
         }, 100);
