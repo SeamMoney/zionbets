@@ -55,8 +55,8 @@ export function generateChartData(gameRoundId: string, crashPoint: number): any[
 
     const open: number = currentElapsedTimeMs === 0 ? startingPrice : dataPoints[currentElapsedTimeMs / tickMs - 1].dataPoint.close ;
     const close = open + candleStickValue;
-    const high = close + (Math.random() * 5);
-    const low = open - (Math.random() * 5);
+    const high = close + (Math.random() * 5) * sineValue;
+    const low = open - (Math.random() * 5) * sineValue;
     const timeString = currentDate.toISOString().split('T')[0];
     dataPoints.push({
       elapsedTime: currentElapsedTimeMs,
@@ -81,8 +81,8 @@ export function generateChartData(gameRoundId: string, crashPoint: number): any[
 
     const open: number = currentElapsedTimeMs === 0 ? startingPrice : dataPoints[currentElapsedTimeMs / tickMs - 1].dataPoint.close ;
     const close = open + candleStickValue;
-    const high = close + (Math.random() * 5) * currentCrashPoint;
-    const low = open - (Math.random() * 5) * currentCrashPoint;
+    const high = close + (Math.random() * 5) * sineValue * currentCrashPoint * 5;
+    const low = open - (Math.random() * 5) * sineValue * currentCrashPoint * 5;
     const timeString = currentDate.toISOString().split('T')[0];
     dataPoints.push({
       elapsedTime: currentElapsedTimeMs,
