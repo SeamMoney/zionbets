@@ -77,7 +77,7 @@ function CandlestickChart ({
             upColor: 'white',
             wickUpColor: '#39FF14',
             wickDownColor: '#39FF14',
-            downColor: 'rgba(0, 0, 0, 0)',
+            downColor: 'black',
             borderVisible: true,
             borderColor: '#39FF14'
         });
