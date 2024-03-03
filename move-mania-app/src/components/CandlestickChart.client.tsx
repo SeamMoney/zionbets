@@ -18,16 +18,19 @@ function CandlestickChart ({
     startTime,
     crashPoint,
     data,
+    linedata
 }: {
     startTime: number;
     crashPoint: number;
     data: any[];
+    linedata: any[];
 }) {
     const chartContainerRef = useRef<HTMLDivElement>(null);
     
     useEffect(() => {
 
         console.log("data:", data)
+        console.log("linedata:", linedata)
 
         if (!chartContainerRef.current) return;
 
@@ -65,20 +68,27 @@ function CandlestickChart ({
                 barSpacing: 15,
             },
             rightPriceScale: {  
-                visible: false,
+                // visible: false,
             },
 
         });
 
 
-        const candleSeries = newChart.addCandlestickSeries({
+        // const candleSeries = newChart.addCandlestickSeries({
 
-            upColor: 'white',
-            wickUpColor: '#39FF14',
-            wickDownColor: '#39FF14',
-            downColor: 'black',
-            borderVisible: true,
-            borderColor: '#39FF14'
+        //     upColor: 'white',
+        //     wickUpColor: '#39FF14',
+        //     wickDownColor: '#39FF14',
+        //     downColor: 'black',
+        //     borderVisible: true,
+        //     borderColor: '#39FF14'
+        // });
+
+        const areaSeries = newChart.addAreaSeries({
+            topColor: 'green',
+            bottomColor: 'black',
+            lineColor: 'green',
+            lineWidth: 2,
         });
 
         // const movingAverage50 = newChart.addLineSeries({
@@ -133,31 +143,34 @@ function CandlestickChart ({
         // console.log("startTime:", (startTime - 20 * 1000))
         // console.log('date.now()', Date.now())
         const elapsedMs = Date.now() - (startTime - 20 * 1000);
+        const lineElapsedMs = Date.now() - startTime;
         // console.log("elapsedMs:", elapsedMs)
 
         const dataToShow = data.filter((point) => point.elapsedTime <= elapsedMs).map((point) => point.dataPoint);
+        const lineDataToShow = linedata.filter((point) => point.elapsedTime <= lineElapsedMs).map((point) => point.dataPoint);
         // console.log("dataToShow:", dataToShow)
 
-        candleSeries.setData(dataToShow);
+        // candleSeries.setData(dataToShow);
+        areaSeries.setData(lineDataToShow);
 
         newChart.timeScale().setVisibleLogicalRange({
-            from: dataToShow.length > 200 ? dataToShow.length > 250 ? 200 : dataToShow.length - 50 : dataToShow.length - 50,  
-            to: dataToShow.length
+            from: 0,  
+            to: Math.max(10, lineDataToShow.length) 
         })
 
         // Set timeout to update the chart every 100ms with the next data point
         const interval = setInterval(() => {
-            const elapsedMs = Date.now() - (startTime - 20 * 1000);
-            console.log("elapsedMs:", elapsedMs)
+            const lineElapsedMs = Date.now() - startTime;
+    
             const dataToShow = data.filter((point) => point.elapsedTime <= elapsedMs).map((point) => point.dataPoint);
-
-            console.log("dataToShow.length:", dataToShow.length)
-
-            candleSeries.setData(dataToShow);
+            const lineDataToShow = linedata.filter((point) => point.elapsedTime <= lineElapsedMs).map((point) => point.dataPoint);
+    
+            // candleSeries.setData(dataToShow);
+            areaSeries.setData(lineDataToShow);
 
             newChart.timeScale().setVisibleLogicalRange({
-                from: dataToShow.length > 200 ? dataToShow.length > 250 ? 200 : dataToShow.length - 50 : dataToShow.length - 50,  
-                to: dataToShow.length
+                from: 0,  
+                to: Math.max(10, lineDataToShow.length) 
             })
         }, 100);
 
