@@ -10,7 +10,7 @@ import {
 import { User } from "@/lib/schema";
 import { cashOutBet, setNewBet, startRound } from "@/lib/socket";
 import { RoundStart, SOCKET_EVENTS } from "@/lib/types";
-import { calculateCurrentCrashPoint, cn } from "@/lib/utils";
+import { EXPONENTIAL_FACTOR, calculateCurrentCrashPoint, cn, log } from "@/lib/utils";
 import { time } from "console";
 import { getSession } from "next-auth/react";
 import { useContext, useEffect, useState } from "react";
@@ -61,12 +61,12 @@ export default function ControlCenter() {
   }, [gameStatus]);
 
   const checkAutoCashout = () => {
-    const timeUntilCrash = gameStatus?.startTime! + (gameStatus?.crashPoint!) * 1000 - Date.now();
-    const timeUntilCashout = gameStatus?.startTime! + parseFloat(autoCashoutAmount)! * 1000 - Date.now();
+    const timeUntilCrash = gameStatus?.startTime! + log(EXPONENTIAL_FACTOR, gameStatus?.crashPoint!) * 1000 - Date.now();
+    const timeUntilCashout = gameStatus?.startTime! + log(EXPONENTIAL_FACTOR, parseFloat(autoCashoutAmount)!) * 1000 - Date.now();
     if (hasBet && autoCashout && timeUntilCashout < timeUntilCrash && timeUntilCashout > 0) {
       setTimeout(() => {
         onCashOut();
-      }, timeUntilCashout - 1000);
+      }, timeUntilCashout);
     }
   }
 
