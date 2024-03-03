@@ -68,7 +68,7 @@ export default function RootLayout({
                 </div>
               </div>
             </nav>
-            <div className="flex flex-1 flex-col pt-12 lg:pt-20 lg:mr-96 border border-green-500">
+            <div className="flex flex-1 flex-col pt-12 lg:pt-20 lg:mr-96">
               <main className="flex-1 overflow-y-auto">
                 {children}
                 <Toaster />
