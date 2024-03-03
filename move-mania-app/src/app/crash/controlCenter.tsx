@@ -10,7 +10,7 @@ import {
 import { User } from "@/lib/schema";
 import { cashOutBet, setNewBet, startRound } from "@/lib/socket";
 import { RoundStart, SOCKET_EVENTS } from "@/lib/types";
-import { cn } from "@/lib/utils";
+import { calculateCurrentCrashPoint, cn } from "@/lib/utils";
 import { time } from "console";
 import { getSession } from "next-auth/react";
 import { useContext, useEffect, useState } from "react";
@@ -92,7 +92,7 @@ export default function ControlCenter() {
 
     if (!gameStatus?.startTime) return;
 
-    const cashoutMultipler = (Date.now() - gameStatus.startTime) / 1000 + 1;
+    const cashoutMultipler = calculateCurrentCrashPoint((Date.now() - gameStatus.startTime) / 1000);
 
     const data = {
       roundId: 1,
