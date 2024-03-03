@@ -42,8 +42,8 @@ function CandlestickChart ({
                 fontFamily: "'Roboto Mono', sans-serif",
             },
             grid: {
-                vertLines: { color: '#33333350' },
-                horzLines: { color: '#33333350' },
+                vertLines: { color: '#333333' },
+                horzLines: { color: '#333333' },
             },
             crosshair: {
                 mode: CrosshairMode.Hidden,
@@ -64,12 +64,16 @@ function CandlestickChart ({
                 secondsVisible: false,
                 timeVisible: false,
                 ticksVisible: false,
-                borderColor: '#485c7b',
+                borderColor: '#333333',
                 barSpacing: 15,
+                
             },
             rightPriceScale: {  
+                borderColor: '#333333',
                 // visible: false,
             },
+            handleScale: false, 
+            handleScroll: false
 
         });
 
@@ -155,8 +159,9 @@ function CandlestickChart ({
 
         newChart.timeScale().setVisibleLogicalRange({
             from: 0,  
-            to: Math.max(10, lineDataToShow.length) 
+            to: lineDataToShow.length + 10 
         })
+        
 
         // Set timeout to update the chart every 100ms with the next data point
         const interval = setInterval(() => {
@@ -170,7 +175,7 @@ function CandlestickChart ({
 
             newChart.timeScale().setVisibleLogicalRange({
                 from: 0,  
-                to: Math.max(10, lineDataToShow.length) 
+                to: lineDataToShow.length + 10
             })
         }, 100);
 

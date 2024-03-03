@@ -47,7 +47,7 @@ export default function GameScreen() {
     );
   } else if (gameStatus.status === "COUNTDOWN") {
     return (
-      <div className=" w-full -mt-8">
+      <div className=" w-full -mt-10">
         <CountUp
           className="relative z-10 top-12 left-5 text-green-500 text-4xl"
           start={(gameStatus.startTime! - Date.now()) / 1000}
@@ -65,7 +65,7 @@ export default function GameScreen() {
     );
   } else if (gameStatus.status === "IN_PROGRESS") {
     return (
-      <div className=" w-full -mt-8">
+      <div className=" w-full -mt-10">
         <div>
           <span className="relative z-10 top-12 left-5 text-green-500 text-4xl tracking-base">{currentMultiplier.toFixed(2)}x</span>
           {/* <CountUp
@@ -90,7 +90,7 @@ export default function GameScreen() {
     );
   } else if (gameStatus.status === "END") {
     return (
-      <div className=" w-full -mt-8">
+      <div className=" w-full -mt-10">
         <div>
           <CountUp
           className="relative z-10 top-12 left-5 text-green-500 text-4xl"
