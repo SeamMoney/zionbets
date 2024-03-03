@@ -12,7 +12,7 @@ import { socket } from "@/lib/socket";
 
 import { gameStatusContext } from "./CrashProvider";
 import CandlestickChart from "@/components/CandlestickChart.client";
-import { calculateCurrentCrashPoint, generateChartData } from "@/lib/utils";
+import { calculateCurrentCrashPoint, generateChartData, generateLineChartData } from "@/lib/utils";
 
 export default function GameScreen() {
   const {
@@ -49,27 +49,27 @@ export default function GameScreen() {
     return (
       <div className=" w-full -mt-8">
         <CountUp
-          className="relative z-10 top-8 left-5 text-green-500 text-xl"
+          className="relative z-10 top-12 left-5 text-green-500 text-4xl"
           start={(gameStatus.startTime! - Date.now()) / 1000}
           end={0}
           duration={(gameStatus.startTime! - Date.now()) / 1000}
           separator=" "
           decimals={0}
           decimal="."
-          prefix="Bull run in "
-          suffix=" seconds"
+          prefix="Next round in  "
+          suffix=" s"
           useEasing={false}
         />
-        <CandlestickChart startTime={gameStatus.startTime!} crashPoint={gameStatus.crashPoint} data={generateChartData(gameStatus.roundId, gameStatus.crashPoint)} />
+        <CandlestickChart startTime={gameStatus.startTime!} crashPoint={gameStatus.crashPoint} data={generateChartData(gameStatus.roundId, gameStatus.crashPoint)} linedata={generateLineChartData(gameStatus.roundId, gameStatus.crashPoint)} />
       </div>
     );
   } else if (gameStatus.status === "IN_PROGRESS") {
     return (
       <div className=" w-full -mt-8">
         <div>
-          <span className="relative z-10 top-8 left-5 text-green-500 text-xl">Your portfolio is up: {currentMultiplier.toFixed(2)}x</span>
+          <span className="relative z-10 top-12 left-5 text-green-500 text-4xl tracking-base">{currentMultiplier.toFixed(2)}x</span>
           {/* <CountUp
-            className="relative z-10 top-8 left-5 text-green-500 text-xl"
+            className="relative z-10 top-12 left-5 text-green-500 text-xl"
             start={(Date.now() - gameStatus.startTime!) / 1000 + 1}
             end={gameStatus.crashPoint!}
             duration={gameStatus.crashPoint! - ((Date.now() - gameStatus.startTime!) / 1000 + 1)}
@@ -84,7 +84,7 @@ export default function GameScreen() {
             //   return (t==0) ? b : c * Math.pow(1.06, 10 * (t/d - 1)) + b;
             // }}
           /> */}
-          <CandlestickChart startTime={gameStatus.startTime!} crashPoint={gameStatus.crashPoint} data={generateChartData(gameStatus.roundId, gameStatus.crashPoint)} />
+          <CandlestickChart startTime={gameStatus.startTime!} crashPoint={gameStatus.crashPoint} data={generateChartData(gameStatus.roundId, gameStatus.crashPoint)} linedata={generateLineChartData(gameStatus.roundId, gameStatus.crashPoint)} />
         </div>
       </div>
     );
@@ -93,18 +93,18 @@ export default function GameScreen() {
       <div className=" w-full -mt-8">
         <div>
           <CountUp
-          className="relative z-10 top-8 left-5 text-green-500 text-xl"
+          className="relative z-10 top-12 left-5 text-green-500 text-4xl"
             start={gameStatus.crashPoint!}
             end={gameStatus.crashPoint!}
             duration={0}
             separator=""
             decimals={2}
             decimal="."
-            prefix="Rugged! All time high: "
+            prefix="Crashed at "
             suffix="x"
             useEasing={false}
           />
-          <CandlestickChart startTime={gameStatus.startTime!} crashPoint={gameStatus.crashPoint} data={generateChartData(gameStatus.roundId, gameStatus.crashPoint)} />
+          <CandlestickChart startTime={gameStatus.startTime!} crashPoint={gameStatus.crashPoint} data={generateChartData(gameStatus.roundId, gameStatus.crashPoint)} linedata={generateLineChartData(gameStatus.roundId, gameStatus.crashPoint)} />
         </div>
       </div>
     );

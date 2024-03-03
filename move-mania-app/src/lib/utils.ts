@@ -8,6 +8,27 @@ export function cn(...inputs: ClassValue[]) {
 
 export const EXPONENTIAL_FACTOR = 1.06;
 
+export function generateLineChartData(gameRoundId: string, crashPoint: number): any[] {
+  const exponentialBase = EXPONENTIAL_FACTOR;
+  const tickMs = 100;
+  const gameLengthMs = log(exponentialBase, crashPoint) * 1000;
+  let currentElapsedTimeMs = 0;
+  const dataPoints: any[] = [];
+  let currentDate = new Date("2021-01-01T00:00:00Z");
+  for (currentElapsedTimeMs; currentElapsedTimeMs < gameLengthMs; currentElapsedTimeMs += tickMs) {
+    const value = calculateCurrentCrashPoint(currentElapsedTimeMs / 1000);
+    const timeString = currentDate.toISOString().split('T')[0];
+    dataPoints.push({
+      elapsedTime: currentElapsedTimeMs,
+      dataPoint: { time: timeString, value }
+    });
+    currentDate = new Date(currentDate.getTime() + (24 * 60 * 60 * 1000));
+  }
+
+  return dataPoints;
+}
+
+
 export function generateChartData(gameRoundId: string, crashPoint: number): any[] {
 
   const startingPrice = 50;
