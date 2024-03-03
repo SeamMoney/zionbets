@@ -33,7 +33,6 @@ function CandlestickChart ({
 
         const newChart = createChart(chartContainerRef.current, {
             width: chartContainerRef.current.clientWidth,
-            height: 500,
             layout: {
                 background: { color: '#000' },
                 textColor: '#33cc33',
@@ -155,7 +154,7 @@ function CandlestickChart ({
         return () => clearInterval(interval);
     }, [])
 
-    return <div ref={chartContainerRef} className="h-full w-full border-l border-b border-green-500" style={{height: '100%'}} />
+    return <div ref={chartContainerRef} className="h-[300px] lg:h-[500px] w-full border-b border-neutral-700 overflow-hidden" />
 };
 
 export default CandlestickChart;
