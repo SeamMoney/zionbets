@@ -1,10 +1,10 @@
 [package]
-name = "move_mania"
+name = "zion"
 version = "1.0.0"
 authors = []
 
 [addresses]
-move_mania = "0xBEEF"
+zion = "0xBEEF"
 
 [dev-addresses]
 
