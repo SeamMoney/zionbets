@@ -32,7 +32,7 @@ export default function RootLayout({
       <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"></meta>
       <body className={baijamjuree.className + " text-white"}>
         
-          <div className="flex h-screen overflow-hidden">
+          <div className="flex h-full min-h-screen overflow-hidden">
             <nav className="fixed w-full h-12 lg:h-20 z-30 px-2 lg:px-4 border-b border-neutral-700 bg-[#020202] bg-noise">
               <div className="flex flex-row items-center justify-between w-full h-full">
                 <div className="flex flex-row gap-4 items-center ">
@@ -68,7 +68,7 @@ export default function RootLayout({
                 </div>
               </div>
             </nav>
-            <div className="flex flex-1 flex-col pt-12 lg:pt-20 xl:mr-96">
+            <div className="flex flex-1 flex-col pt-12 lg:pt-20 lg:mr-96 border border-green-500">
               <main className="flex-1 overflow-y-auto">
                 {children}
                 <Toaster />
