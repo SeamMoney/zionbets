@@ -70,6 +70,10 @@ function CandlestickChart ({
             },
             rightPriceScale: {  
                 borderColor: '#333333',
+
+                scaleMargins: {
+                    bottom: 0,
+                }
                 // visible: false,
             },
             handleScale: false, 
