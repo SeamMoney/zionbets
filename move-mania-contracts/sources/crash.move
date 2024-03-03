@@ -1,4 +1,4 @@
-module move_mania::crash {
+module zion::crash {
 
   use std::bcs;
   use std::hash;
@@ -15,7 +15,7 @@ module move_mania::crash {
   use aptos_framework::randomness::{Self, PerBlockRandomness};
   
   const SEED: vector<u8> = b"move-mania-crash";
-  const MAX_CRASH_POINT: u64 = 100_000; // 100 seconds in milliseconds
+  const MAX_CRASH_POINT: u64 = 18446744073709551615; // 2^64 - 1
   
   struct State has key {
     signer_cap: account::SignerCapability,
@@ -73,7 +73,7 @@ module move_mania::crash {
         house_secret_hash,
         salt_hash,
         bets: simple_map::new(),
-        randomness: randomness::u64_range(0, 100),
+        randomness: randomness::u64_integer(),
         crash_point_ms: option::none()
       };
       option::fill(&mut state.current_game, new_game);
@@ -179,7 +179,7 @@ module move_mania::crash {
     @return - address of the module's resource account
   */ 
   inline fun get_resource_address(): address {
-    account::create_resource_address(&@move_mania, SEED)
+    account::create_resource_address(&@zion, SEED)
   }
 
   inline fun verify_hashes(
