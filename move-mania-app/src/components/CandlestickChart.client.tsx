@@ -140,6 +140,11 @@ function CandlestickChart ({
 
         candleSeries.setData(dataToShow);
 
+        newChart.timeScale().setVisibleLogicalRange({
+            from: 0, 
+            to: dataToShow.length
+        })
+
         // Set timeout to update the chart every 100ms with the next data point
         const interval = setInterval(() => {
             const elapsedMs = Date.now() - (startTime - 20 * 1000);
@@ -149,6 +154,11 @@ function CandlestickChart ({
             console.log("dataToShow.length:", dataToShow.length)
 
             candleSeries.setData(dataToShow);
+
+            newChart.timeScale().setVisibleLogicalRange({
+                from: 0, 
+                to: dataToShow.length
+            })
         }, 100);
 
         return () => clearInterval(interval);
