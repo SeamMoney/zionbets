@@ -13,6 +13,9 @@ module zion::crash {
   use aptos_framework::aptos_coin::{AptosCoin};
   use aptos_framework::event::{Self, EventHandle};
   use aptos_framework::randomness::{Self, PerBlockRandomness};
+  use aptos_framework::math128;
+
+  use std::debug::print;
   
   const SEED: vector<u8> = b"move-mania-crash";
   const MAX_CRASH_POINT: u64 = 18446744073709551615; // 2^64 - 1
@@ -65,19 +68,22 @@ module zion::crash {
 
     // Check params
 
-    if (option::is_some(&state.current_game)) {
-      abort(1)
-    } else {
-      let new_game = Game {
-        start_time_ms, 
-        house_secret_hash,
-        salt_hash,
-        bets: simple_map::new(),
-        randomness: randomness::u64_integer(),
-        crash_point_ms: option::none()
-      };
-      option::fill(&mut state.current_game, new_game);
-    }
+    assert!(
+      option::is_none(&state.current_game),
+      1
+    );
+
+    let new_randomness = randomness::u64_integer();
+
+    let new_game = Game {
+      start_time_ms, 
+      house_secret_hash,
+      salt_hash,
+      bets: simple_map::new(),
+      randomness: new_randomness,
+      crash_point_ms: option::none()
+    };
+    option::fill(&mut state.current_game, new_game);
   }
 
   public entry fun place_bet(
@@ -174,6 +180,44 @@ module zion::crash {
     vector::destroy_empty(bets);
   }
 
+  fun calculate_crash_point_with_randomness(
+    randomness: u64, 
+    house_secret: String
+  ): u128 {
+    let randomness_bytes = bcs::to_bytes(&randomness);
+    let house_secret_bytes = bcs::to_bytes(&house_secret);
+
+    vector::append(&mut randomness_bytes, copy house_secret_bytes);
+
+    let hash = hash::sha3_256(randomness_bytes);
+
+    print(&hash);
+    parse_hex(vector::trim(&mut hash, 16))
+  }
+
+  fun parse_hex(hex: vector<u8>): u128 {
+
+    print(&hex);
+
+    let exponent = 0;
+    let sum = 0;
+
+    while (vector::length(&hex) > 0) {
+      let byte = (vector::pop_back(&mut hex) as u128);
+      print(&byte);
+      print(&((byte % 16) * math128::pow(16, exponent)));
+      print(&((byte / 16) * math128::pow(16, exponent + 1)));
+
+      sum = sum + (byte % 16) * math128::pow(16, exponent) + (byte / 16) * math128::pow(16, exponent + 1);
+
+      exponent = exponent + 2;
+
+      print(&sum);
+    };
+
+    sum
+  }
+
   /* 
     Create and return the address of the module's resource account
     @return - address of the module's resource account
@@ -219,5 +263,14 @@ module zion::crash {
         0
       }
     }
+  }
+
+  #[test]
+  fun test_calculate_crash_point_with_randomness() {
+    let randomness: u64 = 123456789;
+    let house_secret: vector<u8> = b"house_secret";
+
+    let expected_crash_point = calculate_crash_point_with_randomness(randomness, string::utf8(house_secret));
+    print(&expected_crash_point);
   }
 }
