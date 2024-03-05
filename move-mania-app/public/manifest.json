@@ -1,0 +1,14 @@
+{
+  "name": "Zion Bets",
+  "short_name": "ZION",
+  "theme_color": "#34ee33",
+  "background_color": "#000000",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/",
+  "start_url": "/",
+  "icons": [
+    
+  ],
+  "splash_pages": null
+}
