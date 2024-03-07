@@ -18,6 +18,7 @@ import { Socket, io } from "socket.io-client";
 
 import { socket } from "@/lib/socket";
 import { gameStatusContext } from "./CrashProvider";
+import { placeBet } from "@/lib/aptos";
 
 export type GameStatus = {
   status: "COUNTDOWN" | "IN_PROGRESS" | "END";
@@ -105,7 +106,19 @@ export default function ControlCenter() {
 
   return (
     <div className="w-full h-full flex flex-col gap-4 min-[550px]:flex-row items-start min-[550px]:items-center min-[550px]:justify-between gap-1 p-2">
-
+      <button onClick={async () => {
+        if (!account) return;
+        console.log(
+          await placeBet(account, {
+            roundId: 1,
+            playerEmail: account.email || "",
+            betAmount: 2.4,
+            coinType: "APT",
+          })
+        )
+      }}>
+        aptos bet
+      </button>
 
       <div className=" flex flex-col items-start justify-around px-2 gap-2 w-full">
         <div className="flex flex-col gap-1 w-full">
