@@ -131,6 +131,11 @@ module zion::crash {
     vector::destroy_empty(bets);
   }
 
+  /**
+  * Places a bet in the current game of crash. To be used by players via the client.
+  * @param player - the signer of the player
+  * @param bet_amount - the amount of the bet
+  */
   public entry fun place_bet(
     player: &signer,
     bet_amount: u64
@@ -140,7 +145,7 @@ module zion::crash {
     assert!(option::is_some(&state.current_game), 1);
 
     let game_mut_ref = option::borrow_mut(&mut state.current_game);
-    assert!(timestamp::now_microseconds() < game_mut_ref.start_time_ms, 2);
+    assert!(timestamp::now_microseconds() > game_mut_ref.start_time_ms, 2);
 
     let new_bet = Bet {
       player: signer::address_of(player),
