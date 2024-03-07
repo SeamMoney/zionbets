@@ -11,16 +11,30 @@ import crypto from 'crypto';
  * @param salt The salt provided by the server to ensure the random number is not predictable
  */
 export function calculateCrashPoint(randomNumber: number, salt: string) {
-  const hash = crypto.createHash("sha256");
-  const hm = hash.update(randomNumber + salt);
+  const hash = crypto.createHash("SHA3-256");
+  // decodeURIComponent('616263'.replace(/\s+/g, '').replace(/[0-9a-f]{2}/g, '%$&'));
+
+  // console.log('randomNumber', randomNumber);
+  // console.log('salt', salt);
+  const hashString = `${randomNumber}${salt}`;
+  // console.log('hashString', hashString);
+  const hm = hash.update(hashString);
   const h = hm.digest('hex');
+  // console.log('hash', h);
+
+  console.log('parseInt(h, 16)', parseInt(h, 16));
+  console.log('parseInt(h, 16) % 33', parseInt(h, 16) % 33);
   
   if (parseInt(h, 16) % 33 == 0) {
     return 0;
   }
 
   const n = parseInt(h.slice(0, 13), 16);
+  // console.log('h.slice(0, 13)', h.slice(0, 13));
+  // console.log('n', n);
   const e = Math.pow(2, 52);
+  // console.log('e', e);
+  // console.log('Math.floor((100 * e - n) / (e - n)) / 100', Math.floor((100 * e - n) / (e - n)) / 100);
   return Math.floor((100 * e - n) / (e - n)) / 100;
 }
 
@@ -30,3 +44,11 @@ export function calculateCrashPoint(randomNumber: number, salt: string) {
 //   const salt = Math.random().toString(36).substring(7);
 //   console.log(calculateCrashPoint(randomNumber, salt));
 // }
+
+// Run through the calculateCrashPoint function with 1000 times and log the result
+for (let i = 0; i < 5; i++) {
+  const randomNumber = i;
+  const salt = 'test';
+  console.log(calculateCrashPoint(randomNumber, salt), randomNumber, salt);
+}
+console.log(Number.MAX_SAFE_INTEGER)
