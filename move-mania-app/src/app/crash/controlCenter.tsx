@@ -18,7 +18,7 @@ import { Socket, io } from "socket.io-client";
 
 import { socket } from "@/lib/socket";
 import { gameStatusContext } from "./CrashProvider";
-import { placeBet } from "@/lib/aptos";
+import { cashOut, placeBet } from "@/lib/aptos";
 
 export type GameStatus = {
   status: "COUNTDOWN" | "IN_PROGRESS" | "END";
@@ -118,6 +118,19 @@ export default function ControlCenter() {
         )
       }}>
         aptos bet
+      </button>
+
+      <button onClick={async () => {
+        if (!account) return;
+        console.log(
+          await cashOut(account, {
+            roundId: 1,
+            playerEmail: account.email,
+            cashOutMultiplier: 1.2,
+          })
+        )
+      }}>
+        aptos cashout
       </button>
 
       <div className=" flex flex-col items-start justify-around px-2 gap-2 w-full">

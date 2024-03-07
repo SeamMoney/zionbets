@@ -1,5 +1,5 @@
 import { AptosAccount, AptosClient, FaucetClient, HexString, Provider } from "aptos";
-import { BetData } from "./types";
+import { BetData, CashOutData } from "./types";
 import { User } from "./schema";
 
 const MODULE_ADDRESS = '0x84b53c89b31c8b41463946e7909cb606b4a77e3a6793de86195677175dd3b6c4';
@@ -65,6 +65,33 @@ export async function placeBet(user: User, betData: BetData) {
   );
 
   const tx = await provider.signAndSubmitTransaction(userAccount, placeBetTxn);
+
+  const txResult = await client.waitForTransactionWithResult(tx);
+  console.log(txResult);
+
+  if (!(txResult as any).success) {
+    return null;
+  }
+
+  return {
+    txnHash: txResult.hash,
+  };
+}
+
+export async function cashOut(user: User, cashOutData: CashOutData) {
+  const userAccount = await getUserAccount(user.private_key);
+
+  const cashOutTxn = await provider.generateTransaction(
+    userAccount.address(),
+    {
+      function: `${MODULE_ADDRESS}::${MODULE_NAME}::cash_out`,
+      type_arguments: [],
+      arguments: []
+    },
+    TRANSACTION_OPTIONS
+  );
+
+  const tx = await provider.signAndSubmitTransaction(userAccount, cashOutTxn);
 
   const txResult = await client.waitForTransactionWithResult(tx);
   console.log(txResult);
