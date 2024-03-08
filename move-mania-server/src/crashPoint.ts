@@ -22,20 +22,21 @@ export function calculateCrashPoint(randomNumber: number, salt: string) {
   const h = hm.digest('hex');
   // console.log('hash', h);
 
-  console.log('parseInt(h, 16)', parseInt(h, 16));
-  console.log('parseInt(h, 16) % 33', parseInt(h, 16) % 33);
-  
-  if (parseInt(h, 16) % 33 == 0) {
+  // console.log('h', h);
+  // console.log('parseInt(h, 16)', parseInt(h, 16));
+  // console.log('parseInt(h, 16) % 33', parseInt(h, 16) % 33);
+  // console.log('BigInt(h) % BigInt(33)', BigInt('0x'+ h) % BigInt(33));
+  if (BigInt('0x'+ h) % BigInt(33) == BigInt(0)) {
     return 0;
   }
 
-  const n = parseInt(h.slice(0, 13), 16);
+  const n = BigInt('0x0' + h.slice(0, 13));
   // console.log('h.slice(0, 13)', h.slice(0, 13));
   // console.log('n', n);
-  const e = Math.pow(2, 52);
+  const e = BigInt(2) ** BigInt(52);
   // console.log('e', e);
   // console.log('Math.floor((100 * e - n) / (e - n)) / 100', Math.floor((100 * e - n) / (e - n)) / 100);
-  return Math.floor((100 * e - n) / (e - n)) / 100;
+  return (Number((BigInt(100) * e - n)) / Number(e - n) / 100).toFixed(2);
 }
 
 // // Run through the calculateCrashPoint function with 1000 times and log the result
@@ -46,9 +47,8 @@ export function calculateCrashPoint(randomNumber: number, salt: string) {
 // }
 
 // Run through the calculateCrashPoint function with 1000 times and log the result
-for (let i = 0; i < 5; i++) {
+for (let i = 0; i < 100; i++) {
   const randomNumber = i;
   const salt = 'test';
   console.log(calculateCrashPoint(randomNumber, salt), randomNumber, salt);
 }
-console.log(Number.MAX_SAFE_INTEGER)
