@@ -158,6 +158,11 @@ module zion::crash {
     coin::merge(&mut state.house_pool, bet_coin);
   }
 
+
+  /**
+  * Allows a player to cash out their bet in the current game of crash. To be used by players via the client.
+  * @param player - the signer of the player
+  */
   public entry fun cash_out(
     player: &signer
   ) acquires State {
@@ -165,13 +170,35 @@ module zion::crash {
     assert!(option::is_some(&state.current_game), 1);
 
     let game_mut_ref = option::borrow_mut(&mut state.current_game);
-    assert!(timestamp::now_microseconds() < game_mut_ref.start_time_ms, 2);
+    assert!(timestamp::now_microseconds() > game_mut_ref.start_time_ms, 2);
 
     let bet = simple_map::borrow_mut(&mut game_mut_ref.bets, &signer::address_of(player));
     assert!(option::is_none(&bet.cash_out), 3);
   
     let cash_out = timestamp::now_microseconds() - game_mut_ref.start_time_ms;
     bet.cash_out = option::some(cash_out);
+  }
+
+
+  fun calculate_cash_out_point_from_time_elapsed(
+    start_time_ms: u64, 
+    current_time_ms: u64
+  ): u64 {
+    let difference = current_time_ms - start_time_ms;
+
+    if (difference == 0) {
+      return 0
+    };
+
+    let seconds_elapsed = difference / 1000;
+    let i = 1;
+    let current_cash_out = 106000000;
+    while (i < seconds_elapsed) {
+      current_cash_out = current_cash_out * 106000000 / 1_0000_0000;
+      i = i + 1;
+    };
+
+    current_cash_out
   }
 
   // public entry fun reveal_crashpoint_and_distribute_winnings(
@@ -244,8 +271,8 @@ module zion::crash {
     let hash = hash::sha3_256(*string::bytes(&randomness_string));
 
     // print(&hash);
-    print(&parse_hex(hash, false));
-    print(&(parse_hex(hash, false) % 33));
+    // print(&parse_hex(hash, false));
+    // print(&(parse_hex(hash, false) % 33));
     if (parse_hex(hash, false) % 33 == 0) {
       0
     } else {
@@ -349,18 +376,28 @@ module zion::crash {
   fun test_calculate_crash_point_with_randomness() {
     let house_secret = string::utf8(b"test");
 
-    // let index = 0;
-    // while (index < 5) {
-    //   let randomness = index;
-    //   let crash_point = calculate_crash_point_with_randomness(randomness, house_secret);
-    //   print(&randomness);
-    //   print(&house_secret);
-    //   print(&crash_point);
-    //   index = index + 1;
-    // };
+    let index = 0;
+    while (index < 100) {
+      let randomness = index;
+      let crash_point = calculate_crash_point_with_randomness(randomness, house_secret);
+      print(&randomness);
+      // print(&house_secret);
+      print(&crash_point);
+      index = index + 1;
+    };
+  }
 
-    let num: u256 = 9969647506454130227674018047161338038021863940491555036153395554133127286501;
+  #[test]
+  fun test_calculate_cash_out_point_from_time_elapsed() {
+    let i = 0;
 
-    print(&(num % 33));
+    while (i < 100) {
+      print(&i);
+      let start_time_ms = 1000;
+      let current_time_ms = 1000 * (i + 1);
+      let cash_out = calculate_cash_out_point_from_time_elapsed(start_time_ms, current_time_ms);
+      print(&cash_out);
+      i = i + 1;
+    }
   }
 }
