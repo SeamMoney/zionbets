@@ -410,7 +410,7 @@ module zion::crash {
     let salted_house_secret_hash = hash::sha3_256(*string::bytes(&salted_house_secret));
     let salt_hash = hash::sha3_256(*string::bytes(&salt));
 
-    start_game()
+    // start_game()
 
     // let result = verify_hashes(house_secret, salt, &salted_house_secret_hash, &salt_hash);
     // assert!(result, 1);
@@ -433,7 +433,7 @@ module zion::liqudity_pool {
   use aptos_std::comparator::{Self, Result};
   use aptos_framework::aptos_coin::{Self, AptosCoin};
 
-  const LP_COIN_DECIMALS: u8 = 9;
+  const LP_COIN_DECIMALS: u8 = 8;
   const SEED: vector<u8> = b"zion-liquidity-pool";
 
   struct LPCoin {}
@@ -456,7 +456,7 @@ module zion::liqudity_pool {
 
     let (lp_coin_burn_cap, lp_coin_freeze_cap, lp_coin_mint_cap) = 
       coin::initialize<LPCoin>(
-        &resource_account_signer, 
+        admin, 
         string::utf8(b"Zion bets LP coin"),
         string::utf8(b"ZBET"),
         LP_COIN_DECIMALS,
@@ -500,6 +500,7 @@ module zion::liqudity_pool {
     coin::merge(&mut liquidity_pool.reserve_coin, supplied_coin);
 
     let lp_coin = coin::mint(amount_lp_coins_to_mint, &liquidity_pool.lp_coin_mint_cap);
+    coin::register<LPCoin>(supplier);
     coin::deposit(signer::address_of(supplier), lp_coin);
   }
 
@@ -537,4 +538,69 @@ module zion::liqudity_pool {
   inline fun get_resource_address(): address {
     account::create_resource_address(&@zion, SEED)
   }
+
+  #[test(admin = @zion, user = @0xA)]
+  fun test_init_module_success_resources_created(
+      admin: &signer, 
+  ) acquires State, LiquidityPool {
+    let admin_address = signer::address_of(admin);
+    account::create_account_for_test(admin_address);
+    
+    init_module(admin);
+
+    let resource_account_address = get_resource_address();
+
+    let state = borrow_global<State>(resource_account_address);
+    assert!(
+      account::get_signer_capability_address(&state.signer_cap) == 
+        resource_account_address, 
+      0
+    );
+
+    let liquidity_pool = borrow_global<LiquidityPool>(resource_account_address);
+    assert!(
+      coin::value(&liquidity_pool.reserve_coin) == 0, 
+      1
+    );
+  }
+
+  #[test(admin = @zion, user = @0xA)]
+  fun test_supply_liquidity_success_initial_liquidity(
+    admin: &signer, 
+    user: &signer
+  ) acquires LiquidityPool {
+    let admin_address = signer::address_of(admin);
+    account::create_account_for_test(admin_address);
+
+    let user_address = signer::address_of(user);
+    account::create_account_for_test(user_address);
+
+    let aptos_framework = account::create_account_for_test(@aptos_framework);
+    let (burn_cap, mint_cap) = aptos_coin::initialize_for_test(&aptos_framework);
+    coin::register<AptosCoin>(admin);
+    coin::register<AptosCoin>(user);
+
+    init_module(admin);
+
+    let supply_amount = 1_0000_0000;
+    coin::deposit(user_address, coin::mint(supply_amount, &mint_cap));
+    supply_liquidity(user, supply_amount);
+
+    let resource_account_address = get_resource_address();
+    let liquidity_pool = borrow_global<LiquidityPool>(resource_account_address);
+    assert!(
+      coin::value(&liquidity_pool.reserve_coin) == supply_amount, 
+      0
+    );
+
+    let lp_coin_supply = *option::borrow(&coin::supply<LPCoin>());
+    assert!(
+      lp_coin_supply == (supply_amount as u128), 
+      1
+    );
+
+    coin::destroy_burn_cap(burn_cap);
+    coin::destroy_mint_cap(mint_cap);
+  }
+
 }
