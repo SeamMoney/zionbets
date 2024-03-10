@@ -18,7 +18,7 @@ module zion::crash {
 
   use std::debug::print;
   
-  const SEED: vector<u8> = b"move-mania-crash";
+  const SEED: vector<u8> = b"zion-crash";
   const MAX_CRASH_POINT: u128 = 340282366920938463463374607431768211455; // 2^64 - 1
   const COUNTDOWN_MS: u64 = 20 * 1000;
   
@@ -35,7 +35,7 @@ module zion::crash {
     salt_hash: vector<u8>,
     randomness: u64,
     bets: SimpleMap<address, Bet>,
-    crash_point_ms: Option<u64>
+    // crash_point_ms: Option<u64>
   }
 
   struct Bet has store {
@@ -94,7 +94,7 @@ module zion::crash {
       salt_hash,
       bets: simple_map::new(),
       randomness: new_randomness,
-      crash_point_ms: option::none()
+      // crash_point_ms: option::none()
     };
     option::fill(&mut state.current_game, new_game);
   }
@@ -108,7 +108,7 @@ module zion::crash {
       salt_hash: _,
       randomness: _,
       bets: game_bets,
-      crash_point_ms: _
+      // crash_point_ms: _
     } = game;
 
     let (betters, bets) = simple_map::to_vec_pair(game_bets);
@@ -164,7 +164,8 @@ module zion::crash {
   * @param player - the signer of the player
   */
   public entry fun cash_out(
-    player: &signer
+    player: &signer,
+    cash_out: u64
   ) acquires State {
     let state = borrow_global_mut<State>(get_resource_address());
     assert!(option::is_some(&state.current_game), 1);
@@ -175,7 +176,6 @@ module zion::crash {
     let bet = simple_map::borrow_mut(&mut game_mut_ref.bets, &signer::address_of(player));
     assert!(option::is_none(&bet.cash_out), 3);
   
-    let cash_out = timestamp::now_microseconds() - game_mut_ref.start_time_ms;
     bet.cash_out = option::some(cash_out);
   }
 
@@ -201,66 +201,64 @@ module zion::crash {
     current_cash_out
   }
 
-  // public entry fun reveal_crashpoint_and_distribute_winnings(
-  //   house_secret: u64, 
-  //   salt: u64
-  // ) acquires State {
-  //   let state = borrow_global_mut<State>(get_resource_address());
-  //   assert!(option::is_some(&state.current_game), 1);
+  public entry fun reveal_crashpoint_and_distribute_winnings(
+    house_secret: String, 
+    salt: String
+  ) acquires State {
+    let state = borrow_global_mut<State>(get_resource_address());
+    assert!(option::is_some(&state.current_game), 1);
 
-  //   let game_mut_ref = option::borrow_mut(&mut state.current_game);
-  //   assert!(timestamp::now_microseconds() < game_mut_ref.start_time_ms, 2);
+    let game_mut_ref = option::borrow_mut(&mut state.current_game);
+    assert!(timestamp::now_microseconds() > game_mut_ref.start_time_ms, 2);
 
-  //   assert!(
-  //     verify_hashes(
-  //       &house_secret, 
-  //       &salt, 
-  //       &game_mut_ref.house_secret_hash, 
-  //       &game_mut_ref.salt_hash
-  //     ), 
-  //     3
-  //   );
+    assert!(
+      verify_hashes(
+        house_secret, 
+        salt, 
+        &game_mut_ref.house_secret_hash, 
+        &game_mut_ref.salt_hash
+      ), 
+      3
+    );
 
-  //   // let crash_point_ms = (game_mut_ref.randomness + house_secret) % MAX_CRASH_POINT;
+    let game = option::extract(&mut state.current_game);
+    let Game {
+      start_time_ms: _,
+      house_secret_hash: _,
+      salt_hash: _,
+      randomness,
+      bets: game_bets,
+      // crash_point_ms: _
+    } = game;
+    let (betters, bets) = simple_map::to_vec_pair(game_bets);
 
-  //   assert!(timestamp::now_microseconds() > 0, 4);
+    let number_of_bets = vector::length(&betters);
+    let cleared_betters = 0;
 
-  //   let game = option::extract(&mut state.current_game);
-  //   let Game {
-  //     start_time_ms: _,
-  //     house_secret_hash: _,
-  //     salt_hash: _,
-  //     randomness: _,
-  //     bets: game_bets,
-  //     crash_point_ms: _
-  //   } = game;
-  //   let (betters, bets) = simple_map::to_vec_pair(game_bets);
+    let crash_point = calculate_crash_point_with_randomness(randomness, string_utils::to_string(&house_secret));
 
-  //   let number_of_bets = vector::length(&betters);
-  //   let cleared_betters = 0;
+    while (cleared_betters < number_of_bets) {
+      let better = vector::pop_back(&mut betters);
+      let bet = vector::pop_back(&mut bets);
 
-  //   while (cleared_betters < number_of_bets) {
-  //     let better = vector::pop_back(&mut betters);
-  //     let bet = vector::pop_back(&mut bets);
+      let winnings = determine_win(bet, crash_point);
 
-  //     let winnings = determine_win(bet, crash_point_ms);
+      if (winnings > 0) {
+        let winnings_coin = coin::extract(&mut state.house_pool, winnings);
+        coin::deposit(better, winnings_coin);
+      };
 
-  //     if (winnings > 0) {
-  //       let winnings_coin = coin::extract(&mut state.house_pool, winnings);
-  //       coin::deposit(better, winnings_coin);
-  //     };
+      cleared_betters = cleared_betters + 1;
+    };
 
-  //     cleared_betters = cleared_betters + 1;
-  //   };
-
-  //   vector::destroy_empty(betters);
-  //   vector::destroy_empty(bets);
-  // }
+    vector::destroy_empty(betters);
+    vector::destroy_empty(bets);
+  }
 
   fun calculate_crash_point_with_randomness(
     randomness: u64, 
     house_secret: String
-  ): u256 {
+  ): u64 {
     let randomness_string = string_utils::to_string(&randomness);
     // print(&randomness_string);
     // print(&house_secret);
@@ -281,7 +279,7 @@ module zion::crash {
       // print(&value);
       let e = pow(2, 52);
       // print(&e);
-      ((100 * e - value) / (e - value))
+      (((100 * e - value) / (e - value)) as u64)
     }
   }
 
@@ -334,14 +332,14 @@ module zion::crash {
   }
 
   inline fun verify_hashes(
-    house_secret: &u64, 
-    salt: &u64, 
+    house_secret: String, 
+    salt: String, 
     house_secret_hash: &vector<u8>,
     salt_hash: &vector<u8>
   ): bool {
-    let house_secret_bytes = bcs::to_bytes(house_secret);
-    let salt_bytes = bcs::to_bytes(salt);
-    vector::append(&mut house_secret_bytes, copy salt_bytes);
+    string::append(&mut house_secret, salt);
+    let house_secret_bytes = *string::bytes(&house_secret);
+    let salt_bytes = *string::bytes(&salt);
 
     let actual_house_secret_hash = hash::sha3_256(house_secret_bytes);
     let actual_salt_hash = hash::sha3_256(salt_bytes);
@@ -351,8 +349,8 @@ module zion::crash {
 
   inline fun determine_win(
     bet: Bet, 
-    crash_point_ms: u64
-  ): u64{
+    crash_point: u64
+  ): u64 {
     let Bet {
       player: _,
       bet_amount,
@@ -363,7 +361,7 @@ module zion::crash {
       0
     } else {
       let player_cash_out = option::extract(&mut player_cash_out_option);
-      if (player_cash_out < crash_point_ms) {
+      if (player_cash_out < crash_point) {
         let winnings = bet_amount * player_cash_out / 100; 
         winnings
       } else {
@@ -399,5 +397,87 @@ module zion::crash {
       print(&cash_out);
       i = i + 1;
     }
+  }
+
+  #[test(user = @0xA)]
+  fun test_verify_hashes(
+    user: &signer
+  ) {
+    let house_secret = string::utf8(b"test");
+    let salt = string::utf8(b"salt");
+    let salted_house_secret = string::utf8(b"testsalt");
+
+    let salted_house_secret_hash = hash::sha3_256(*string::bytes(&salted_house_secret));
+    let salt_hash = hash::sha3_256(*string::bytes(&salt));
+
+    start_game()
+
+    // let result = verify_hashes(house_secret, salt, &salted_house_secret_hash, &salt_hash);
+    // assert!(result, 1);
+  }
+}
+
+module zion::liqudity_pool {
+
+  use std::type_info;
+  use aptos_framework::event;
+  use aptos_framework::option;
+  use aptos_framework::math64;
+  use aptos_framework::account;
+  use aptos_framework::math128;
+  use aptos_framework::timestamp;
+  use std::string::{Self, String};
+  use aptos_framework::string_utils;
+  use aptos_framework::resource_account;
+  use aptos_framework::coin::{Self, Coin};
+  use aptos_std::comparator::{Self, Result};
+  use aptos_framework::aptos_coin::{Self, AptosCoin};
+
+  const LP_COIN_DECIMALS: u8 = 9;
+
+
+  struct LPCoin {}
+
+  struct LiquidityPool has key {
+    reserver_coin: Coin<AptosCoin>,
+    // mint cap of the specific pool's LP token
+    lp_coin_mint_cap: coin::MintCapability<LPCoin>,
+    // burn cap of the specific pool's LP token
+    lp_coin_burn_cap: coin::BurnCapability<LPCoin>
+  }
+
+  struct State has key {
+    // signer cap of the module's resource account
+    signer_cap: account::SignerCapability
+  }
+
+  fun init_module(admin: &signer) {
+    let (resource_account_signer, signer_cap) = account::create_resource_account(admin, b"zion-liquidity-pool");
+
+    let (lp_coin_burn_cap, lp_coin_freeze_cap, lp_coin_mint_cap) = 
+      coin::initialize<LPCoin>(
+        &resource_account_signer, 
+        string::utf8(b"Zion bets LP coin"),
+        string::utf8(b"ZBET"),
+        LP_COIN_DECIMALS,
+        true
+      );
+    coin::destroy_freeze_cap(lp_coin_freeze_cap);
+
+    move_to(
+      &resource_account_signer,
+      LiquidityPool {
+        reserver_coin: coin::zero<AptosCoin>(),
+        lp_coin_mint_cap,
+        lp_coin_burn_cap
+      }
+    );
+
+    move_to<State>(
+      &resource_account_signer,
+      State {
+        signer_cap: signer_cap
+      }
+    );
   }
 }

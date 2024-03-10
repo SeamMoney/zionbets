@@ -36,7 +36,7 @@ export function calculateCrashPoint(randomNumber: number, salt: string) {
   const e = BigInt(2) ** BigInt(52);
   // console.log('e', e);
   // console.log('Math.floor((100 * e - n) / (e - n)) / 100', Math.floor((100 * e - n) / (e - n)) / 100);
-  return (Number((BigInt(100) * e - n)) / Number(e - n) / 100).toFixed(2);
+  return Number((Number((BigInt(100) * e - n)) / Number(e - n) / 100).toFixed(2));
 }
 
 // // Run through the calculateCrashPoint function with 1000 times and log the result
@@ -46,9 +46,9 @@ export function calculateCrashPoint(randomNumber: number, salt: string) {
 //   console.log(calculateCrashPoint(randomNumber, salt));
 // }
 
-// Run through the calculateCrashPoint function with 1000 times and log the result
-for (let i = 0; i < 100; i++) {
-  const randomNumber = i;
-  const salt = 'test';
-  console.log(calculateCrashPoint(randomNumber, salt), randomNumber, salt);
-}
+// // Run through the calculateCrashPoint function with 1000 times and log the result
+// for (let i = 0; i < 100; i++) {
+//   const randomNumber = i;
+//   const salt = 'test';
+//   console.log(calculateCrashPoint(randomNumber, salt), randomNumber, salt);
+// }
