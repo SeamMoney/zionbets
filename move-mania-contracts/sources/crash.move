@@ -417,7 +417,7 @@ module zion::crash {
   }
 }
 
-module zion::liqudity_pool {
+module zion::liquidity_pool {
 
   use std::type_info;
   use std::signer;
@@ -440,6 +440,7 @@ module zion::liqudity_pool {
 
   struct LiquidityPool has key {
     reserve_coin: Coin<AptosCoin>,
+    locked_liquidity: Coin<LPCoin>,
     // mint cap of the specific pool's LP token
     lp_coin_mint_cap: coin::MintCapability<LPCoin>,
     // burn cap of the specific pool's LP token
@@ -468,6 +469,7 @@ module zion::liqudity_pool {
       &resource_account_signer,
       LiquidityPool {
         reserve_coin: coin::zero<AptosCoin>(),
+        locked_liquidity: coin::zero<LPCoin>(),
         lp_coin_mint_cap,
         lp_coin_burn_cap
       }
@@ -522,13 +524,13 @@ module zion::liqudity_pool {
     coin::burn(lp_coin_to_remove, &liquidity_pool.lp_coin_burn_cap);
   }
 
-  public entry fun burn_lp_coins(
+  public entry fun lock_lp_coins(
     owner: &signer, 
     lp_coin_amount: u64
   ) acquires LiquidityPool {
-    let liquidity_pool = borrow_global_mut<LiquidityPool>(get_resource_address());
-    let lp_coin_to_remove = coin::withdraw(owner, lp_coin_amount);
-    coin::burn(lp_coin_to_remove, &liquidity_pool.lp_coin_burn_cap);
+    let liquidity_pool = borrow_global_mut<LiquidityPool>(get_resource_address());  
+    let lp_coin_to_lock = coin::withdraw(owner, lp_coin_amount);
+    coin::merge(&mut liquidity_pool.locked_liquidity, lp_coin_to_lock);
   } 
 
   /* 
@@ -730,6 +732,53 @@ module zion::liqudity_pool {
     assert!(
       lp_coin_supply_after_removal == lp_coin_supply / 2, 
       1
+    );
+
+    coin::destroy_burn_cap(burn_cap);
+    coin::destroy_mint_cap(mint_cap);
+  }
+
+  #[test(admin = @zion, user = @0xA)]
+  fun test_lock_lp_coins_success(
+    admin: &signer, 
+    user: &signer
+  ) acquires LiquidityPool {
+    let admin_address = signer::address_of(admin);
+    account::create_account_for_test(admin_address);
+
+    let user_address = signer::address_of(user);
+    account::create_account_for_test(user_address);
+
+    let aptos_framework = account::create_account_for_test(@aptos_framework);
+    let (burn_cap, mint_cap) = aptos_coin::initialize_for_test(&aptos_framework);
+    coin::register<AptosCoin>(admin);
+    coin::register<AptosCoin>(user);
+
+    init_module(admin);
+
+    let supply_amount = 1_0000_0000;
+    coin::deposit(user_address, coin::mint(supply_amount, &mint_cap));
+    supply_liquidity(user, supply_amount);
+
+    let lp_coin_supply = *option::borrow(&coin::supply<LPCoin>());
+    lock_lp_coins(user, (lp_coin_supply as u64));
+
+    let resource_account_address = get_resource_address();
+    let liquidity_pool = borrow_global<LiquidityPool>(resource_account_address);
+    assert!(
+      coin::value(&liquidity_pool.reserve_coin) == supply_amount, 
+      0
+    );
+
+    let lp_coin_supply_after_burn = *option::borrow(&coin::supply<LPCoin>());
+    assert!(
+      (lp_coin_supply_after_burn as u64) == supply_amount, 
+      1
+    );
+
+    assert!(
+      coin::value(&liquidity_pool.locked_liquidity) == (lp_coin_supply as u64), 
+      2
     );
 
     coin::destroy_burn_cap(burn_cap);
