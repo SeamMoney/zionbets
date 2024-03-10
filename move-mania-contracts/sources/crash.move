@@ -439,7 +439,7 @@ module zion::liqudity_pool {
   struct LPCoin {}
 
   struct LiquidityPool has key {
-    reserver_coin: Coin<AptosCoin>,
+    reserve_coin: Coin<AptosCoin>,
     // mint cap of the specific pool's LP token
     lp_coin_mint_cap: coin::MintCapability<LPCoin>,
     // burn cap of the specific pool's LP token
@@ -467,7 +467,7 @@ module zion::liqudity_pool {
     move_to(
       &resource_account_signer,
       LiquidityPool {
-        reserver_coin: coin::zero<AptosCoin>(),
+        reserve_coin: coin::zero<AptosCoin>(),
         lp_coin_mint_cap,
         lp_coin_burn_cap
       }
@@ -487,7 +487,7 @@ module zion::liqudity_pool {
   ) acquires LiquidityPool {
     let liquidity_pool = borrow_global_mut<LiquidityPool>(get_resource_address());
 
-    let reserve_amount = coin::value(&liquidity_pool.reserver_coin);
+    let reserve_amount = coin::value(&liquidity_pool.reserve_coin);
     let lp_coin_supply = *option::borrow(&coin::supply<LPCoin>());
 
     let amount_lp_coins_to_mint = if (lp_coin_supply == 0) {
@@ -497,10 +497,28 @@ module zion::liqudity_pool {
     };
 
     let supplied_coin = coin::withdraw(supplier, supply_amount);
-    coin::merge(&mut liquidity_pool.reserver_coin, supplied_coin);
+    coin::merge(&mut liquidity_pool.reserve_coin, supplied_coin);
 
     let lp_coin = coin::mint(amount_lp_coins_to_mint, &liquidity_pool.lp_coin_mint_cap);
     coin::deposit(signer::address_of(supplier), lp_coin);
+  }
+
+  public entry fun remove_liquidity(
+    supplier: &signer, 
+    lp_coin_amount: u64
+  ) acquires LiquidityPool {
+    let liquidity_pool = borrow_global_mut<LiquidityPool>(get_resource_address());
+
+
+    let reserve_amount = coin::value(&liquidity_pool.reserve_coin);
+    let lp_coin_supply = *option::borrow(&coin::supply<LPCoin>());
+
+    let amount_reserve_to_remove = (math128::mul_div((lp_coin_amount as u128), (reserve_amount as u128), lp_coin_supply) as u64);
+    let remove_reserve_coin = coin::extract(&mut liquidity_pool.reserve_coin, amount_reserve_to_remove);
+    coin::deposit(signer::address_of(supplier), remove_reserve_coin);
+
+    let lp_coin_to_remove = coin::withdraw(supplier, lp_coin_amount);
+    coin::burn(lp_coin_to_remove, &liquidity_pool.lp_coin_burn_cap);
   }
 
   /* 
