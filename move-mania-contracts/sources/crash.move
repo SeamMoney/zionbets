@@ -4,6 +4,7 @@ module zion::crash {
   use std::hash;
   use std::signer;
   use std::vector;
+  use zion::liquidity_pool;
   use aptos_framework::account;
   use aptos_framework::timestamp;
   use std::option::{Self, Option};
@@ -25,7 +26,6 @@ module zion::crash {
   struct State has key {
     signer_cap: account::SignerCapability,
     current_game: Option<Game>,
-    house_pool: Coin<AptosCoin>
   }
 
   struct Game has store {
@@ -58,8 +58,7 @@ module zion::crash {
       &resource_account_signer,
       State {
         signer_cap: signer_cap,
-        current_game: option::none(),
-        house_pool: coin::zero<AptosCoin>()
+        current_game: option::none()
       }
     );
   }
@@ -155,7 +154,7 @@ module zion::crash {
     simple_map::add(&mut game_mut_ref.bets, signer::address_of(player), new_bet);
     
     let bet_coin = coin::withdraw(player, bet_amount);
-    coin::merge(&mut state.house_pool, bet_coin);
+    liquidity_pool::put_reserve_coins(bet_coin);
   }
 
 
@@ -244,7 +243,7 @@ module zion::crash {
       let winnings = determine_win(bet, crash_point);
 
       if (winnings > 0) {
-        let winnings_coin = coin::extract(&mut state.house_pool, winnings);
+        let winnings_coin = liquidity_pool::extract_reserve_coins(winnings);
         coin::deposit(better, winnings_coin);
       };
 
