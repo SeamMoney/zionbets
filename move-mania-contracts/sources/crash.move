@@ -433,6 +433,8 @@ module zion::liquidity_pool {
   use aptos_std::comparator::{Self, Result};
   use aptos_framework::aptos_coin::{Self, AptosCoin};
 
+  friend zion::crash;
+
   const LP_COIN_DECIMALS: u8 = 8;
   const SEED: vector<u8> = b"zion-liquidity-pool";
 
