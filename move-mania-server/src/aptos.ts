@@ -1,10 +1,10 @@
 import { AptosAccount, AptosClient, HexString, Provider, Network } from "aptos";
 import crypto from 'crypto';
 
-const MODULE_ADDRESS = '0x8404f42a23ecdd3d49b6cfbf876c6acaa8f50da825a10feb81bdb2b055a55d68';
-const MODULE_NAME = 'crash';
-const RESOURCE_ACCOUNT_ADDRESS = '0xfc93821f9e31367ca203de80f5554f7d39678728427ed395fa1a5c50717f920d';
-const ADMIN_ACCOUNT_PRIVATE_KEY = '0xeb887a4de411a8679da1e19fc64cfb99cd38efc2dbba2979aac46f3658e3f5dc';
+const MODULE_ADDRESS = '0xd88fc15949378757f66045995e666e6ac76f5d0e9879903333203be239d654a8';
+const CRASH_RESOURCE_ACCOUNT_ADDRESS = '0xd1f80c92f20c3027476f264d45c5e832f2cabdb23bd921ccdbb3b41a65df06a3';
+const LP_RESOURCE_ACCOUNT_ADDRESS = '0xf5393e9a5acca561dcf3ca6bb585702b7156004afe6ede2e2163cdf21225394e'
+const ADMIN_ACCOUNT_PRIVATE_KEY = '0x358f9ab5d95321dd3f9426ec10808ae02d4d645c7e21c5e2f651b23775bc2caa';
 
 const RPC_URL = 'https://fullnode.random.aptoslabs.com';
 const FAUCET_URL = 'https://faucet.random.aptoslabs.com'
@@ -19,6 +19,9 @@ const TRANSACTION_OPTIONS = {
   max_gas_amount: '500000',
   gas_unit_price: '100',
 };
+
+const fromHexString = (hexString: any) =>
+  Uint8Array.from(hexString.match(/.{1,2}/g).map((byte: any) => parseInt(byte, 16)));
 
 function getAdminAccount() {
   return new AptosAccount(
@@ -35,11 +38,11 @@ export async function createNewGame(house_secret: string, salt: string) {
   const createGameTxn = await provider.generateTransaction(
     adminAccount.address(), 
     {
-      function: `${MODULE_ADDRESS}::${MODULE_NAME}::start_game`,
+      function: `${MODULE_ADDRESS}::crash::start_game`,
       type_arguments: [],
       arguments: [
-        hashed_salted_house_secret, 
-        hashed_salt
+        fromHexString(hashed_salted_house_secret),
+        fromHexString(hashed_salt)
       ]
     }, 
     TRANSACTION_OPTIONS
@@ -54,7 +57,7 @@ export async function createNewGame(house_secret: string, salt: string) {
   let randomNumber;
   (txResult as any).changes.forEach((change: any) => {
     // console.log(change);
-    if (change.data && change.data.type && change.data.type === `${MODULE_ADDRESS}::${MODULE_NAME}::State`){
+    if (change.data && change.data.type && change.data.type === `${MODULE_ADDRESS}::crash::State`){
       console.log(JSON.stringify(change.data.data.current_game.vec[0], null, 4));
       startTime = parseInt(change.data.data.current_game.vec[0].start_time_ms);
       randomNumber = parseInt(change.data.data.current_game.vec[0].randomness);
@@ -82,10 +85,10 @@ export async function endGame(house_secret: string, salt: string) {
   const createGameTxn = await provider.generateTransaction(
     adminAccount.address(), 
     {
-      function: `${MODULE_ADDRESS}::${MODULE_NAME}::reveal_crashpoint_and_distribute_winnings`,
+      function: `${MODULE_ADDRESS}::crash::reveal_crashpoint_and_distribute_winnings`,
       type_arguments: [],
       arguments: [
-        house_secret, 
+        `${house_secret}${salt}`, 
         salt
       ]
     }, 
@@ -101,7 +104,7 @@ export async function endGame(house_secret: string, salt: string) {
   // let randomNumber;
   // (txResult as any).changes.forEach((change: any) => {
   //   // console.log(change);
-  //   if (change.data && change.data.type && change.data.type === `${MODULE_ADDRESS}::${MODULE_NAME}::State`){
+  //   if (change.data && change.data.type && change.data.type === `${MODULE_ADDRESS}::crash::State`){
   //     console.log(JSON.stringify(change.data.data.current_game.vec[0], null, 4));
   //     startTime = parseInt(change.data.data.current_game.vec[0].start_time_ms);
   //     randomNumber = parseInt(change.data.data.current_game.vec[0].randomness);
@@ -120,4 +123,10 @@ export async function endGame(house_secret: string, salt: string) {
 }
 
 // createNewGame('house_secret', 'salt')
-// endGame('house_secret', 'salt')
+endGame('house_secret', 'salt')
+
+// console.log(crypto.createHash("SHA3-256").update(`house_secretsalt`).digest('hex'));
+// console.log(crypto.createHash("SHA3-256").update(`salt`).digest('hex'));
+
+// console.log(fromHexString(crypto.createHash("SHA3-256").update(`house_secretsalt`).digest('hex')))
+// console.log(fromHexString(crypto.createHash("SHA3-256").update(`salt`).digest('hex')))
