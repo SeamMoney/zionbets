@@ -420,11 +420,11 @@ module zion::crash {
 module zion::liqudity_pool {
 
   use std::type_info;
+  use std::signer;
   use aptos_framework::event;
   use aptos_framework::option;
-  use aptos_framework::math64;
-  use aptos_framework::account;
   use aptos_framework::math128;
+  use aptos_framework::account;
   use aptos_framework::timestamp;
   use std::string::{Self, String};
   use aptos_framework::string_utils;
@@ -434,7 +434,7 @@ module zion::liqudity_pool {
   use aptos_framework::aptos_coin::{Self, AptosCoin};
 
   const LP_COIN_DECIMALS: u8 = 9;
-
+  const SEED: vector<u8> = b"zion-liquidity-pool";
 
   struct LPCoin {}
 
@@ -452,7 +452,7 @@ module zion::liqudity_pool {
   }
 
   fun init_module(admin: &signer) {
-    let (resource_account_signer, signer_cap) = account::create_resource_account(admin, b"zion-liquidity-pool");
+    let (resource_account_signer, signer_cap) = account::create_resource_account(admin, SEED);
 
     let (lp_coin_burn_cap, lp_coin_freeze_cap, lp_coin_mint_cap) = 
       coin::initialize<LPCoin>(
@@ -479,5 +479,35 @@ module zion::liqudity_pool {
         signer_cap: signer_cap
       }
     );
+  }
+
+  public entry fun supply_liquidity(
+    supplier: &signer,
+    supply_amount: u64,
+  ) acquires LiquidityPool {
+    let liquidity_pool = borrow_global_mut<LiquidityPool>(get_resource_address());
+
+    let reserve_amount = coin::value(&liquidity_pool.reserver_coin);
+    let lp_coin_supply = *option::borrow(&coin::supply<LPCoin>());
+
+    let amount_lp_coins_to_mint = if (lp_coin_supply == 0) {
+      supply_amount
+    } else {
+      (math128::mul_div((supply_amount as u128), lp_coin_supply, (reserve_amount as u128)) as u64)
+    };
+
+    let supplied_coin = coin::withdraw(supplier, supply_amount);
+    coin::merge(&mut liquidity_pool.reserver_coin, supplied_coin);
+
+    let lp_coin = coin::mint(amount_lp_coins_to_mint, &liquidity_pool.lp_coin_mint_cap);
+    coin::deposit(signer::address_of(supplier), lp_coin);
+  }
+
+  /* 
+    Create and return the address of the module's resource account
+    @return - address of the module's resource account
+  */ 
+  inline fun get_resource_address(): address {
+    account::create_resource_address(&@zion, SEED)
   }
 }
