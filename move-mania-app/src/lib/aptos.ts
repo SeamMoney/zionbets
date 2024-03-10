@@ -2,7 +2,7 @@ import { AptosAccount, AptosClient, FaucetClient, HexString, Provider } from "ap
 import { BetData, CashOutData } from "./types";
 import { User } from "./schema";
 
-const MODULE_ADDRESS = '0x84b53c89b31c8b41463946e7909cb606b4a77e3a6793de86195677175dd3b6c4';
+const MODULE_ADDRESS = '0x8404f42a23ecdd3d49b6cfbf876c6acaa8f50da825a10feb81bdb2b055a55d68';
 const MODULE_NAME = 'crash';
 
 const RPC_URL = 'https://fullnode.random.aptoslabs.com';
@@ -86,7 +86,9 @@ export async function cashOut(user: User, cashOutData: CashOutData) {
     {
       function: `${MODULE_ADDRESS}::${MODULE_NAME}::cash_out`,
       type_arguments: [],
-      arguments: []
+      arguments: [
+        cashOutData.cashOutMultiplier * 100
+      ]
     },
     TRANSACTION_OPTIONS
   );
