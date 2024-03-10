@@ -603,4 +603,137 @@ module zion::liqudity_pool {
     coin::destroy_mint_cap(mint_cap);
   }
 
+  #[test(admin = @zion, user = @0xA)]
+  fun test_supply_liquidity_success_additional_liquidity_100_percent(
+    admin: &signer, 
+    user: &signer
+  ) acquires LiquidityPool {
+    let admin_address = signer::address_of(admin);
+    account::create_account_for_test(admin_address);
+
+    let user_address = signer::address_of(user);
+    account::create_account_for_test(user_address);
+
+    let aptos_framework = account::create_account_for_test(@aptos_framework);
+    let (burn_cap, mint_cap) = aptos_coin::initialize_for_test(&aptos_framework);
+    coin::register<AptosCoin>(admin);
+    coin::register<AptosCoin>(user);
+
+    init_module(admin);
+
+    let supply_amount = 1_0000_0000;
+    coin::deposit(admin_address, coin::mint(supply_amount, &mint_cap));
+    supply_liquidity(admin, supply_amount);
+
+    let additional_supply_amount = 1_0000_0000;
+    coin::deposit(user_address, coin::mint(additional_supply_amount, &mint_cap));
+    supply_liquidity(user, additional_supply_amount);
+
+    let resource_account_address = get_resource_address();
+    let liquidity_pool = borrow_global<LiquidityPool>(resource_account_address);
+    assert!(
+      coin::value(&liquidity_pool.reserve_coin) == (supply_amount + additional_supply_amount), 
+      0
+    );
+
+    let lp_coin_supply = *option::borrow(&coin::supply<LPCoin>());
+    assert!(
+      lp_coin_supply == ((supply_amount + additional_supply_amount) as u128), 
+      1
+    );
+
+    coin::destroy_burn_cap(burn_cap);
+    coin::destroy_mint_cap(mint_cap);
+  }
+
+  #[test(admin = @zion, user = @0xA)]
+  fun test_supply_liquidity_success_additional_liquidity_50_percent(
+    admin: &signer, 
+    user: &signer
+  ) acquires LiquidityPool {
+    let admin_address = signer::address_of(admin);
+    account::create_account_for_test(admin_address);
+
+    let user_address = signer::address_of(user);
+    account::create_account_for_test(user_address);
+
+    let aptos_framework = account::create_account_for_test(@aptos_framework);
+    let (burn_cap, mint_cap) = aptos_coin::initialize_for_test(&aptos_framework);
+    coin::register<AptosCoin>(admin);
+    coin::register<AptosCoin>(user);
+
+    init_module(admin);
+
+    let supply_amount = 1_0000_0000;
+    coin::deposit(user_address, coin::mint(supply_amount, &mint_cap));
+    supply_liquidity(user, supply_amount);
+
+    let additional_supply_amount = 5000_0000;
+    coin::deposit(user_address, coin::mint(additional_supply_amount, &mint_cap));
+    supply_liquidity(user, additional_supply_amount);
+
+    let resource_account_address = get_resource_address();
+    let liquidity_pool = borrow_global<LiquidityPool>(resource_account_address);
+    assert!(
+      coin::value(&liquidity_pool.reserve_coin) == (supply_amount + additional_supply_amount), 
+      0
+    );
+
+    let lp_coin_supply = *option::borrow(&coin::supply<LPCoin>());
+    assert!(
+      lp_coin_supply == ((supply_amount + additional_supply_amount) as u128), 
+      1
+    );
+
+    coin::destroy_burn_cap(burn_cap);
+    coin::destroy_mint_cap(mint_cap);
+  }
+
+  #[test(admin = @zion, user = @0xA)]
+  fun test_remove_liquidity_success_remove_50_percent(
+    admin: &signer, 
+    user: &signer
+  ) acquires LiquidityPool {
+    let admin_address = signer::address_of(admin);
+    account::create_account_for_test(admin_address);
+
+    let user_address = signer::address_of(user);
+    account::create_account_for_test(user_address);
+
+    let aptos_framework = account::create_account_for_test(@aptos_framework);
+    let (burn_cap, mint_cap) = aptos_coin::initialize_for_test(&aptos_framework);
+    coin::register<AptosCoin>(admin);
+    coin::register<AptosCoin>(user);
+
+    init_module(admin);
+
+    let supply_amount = 1_0000_0000;
+    coin::deposit(user_address, coin::mint(supply_amount, &mint_cap));
+    supply_liquidity(user, supply_amount);
+
+    let additional_supply_amount = 5000_0000;
+    coin::deposit(user_address, coin::mint(additional_supply_amount, &mint_cap));
+    supply_liquidity(user, additional_supply_amount);
+
+    let lp_coin_supply = *option::borrow(&coin::supply<LPCoin>());
+    let lp_coin_amount_to_remove = ((lp_coin_supply / 2) as u64);
+    remove_liquidity(user, lp_coin_amount_to_remove);
+
+    let resource_account_address = get_resource_address();
+    let liquidity_pool = borrow_global<LiquidityPool>(resource_account_address);
+    assert!(
+      coin::value(&liquidity_pool.reserve_coin) == (supply_amount + additional_supply_amount) / 2, 
+      0
+    );
+
+    let lp_coin_supply_after_removal = *option::borrow(&coin::supply<LPCoin>());
+    assert!(
+      lp_coin_supply_after_removal == lp_coin_supply / 2, 
+      1
+    );
+
+    coin::destroy_burn_cap(burn_cap);
+    coin::destroy_mint_cap(mint_cap);
+  }
+
 }
