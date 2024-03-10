@@ -521,6 +521,15 @@ module zion::liqudity_pool {
     coin::burn(lp_coin_to_remove, &liquidity_pool.lp_coin_burn_cap);
   }
 
+  public entry fun burn_lp_coins(
+    owner: &signer, 
+    lp_coin_amount: u64
+  ) acquires LiquidityPool {
+    let liquidity_pool = borrow_global_mut<LiquidityPool>(get_resource_address());
+    let lp_coin_to_remove = coin::withdraw(owner, lp_coin_amount);
+    coin::burn(lp_coin_to_remove, &liquidity_pool.lp_coin_burn_cap);
+  } 
+
   /* 
     Create and return the address of the module's resource account
     @return - address of the module's resource account
