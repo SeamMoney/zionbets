@@ -32,6 +32,20 @@ async function getUserAccount(userPrivateKey: string) {
   );
 }
 
+export async function getBalance(userPrivateKey: string, type: string) {
+  const userAccount = await getUserAccount(userPrivateKey);
+  console.log('userAccount: ', userAccount.address().toString());
+  const res = await provider.view({
+    function: `0x1::coin::balance`,
+    type_arguments: [type],
+    arguments: [userAccount.address().toString()],
+  })
+  console.log('res: ', res);
+
+  return parseInt(res[0].toString()) / APT;
+
+}
+
 export async function createAptosKeyPair(): Promise<{
   public_address: string;
   private_key: string;
@@ -40,7 +54,7 @@ export async function createAptosKeyPair(): Promise<{
   const privateKey = wallet.toPrivateKeyObject().privateKeyHex;
   const publicKey = wallet.address();
 
-  await faucetClient.fundAccount(publicKey, 10_0000_0000, 5)
+  // await faucetClient.fundAccount(publicKey, 10_0000_0000, 5)
   return {
     public_address: publicKey.toString(),
     private_key: privateKey,
