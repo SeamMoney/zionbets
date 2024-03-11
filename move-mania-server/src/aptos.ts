@@ -29,7 +29,7 @@ function getAdminAccount() {
   );
 }
 
-export async function createNewGame(house_secret: string, salt: string) { 
+export async function createNewGame(house_secret: string, salt: string): Promise<{ txnHash: string, startTime: number, randomNumber: number } | null> { 
   const adminAccount = getAdminAccount();
 
   const hashed_salted_house_secret = crypto.createHash("SHA3-256").update(`${house_secret}${salt}`).digest('hex');
@@ -58,7 +58,7 @@ export async function createNewGame(house_secret: string, salt: string) {
   (txResult as any).changes.forEach((change: any) => {
     // console.log(change);
     if (change.data && change.data.type && change.data.type === `${MODULE_ADDRESS}::crash::State`){
-      console.log(JSON.stringify(change.data.data.current_game.vec[0], null, 4));
+      // console.log(JSON.stringify(change.data.data.current_game.vec[0], null, 4));
       startTime = parseInt(change.data.data.current_game.vec[0].start_time_ms);
       randomNumber = parseInt(change.data.data.current_game.vec[0].randomness);
     }
@@ -66,15 +66,15 @@ export async function createNewGame(house_secret: string, salt: string) {
   if ((txResult as any).success === false) { 
     return null; 
   }
-  console.log({
-    txnHash: txResult.hash,
-    startTime, 
-    randomNumber
-  })
+  // console.log({
+  //   txnHash: txResult.hash,
+  //   startTime, 
+  //   randomNumber
+  // })
   return {
     txnHash: txResult.hash,
-    startTime, 
-    randomNumber
+    startTime: startTime as unknown as number, 
+    randomNumber: randomNumber as unknown as number
   }
 }
 
@@ -110,20 +110,20 @@ export async function endGame(house_secret: string, salt: string) {
   //     randomNumber = parseInt(change.data.data.current_game.vec[0].randomness);
   //   }
   // });
-  console.log(txResult);
+  // console.log(txResult);
   if ((txResult as any).success === false) { 
     return null; 
   }
-  console.log({
-    txnHash: txResult.hash
-  })
+  // console.log({
+  //   txnHash: txResult.hash
+  // })
   return {
     txnHash: txResult.hash
   }
 }
 
 // createNewGame('house_secret', 'salt')
-endGame('house_secret', 'salt')
+// endGame('house_secret', 'salt')
 
 // console.log(crypto.createHash("SHA3-256").update(`house_secretsalt`).digest('hex'));
 // console.log(crypto.createHash("SHA3-256").update(`salt`).digest('hex'));
