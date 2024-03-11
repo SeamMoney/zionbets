@@ -21,7 +21,7 @@ module zion::crash {
   
   const SEED: vector<u8> = b"zion-crash";
   const MAX_CRASH_POINT: u128 = 340282366920938463463374607431768211455; // 2^64 - 1
-  const COUNTDOWN_MS: u64 = 20 * 1000;
+  const COUNTDOWN_MS: u64 = 20 * 1_000_000;
   
   struct State has key {
     signer_cap: account::SignerCapability,

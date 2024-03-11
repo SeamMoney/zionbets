@@ -101,6 +101,7 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
 
     if (update) {
       getCurrentGame().then((game) => {
+        console.log('crashProvider - getCurrentGame', game)
         if (game == null) {
           setGameStatus(null);
         } else {
@@ -123,10 +124,10 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
               startTime: game.start_time,
               crashPoint: game.secret_crash_point,
             });
-            // setTimeout(() => {
-            //   console.log("IN_PROGRESS - setTimeout")
-            //   setUpdate(true);
-            // }, game.start_time + (game.secret_crash_point == 0 ? 0 : log(EXPONENTIAL_FACTOR, game.secret_crash_point)) * 1000 - Date.now());
+            setTimeout(() => {
+              console.log("IN_PROGRESS - setTimeout")
+              setUpdate(true);
+            }, game.start_time + (game.secret_crash_point == 0 ? 0 : log(EXPONENTIAL_FACTOR, game.secret_crash_point)) * 1000 - Date.now());
           } else {
             console.log("END - page.tsx")
             setGameStatus({

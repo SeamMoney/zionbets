@@ -25,6 +25,14 @@ export function generateLineChartData(gameRoundId: string, crashPoint: number): 
     currentDate = new Date(currentDate.getTime() + (24 * 60 * 60 * 1000));
   }
 
+  // Create a data point for the end of the game to show the crash point at the right time
+  const value = crashPoint;
+  const timeString = currentDate.toISOString().split('T')[0];
+  dataPoints.push({
+    elapsedTime: currentElapsedTimeMs,
+    dataPoint: { time: timeString, value }
+  });
+
   return dataPoints;
 }
 

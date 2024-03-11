@@ -15,6 +15,7 @@ import {
 
 import crypto from 'crypto';
 import { calculateCrashPoint } from "./crashPoint";
+import { createNewGame, endGame as endGameAptos } from "./aptos";
 
 const COUNTDOWN = 20 * 1000;
 const SUMMARY = 5 * 1000;
@@ -51,11 +52,18 @@ io.on("connection", (socket) => {
 
   socket.on(SOCKET_EVENTS.START_ROUND, async () => {
     await clearPlayerList();
-    let crashPoint = calculateCrashPoint(crypto.randomInt(0, 100), crypto.randomBytes(16).toString('hex'));
-    if (crashPoint <= 1) {
-      crashPoint = 0;
+
+    let blockchainTxn = await createNewGame('house_secret', 'salt')
+    console.log("blockchainTxn", blockchainTxn)
+    
+    if (blockchainTxn === null) {
+      console.error("Error creating new game")
+      return
     }
-    const startTime = Date.now() + COUNTDOWN;
+    
+    const crashPoint = calculateCrashPoint(blockchainTxn.randomNumber, 'house_secretsalt');
+    
+    const startTime = Math.floor(blockchainTxn.startTime / 1000);
     const gameId = Math.random().toString(36).substring(7);
     await createGame({
       game_id: gameId,
@@ -66,19 +74,29 @@ io.on("connection", (socket) => {
     console.log("start rounded")
     io.emit(SOCKET_EVENTS.ROUND_START, {
       roundId: 1,
-      startTime: Date.now() + COUNTDOWN,
+      startTime: startTime,
       crashPoint,
     });
 
+    console.log(startTime + ((crashPoint == 0 ? 0 : log(EXPONENTIAL_FACTOR, crashPoint)) * 1000) - Date.now())
+
     setTimeout(async () => {
+      const blockchainTxn = await endGameAptos('house_secret', 'salt')
+      console.log("blockchainTxn", blockchainTxn)
+
+      if (blockchainTxn === null) {
+        console.error("Error ending game")
+        return
+      }
+
       await endGame(gameId);
       await payOutPlayers();
       console.log("end rounded")
-      io.emit(SOCKET_EVENTS.ROUND_RESULT, { roundId: 1, crashPoint });
+      io.emit(SOCKET_EVENTS.ROUND_RESULT, { roundId: gameId, crashPoint });
       setTimeout(async () => {
         await cycleRounds();
       }, SUMMARY);
-    }, COUNTDOWN + (crashPoint == 0 ? 0 : log(EXPONENTIAL_FACTOR, crashPoint)) * 1000);
+    }, startTime + ((crashPoint == 0 ? 0 : log(EXPONENTIAL_FACTOR, crashPoint)) * 1000) - Date.now());
   });
 
   socket.on(SOCKET_EVENTS.CHAT_MESSAGE, async (message) => {
@@ -92,11 +110,18 @@ io.on("connection", (socket) => {
 
 async function cycleRounds() {
   await clearPlayerList();
-  let crashPoint = calculateCrashPoint(crypto.randomInt(0, 100), crypto.randomBytes(16).toString('hex'));
-  if (crashPoint <= 1) {
-    crashPoint = 0;
+  
+  let blockchainTxn = await createNewGame('house_secret', 'salt')
+  console.log("blockchainTxn", blockchainTxn)
+    
+  if (blockchainTxn === null) {
+    console.error("Error creating new game")
+    return
   }
-  const startTime = Date.now() + COUNTDOWN;
+  
+  const crashPoint = calculateCrashPoint(blockchainTxn.randomNumber, 'house_secretsalt');
+  
+  const startTime = Math.floor(blockchainTxn.startTime / 1000);
   const gameId = Math.random().toString(36).substring(7);
   await createGame({
     game_id: gameId,
@@ -107,19 +132,29 @@ async function cycleRounds() {
   console.log("start rounded")
   io.emit(SOCKET_EVENTS.ROUND_START, {
     roundId: 1,
-    startTime: Date.now() + COUNTDOWN,
+    startTime: startTime,
     crashPoint,
   });
 
+  console.log(startTime + ((crashPoint == 0 ? 0 : log(EXPONENTIAL_FACTOR, crashPoint)) * 1000) - Date.now())
+
   setTimeout(async () => {
+    const blockchainTxn = await endGameAptos('house_secret', 'salt')
+    console.log("blockchainTxn", blockchainTxn)
+
+    if (blockchainTxn === null) {
+      console.error("Error ending game")
+      return
+    }
+    
     await endGame(gameId);
     await payOutPlayers();
     console.log("end rounded")
-    io.emit(SOCKET_EVENTS.ROUND_RESULT, { roundId: 1, crashPoint });
+    io.emit(SOCKET_EVENTS.ROUND_RESULT, { roundId: gameId, crashPoint });
     setTimeout(async () => {
       await cycleRounds();
     }, SUMMARY);
-  }, COUNTDOWN + (crashPoint == 0 ? 0 : log(EXPONENTIAL_FACTOR, crashPoint)) * 1000);
+  }, startTime + ((crashPoint == 0 ? 0 : log(EXPONENTIAL_FACTOR, crashPoint)) * 1000) - Date.now());
 }
 
 
