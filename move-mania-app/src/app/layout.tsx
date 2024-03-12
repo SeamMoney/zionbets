@@ -60,7 +60,7 @@ export default function RootLayout({
               </div>
             </nav>
             <div className="flex flex-col pt-12 w-full items-center">
-              <main className="overflow-y-auto max-w-2xl">
+              <main className="overflow-y-auto max-w-5xl">
                 {children}
                 <Toaster  />
               </main>

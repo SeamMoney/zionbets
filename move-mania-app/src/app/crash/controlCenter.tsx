@@ -159,7 +159,7 @@ export default function ControlCenter() {
   };
 
   return (
-    <div className="w-full h-full flex flex-col gap-4 min-[550px]:flex-row items-start min-[550px]:items-center min-[550px]:justify-between gap-1 p-2">
+    <div className="w-full h-full flex flex-col gap-4 items-start gap-1 p-2">
       <div className=" flex flex-col items-start justify-around px-2 gap-2 w-full">
         <div className="flex flex-col gap-1 w-full">
           <div className="flex flex-row justify-between px-4 py-2 border border-neutral-700 bg-neutral-800/20 bg-noise w-full">
