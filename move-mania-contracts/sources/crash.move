@@ -300,7 +300,7 @@ module zion::crash {
     let number_of_bets = vector::length(&betters);
     let cleared_betters = 0;
 
-    let crash_point = calculate_crash_point_with_randomness(randomness, string_utils::to_string(&salted_house_secret));
+    let crash_point = calculate_crash_point_with_randomness(randomness, string::utf8(salted_house_secret));
 
     event::emit_event(
       &mut state.crash_point_calculate_events,
@@ -346,7 +346,7 @@ module zion::crash {
     // print(&randomness_string);
     // print(&house_secret);
     string::append(&mut randomness_string, house_secret);
-    // print(&randomness_string);
+    print(&randomness_string);
 
 
     let hash = hash::sha3_256(*string::bytes(&randomness_string));
@@ -364,6 +364,20 @@ module zion::crash {
       // print(&e);
       (((100 * e - value) / (e - value)) as u64)
     }
+  }
+
+  public entry fun test_out_calculate_crash_point_with_randomness(
+    randomness: u64, 
+    house_secret: vector<u8>
+  ) acquires State {
+    event::emit_event(
+      &mut borrow_global_mut<State>(get_resource_address()).crash_point_calculate_events,
+      CrashPointCalculateEvent {
+        house_secret: house_secret,
+        salt: house_secret,
+        crash_point: calculate_crash_point_with_randomness(randomness, string::utf8(house_secret))
+      }
+    );
   }
 
   fun parse_hex(hex: vector<u8>, ignore_first: bool): u256 {
@@ -452,55 +466,58 @@ module zion::crash {
 
   #[test]
   fun test_calculate_crash_point_with_randomness() {
-    let house_secret = string::utf8(b"test");
+    let house_secret = string::utf8(b"house_secretsalt");
 
-    let index = 0;
-    while (index < 100) {
-      let randomness = index;
-      let crash_point = calculate_crash_point_with_randomness(randomness, house_secret);
-      print(&randomness);
-      print(&house_secret);
-      print(&crash_point);
-      index = index + 1;
-    };
+    let crash_point = calculate_crash_point_with_randomness(3199639427161852469, house_secret);
+    print(&crash_point);
+
+    // let index = 0;
+    // while (index < 100) {
+    //   let randomness = index;
+    //   let crash_point = calculate_crash_point_with_randomness(randomness, house_secret);
+    //   print(&randomness);
+    //   print(&house_secret);
+    //   print(&crash_point);
+    //   index = index + 1;
+    // };
   }
 
-  #[test]
-  fun test_calculate_cash_out_point_from_time_elapsed() {
-    let i = 0;
+  // #[test]
+  // fun test_calculate_cash_out_point_from_time_elapsed() {
+  //   let i = 0;
 
-    while (i < 100) {
-      // print(&i);
-      let start_time_ms = 1000;
-      let current_time_ms = 1000 * (i + 1);
-      let cash_out = calculate_cash_out_point_from_time_elapsed(start_time_ms, current_time_ms);
-      // print(&cash_out);
-      i = i + 1;
-    }
-  }
+  //   while (i < 100) {
+  //     // print(&i);
+  //     let start_time_ms = 1000;
+  //     let current_time_ms = 1000 * (i + 1);
+  //     let cash_out = calculate_cash_out_point_from_time_elapsed(start_time_ms, current_time_ms);
+  //     // print(&cash_out);
+  //     i = i + 1;
+  //   }
+  // }
 
-  #[test(user = @0xA)]
-  fun test_verify_hashes(
-    user: &signer
-  ) {
-    let house_secret = string::utf8(b"house_secret");
-    let salt = string::utf8(b"salt");
-    let salted_house_secret = string::utf8(b"house_secretsalt");
+  // #[test(user = @0xA)]
+  // fun test_verify_hashes(
+  //   user: &signer
+  // ) {
+  //   let house_secret = string::utf8(b"house_secret");
+  //   let salt = string::utf8(b"salt");
+  //   let salted_house_secret = string::utf8(b"house_secretsalt");
 
-    let salted_house_secret_hash = hash::sha3_256(*string::bytes(&salted_house_secret));
-    let salt_hash = hash::sha3_256(*string::bytes(&salt));
+  //   let salted_house_secret_hash = hash::sha3_256(*string::bytes(&salted_house_secret));
+  //   let salt_hash = hash::sha3_256(*string::bytes(&salt));
 
-    print(&salted_house_secret_hash);
+  //   print(&salted_house_secret_hash);
 
-    // start_game(
-    //   user, 
-    //   b"ddb5f6080d454e8696d3362d4669f2216642c678b95c17afdfcbfdde1b58ad6d", 
-    //   b"ddb5f6080d454e8696d3362d4669f2216642c678b95c17afdfcbfdde1b58ad6d"
-    // );
+  //   // start_game(
+  //   //   user, 
+  //   //   b"ddb5f6080d454e8696d3362d4669f2216642c678b95c17afdfcbfdde1b58ad6d", 
+  //   //   b"ddb5f6080d454e8696d3362d4669f2216642c678b95c17afdfcbfdde1b58ad6d"
+  //   // );
 
-    // let result = verify_hashes(house_secret, salt, &salted_house_secret_hash, &salt_hash);
-    // assert!(result, 1);
-  }
+  //   // let result = verify_hashes(house_secret, salt, &salted_house_secret_hash, &salt_hash);
+  //   // assert!(result, 1);
+  // }
 }
 
 module zion::liquidity_pool {
