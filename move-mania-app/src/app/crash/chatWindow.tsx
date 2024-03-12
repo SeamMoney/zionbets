@@ -7,6 +7,17 @@ import { ChatMessage, SOCKET_EVENTS } from "@/lib/types";
 import { getSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
 import { Socket, io } from "socket.io-client";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer"
+
 
 import { socket } from "@/lib/socket";
 
@@ -75,49 +86,58 @@ export default function ChatWindow() {
   };
 
   return (
-    <div className="bg-[#020202] border-b border-x border-neutral-700 h-full w-full flex flex-col items-center py-1 px-2 gap-2 bg-noise">
-      <div className="grow flex flex-col items-start justify-end w-full gap-1 overflow-hidden">
-        {chatMessages.map((message, index) => (
-          <ChatBubble key={index} message={message} />
-        ))}
-      </div>
-      {account ? (
-        <div className="w-full min-h-[30px] flex flex-row gap-1">
-          <div className="grow bg-noise">
-            <input
-              ref={inputRef}
-              className="bg-neutral-950 hover:bg-neutral-800/40 border border-neutral-800 w-full h-full text-white outline-none ps-2"
-              type="text"
-              placeholder="Type a message..."
-              onKeyPress={(e) => {
-                if (e.key === "Enter") {
-                  const input = e.target as HTMLInputElement;
-                  if (input && input.value !== "") {
-                    onSendMessage(input.value);
-                    input.value = "";
+    <Drawer>
+      <DrawerTrigger asChild>
+        <button className="border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 w-full">
+          Chat
+        </button>
+      </DrawerTrigger>
+      <DrawerContent className="h-[60%] bg-[#020202] bg-noise">
+      <div className="border-b border-neutral-700 h-full w-full flex flex-col items-center py-1 px-2 gap-2">
+        <div className="grow flex flex-col items-start justify-end w-full gap-1 overflow-hidden">
+          {chatMessages.map((message, index) => (
+            <ChatBubble key={index} message={message} />
+          ))}
+        </div>
+        {account ? (
+          <div className="w-full min-h-[30px] flex flex-row gap-1">
+            <div className="grow bg-noise">
+              <input
+                ref={inputRef}
+                className="bg-neutral-950 hover:bg-neutral-800/40 border border-neutral-800 w-full h-full text-white outline-none ps-2"
+                type="text"
+                placeholder="Type a message..."
+                onKeyPress={(e) => {
+                  if (e.key === "Enter") {
+                    const input = e.target as HTMLInputElement;
+                    if (input && input.value !== "") {
+                      onSendMessage(input.value);
+                      input.value = "";
+                    }
                   }
+                }}
+              />
+            </div>
+            <button 
+              onClick={() => {
+                if (inputRef.current && inputRef.current.value !== "") {
+                  onSendMessage(inputRef.current.value);
+                  inputRef.current.value = "";
                 }
               }}
-            />
+              className="border border-green-700 hover:bg-[#264234]/40 px-6 py-1 text-green-500"
+            >
+              Send
+            </button>
           </div>
-          <button 
-            onClick={() => {
-              if (inputRef.current && inputRef.current.value !== "") {
-                onSendMessage(inputRef.current.value);
-                inputRef.current.value = "";
-              }
-            }}
-            className="border border-green-700 hover:bg-[#264234]/40 px-6 py-1 text-green-500"
-          >
-            Send
-          </button>
-        </div>
-      ) : (
-        <div className="w-full min-h-[30px] flex flex-row gap-1 justify-center opacity-50">
-          Sign in to chat with other players
-        </div>
-      )}
-    </div>
+        ) : (
+          <div className="w-full min-h-[30px] flex flex-row gap-1 justify-center opacity-50">
+            Sign in to chat with other players
+          </div>
+        )}
+      </div>
+      </DrawerContent>
+    </Drawer>
   );
 }
 
