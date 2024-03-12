@@ -89,7 +89,7 @@ export default function RootLayout({
               </main>
             </div>
 
-            <aside className="fixed bottom-4 right-2">
+            <aside className="fixed bottom-4 right-4">
               <ChatWindow />
             </aside>
           </div>
