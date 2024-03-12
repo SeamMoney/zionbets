@@ -46,6 +46,39 @@ export async function getBalance(userPrivateKey: string, type: string) {
 
 }
 
+export async function transferApt(userPrivateKey: string, amount: number, toAddress: string, type: string) {
+  const userAccount = await getUserAccount(userPrivateKey);
+
+  const txn = await provider.generateTransaction(
+    userAccount.address(),
+    {
+      function: `0x1::coin::transfer`,
+      type_arguments: [type],
+      arguments: [
+        toAddress,
+        Math.floor(amount * APT),
+      ],
+    },
+    TRANSACTION_OPTIONS
+  );
+
+  const tx = await provider.signAndSubmitTransaction(userAccount, txn);
+
+  const txResult = await client.waitForTransactionWithResult(tx);
+
+  console.log(txResult);
+
+  if (!(txResult as any).success) {
+    return null;
+  }
+
+  return {
+    txnHash: txResult.hash,
+    version: (txResult as any).version,
+  };
+
+}
+
 export async function createAptosKeyPair(): Promise<{
   public_address: string;
   private_key: string;
