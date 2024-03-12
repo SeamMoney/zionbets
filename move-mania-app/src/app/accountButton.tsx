@@ -92,7 +92,7 @@ export default function AccountButton() {
             Sign in
           </button>
         )}
-        <SheetContent className="w-full bg-neutral-950 lg:border-neutral-700 border-none">
+        <SheetContent className="w-full bg-neutral-950 border-none">
           {!account ? (
             <div className="flex items-center justify-center h-32">
               <button onClick={onSignIn}>Sign in</button>
