@@ -42,7 +42,7 @@ export default function BalanceButton() {
         }).then((user) => {
           if (user) {
             setAccount(user);
-            getBalance(user.private_key, '0x1::aptos_coin::AptosCoin').then((balance) => {
+            getBalance(user.private_key, '0xead58f20349f8dacf71fe47722a6f14b4f9204c74e078cda7567456a506cd70f::z_apt::ZAPT').then((balance) => {
               setBalance(balance);
             });
           }
@@ -59,6 +59,9 @@ export default function BalanceButton() {
           if (user) {
             // console.log('balance: ', user.balance)
             setAccount(user);
+            getBalance(user.private_key, '0xead58f20349f8dacf71fe47722a6f14b4f9204c74e078cda7567456a506cd70f::z_apt::ZAPT').then((balance) => {
+              setBalance(balance);
+            });
           }
         });
       }, 1000);
@@ -79,7 +82,7 @@ export default function BalanceButton() {
       <Dialog>
       <DialogTrigger asChild>
         <button className="bg-neutral-800 hover:bg-neutral-700 px-2 lg:px-6 py-1 lg:py-2 text-xs lg:text-base text-white font-semibold">
-          {balance?.toFixed(2) || parseInt('0').toFixed(2)} APT
+          {balance?.toFixed(2) || parseInt('0').toFixed(2)} zAPT
         </button>
       </DialogTrigger>
       <DialogContent className="bg-neutral-950">

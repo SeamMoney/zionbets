@@ -71,11 +71,23 @@ export default function ControlCenter() {
     }
   }
 
-  const onSetBet = () => {
+  const onSetBet = async () => {
 
     if (!socket) return;
 
     if (!account) return;
+
+    const blockchainRes = await placeBet(account, {
+      roundId: 1,
+      playerEmail: account.email || "",
+      betAmount: parseFloat(betAmount),
+      coinType: "APT",
+    })
+
+    if (!blockchainRes) {
+      console.error('Error placing bet');
+      return;
+    }
 
     const data = {
       roundId: 1,
@@ -86,7 +98,7 @@ export default function ControlCenter() {
     const success = setNewBet(data);
   };
 
-  const onCashOut = () => {
+  const onCashOut = async () => {
     if (!socket) return;
 
     if (!account) return;
@@ -94,6 +106,17 @@ export default function ControlCenter() {
     if (!gameStatus?.startTime) return;
 
     const cashoutMultipler = calculateCurrentCrashPoint((Date.now() - gameStatus.startTime) / 1000);
+
+    const blockchainRes = await cashOut(account, {
+      roundId: 1,
+      playerEmail: account.email,
+      cashOutMultiplier: cashoutMultipler,
+    });
+
+    if (!blockchainRes) {
+      console.error('Error cashing out');
+      return;
+    }
 
     const data = {
       roundId: 1,
@@ -106,33 +129,6 @@ export default function ControlCenter() {
 
   return (
     <div className="w-full h-full flex flex-col gap-4 min-[550px]:flex-row items-start min-[550px]:items-center min-[550px]:justify-between gap-1 p-2">
-      <button onClick={async () => {
-        if (!account) return;
-        console.log(
-          await placeBet(account, {
-            roundId: 1,
-            playerEmail: account.email || "",
-            betAmount: 2.4,
-            coinType: "APT",
-          })
-        )
-      }}>
-        aptos bet
-      </button>
-
-      <button onClick={async () => {
-        if (!account) return;
-        console.log(
-          await cashOut(account, {
-            roundId: 1,
-            playerEmail: account.email,
-            cashOutMultiplier: 1.2,
-          })
-        )
-      }}>
-        aptos cashout
-      </button>
-
       <div className=" flex flex-col items-start justify-around px-2 gap-2 w-full">
         <div className="flex flex-col gap-1 w-full">
           <div className="flex flex-row justify-between px-4 py-2 border border-neutral-700 bg-neutral-800/20 bg-noise w-full">

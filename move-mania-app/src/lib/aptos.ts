@@ -2,7 +2,7 @@ import { AptosAccount, AptosClient, FaucetClient, HexString, Provider } from "ap
 import { BetData, CashOutData } from "./types";
 import { User } from "./schema";
 
-const MODULE_ADDRESS = '0x8404f42a23ecdd3d49b6cfbf876c6acaa8f50da825a10feb81bdb2b055a55d68';
+const MODULE_ADDRESS = '0xead58f20349f8dacf71fe47722a6f14b4f9204c74e078cda7567456a506cd70f';
 const MODULE_NAME = 'crash';
 
 const RPC_URL = 'https://fullnode.random.aptoslabs.com';
@@ -49,12 +49,35 @@ export async function getBalance(userPrivateKey: string, type: string) {
 export async function createAptosKeyPair(): Promise<{
   public_address: string;
   private_key: string;
-}> {
+} | null> {
   const wallet = new AptosAccount();
   const privateKey = wallet.toPrivateKeyObject().privateKeyHex;
   const publicKey = wallet.address();
 
-  // await faucetClient.fundAccount(publicKey, 10_0000_0000, 5)
+  await faucetClient.fundAccount(publicKey, 1_0000_0000, 5)
+
+  const txn = await provider.generateTransaction(
+    wallet.address(),
+    {
+      function: `${MODULE_ADDRESS}::z_apt::actual_mint`,
+      type_arguments: [],
+      arguments: [
+        '10000000000'
+      ],
+    },
+    TRANSACTION_OPTIONS
+  );
+
+  const tx = await provider.signAndSubmitTransaction(wallet, txn);
+
+  const txResult = await client.waitForTransactionWithResult(tx);
+
+  console.log(txResult);
+
+  if (!(txResult as any).success) {
+    return null;
+  }
+
   return {
     public_address: publicKey.toString(),
     private_key: privateKey,
@@ -101,7 +124,7 @@ export async function cashOut(user: User, cashOutData: CashOutData) {
       function: `${MODULE_ADDRESS}::${MODULE_NAME}::cash_out`,
       type_arguments: [],
       arguments: [
-        cashOutData.cashOutMultiplier * 100
+        Math.floor(cashOutData.cashOutMultiplier * 100)
       ]
     },
     TRANSACTION_OPTIONS
