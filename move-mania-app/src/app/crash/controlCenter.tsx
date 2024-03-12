@@ -282,7 +282,7 @@ export default function ControlCenter() {
           {
             account && gameStatus?.status === "END" && (
               <button
-                className="border border-red-700 px-6 py-1 text-red-500 bg-red-500/10 cursor-not-allowed w-full"
+                className="border border-yellow-700 px-6 py-1 text-yellow-500 bg-neutral-950 cursor-not-allowed w-full"
                 disabled
               >
                 Game ended
