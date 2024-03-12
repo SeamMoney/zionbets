@@ -245,7 +245,7 @@ export default function ControlCenter() {
                 disabled={!(parseFloat(betAmount) > 0) || hasBet}
               >
                 {
-                  hasBet ? "Bet placed" : "Place bet"
+                  hasBet ? "Bet placed" : (parseFloat(betAmount) > 0) ? "Place bet" : "Enter bet amount"
                 }
               </button>
             )
@@ -381,7 +381,8 @@ export default function ControlCenter() {
               <button
                 className={cn(
                   "border bg-[#404226]/40 border-yellow-700 text-yellow-500 px-6 py-1 w-full",
-                    autoCashout && " bg-[#264234]/40 border-green-700 text-green-500"
+                  autoCashout && autoCashoutAmount && "bg-[#264234]/40 border-green-700 text-green-500",
+                  !(parseFloat(autoCashoutAmount) > 0) && "bg-neutral-950"
                 )}
                 onClick={() => {
                   setAutoCashout(!autoCashout);
@@ -389,7 +390,7 @@ export default function ControlCenter() {
                 }}
               >
                 {
-                  autoCashout ? "Turn off auto cashout" : "Turn on auto cashout"
+                  autoCashout ? "Turn off auto cashout" : parseFloat(autoCashoutAmount) > 0 ? "Turn on auto cashout" : "Enter auto cashout amount"
                 }
               </button>
             )

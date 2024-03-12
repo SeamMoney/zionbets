@@ -59,20 +59,8 @@ export default function RootLayout({
                     <span className="text-lg opacity-50">
                       /
                     </span>
-                    <Link href='/roulette' className="text-xl opacity-50">
-                      Roulette
-                    </Link>
-                    <span className="text-lg opacity-50">
-                      /
-                    </span>
-                    <Link href='/coinflip' className="text-xl opacity-50">
-                      Coin Flip
-                    </Link>
-                    <span className="text-lg opacity-50">
-                      /
-                    </span>
-                    <Link href='/jackpot' className="text-xl opacity-50">
-                      Jackpot
+                    <Link href='/pool' className="text-xl opacity-50">
+                      Pool
                     </Link>
                   </div>
                 </div>
@@ -109,23 +97,13 @@ function HamburgerNavigation() {
           <Link href='/' className="text-white text-2xl font-bold">Home</Link>  
         </SheetClose>
         <SheetClose asChild>
-          <Link href='/crash' className="text-sm">
+          <Link href='/crash' className="text-sm opacity-50">
             Crash
           </Link>
         </SheetClose>
         <SheetClose asChild>
-          <Link href='/roulette' className="text-sm opacity-50">
-            Roulette
-          </Link>
-        </SheetClose>
-        <SheetClose asChild>
-          <Link href='/coinflip' className="text-sm opacity-50">
-            Coin Flip
-          </Link>
-        </SheetClose>
-        <SheetClose asChild>
-          <Link href='/jackpot' className="text-sm opacity-50">
-            Jackpot
+          <Link href='/pool' className="text-sm opacity-50">
+            Pool
           </Link>
         </SheetClose>
       </SheetContent>
