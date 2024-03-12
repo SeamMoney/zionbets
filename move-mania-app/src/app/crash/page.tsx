@@ -17,7 +17,7 @@ export default function CrashPage() {
               <ControlCenter />
             </div>
           </div>
-          <div className="h-full flex flex-col items-center justify-center">
+          <div className="h-full w-full flex flex-col items-center justify-center">
             <PlayerList />
           </div>
         </div>
