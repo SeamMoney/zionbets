@@ -76,20 +76,17 @@ export default function AccountButton() {
       <Sheet>
         {account ? (
           <SheetTrigger className="flex flex-col items-center justify-center">
-            <button className="hidden lg:block bg-white px-2 lg:px-6 py-1 lg:py-2 text-xs lg:text-base font-bold text-neutral-950 hover:bg-neutral-300">
-              {account.username}
-            </button>
             <Image 
               src={account.image}
               alt="Profile picture"
               width={36}
               height={36}
-              className="block lg:hidden rounded-none hover:opacity-80"
+              className="block rounded-none hover:opacity-80"
             />
           </SheetTrigger>
         ) : (
           <button
-            className="bg-white px-6 py-1  text-neutral-950"
+            className="bg-white px-6 py-1 text-neutral-950"
             onClick={onSignIn}
           >
             Sign in
