@@ -274,7 +274,7 @@ module zion::crash {
     assert!(option::is_some(&state.current_game), 1);
 
     let game_mut_ref = option::borrow_mut(&mut state.current_game);
-    assert!(timestamp::now_microseconds() > game_mut_ref.start_time_ms, 2);
+    assert!(timestamp::now_microseconds() >= game_mut_ref.start_time_ms, 2);
 
     assert!(
       verify_hashes(
@@ -362,7 +362,12 @@ module zion::crash {
       // print(&value);
       let e = pow(2, 52);
       // print(&e);
-      (((100 * e - value) / (e - value)) as u64)
+      let res = (((100 * e - value) / (e - value)) as u64);
+      if (res == 1) {
+        0
+      } else {
+        res
+      }
     }
   }
 

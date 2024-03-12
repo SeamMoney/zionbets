@@ -151,7 +151,7 @@ async function test_crashpoint_calculatation() {
   console.log(txResult.hash)
 }
 
-test_crashpoint_calculatation()
+// test_crashpoint_calculatation()
 
 // createNewGame('house_secret', 'salt')
 // endGame('house_secret', 'salt')
