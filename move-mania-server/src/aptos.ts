@@ -1,5 +1,6 @@
 import { AptosAccount, AptosClient, HexString, Provider, Network } from "aptos";
 import crypto from 'crypto';
+import { calculateCrashPoint } from "./crashPoint";
 
 const MODULE_ADDRESS = '0xead58f20349f8dacf71fe47722a6f14b4f9204c74e078cda7567456a506cd70f';
 const CRASH_RESOURCE_ACCOUNT_ADDRESS = '0x09a9ee01215961135773c653f6c1a5be29c93cb49c47fb53a583f295796f5b9d';
@@ -30,7 +31,7 @@ function getAdminAccount() {
   );
 }
 
-export async function createNewGame(house_secret: string, salt: string): Promise<{ txnHash: string, startTime: number, randomNumber: number } | null> { 
+export async function createNewGame(house_secret: string, salt: string): Promise<{ txnHash: string, startTime: number, randomNumber: string } | null> { 
   const adminAccount = getAdminAccount();
 
   const hashed_salted_house_secret = crypto.createHash("SHA3-256").update(`${house_secret}${salt}`).digest('hex');
@@ -61,7 +62,7 @@ export async function createNewGame(house_secret: string, salt: string): Promise
     if (change.data && change.data.type && change.data.type === `${MODULE_ADDRESS}::crash::State`){
       // console.log(JSON.stringify(change.data.data.current_game.vec[0], null, 4));
       startTime = parseInt(change.data.data.current_game.vec[0].start_time_ms);
-      randomNumber = parseInt(change.data.data.current_game.vec[0].randomness);
+      randomNumber = change.data.data.current_game.vec[0].randomness;
     }
   });
   if ((txResult as any).success === false) { 
@@ -75,7 +76,7 @@ export async function createNewGame(house_secret: string, salt: string): Promise
   return {
     txnHash: txResult.hash,
     startTime: startTime as unknown as number, 
-    randomNumber: randomNumber as unknown as number
+    randomNumber: randomNumber as unknown as string
   }
 }
 
@@ -89,8 +90,8 @@ export async function endGame(house_secret: string, salt: string) {
       function: `${MODULE_ADDRESS}::crash::reveal_crashpoint_and_distribute_winnings`,
       type_arguments: [],
       arguments: [
-        `${house_secret}${salt}`, 
-        salt
+        Uint8Array.from(Buffer.from(`${house_secret}${salt}`)),
+        Uint8Array.from(Buffer.from(salt))
       ]
     }, 
     TRANSACTION_OPTIONS
@@ -113,6 +114,7 @@ export async function endGame(house_secret: string, salt: string) {
   // });
   // console.log(txResult);
   if ((txResult as any).success === false) { 
+
     return null; 
   }
   // console.log({
@@ -122,6 +124,34 @@ export async function endGame(house_secret: string, salt: string) {
     txnHash: txResult.hash
   }
 }
+
+async function test_crashpoint_calculatation() {
+
+  console.log(calculateCrashPoint('6904922446877749869', 'house_secretsalt'));
+
+  const adminAccount = getAdminAccount();
+
+  const createGameTxn = await provider.generateTransaction(
+    adminAccount.address(), 
+    {
+      function: `${MODULE_ADDRESS}::crash::test_out_calculate_crash_point_with_randomness`,
+      type_arguments: [],
+      arguments: [
+        '6904922446877749869', 
+        'house_secretsalt'
+      ]
+    }, 
+    TRANSACTION_OPTIONS
+  );
+
+  const tx = await provider.signAndSubmitTransaction(adminAccount, createGameTxn);
+
+  const txResult = await client.waitForTransactionWithResult(tx);
+
+  console.log(txResult.hash)
+}
+
+test_crashpoint_calculatation()
 
 // createNewGame('house_secret', 'salt')
 // endGame('house_secret', 'salt')

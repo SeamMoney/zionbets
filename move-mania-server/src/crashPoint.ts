@@ -10,12 +10,12 @@ import crypto from 'crypto';
  * @param randomNumber The random number that is generated on-chain publically
  * @param salt The salt provided by the server to ensure the random number is not predictable
  */
-export function calculateCrashPoint(randomNumber: number, salt: string) {
+export function calculateCrashPoint(randomNumber: string, salt: string) {
   const hash = crypto.createHash("SHA3-256");
   // decodeURIComponent('616263'.replace(/\s+/g, '').replace(/[0-9a-f]{2}/g, '%$&'));
 
-  // console.log('randomNumber', randomNumber);
-  // console.log('salt', salt);
+  console.log('randomNumber', randomNumber);
+  console.log('salt', salt);
   const hashString = `${randomNumber}${salt}`;
   // console.log('hashString', hashString);
   const hm = hash.update(hashString);
@@ -36,7 +36,7 @@ export function calculateCrashPoint(randomNumber: number, salt: string) {
   const e = BigInt(2) ** BigInt(52);
   // console.log('e', e);
   // console.log('Math.floor((100 * e - n) / (e - n)) / 100', Math.floor((100 * e - n) / (e - n)) / 100);
-  return Number((Number((BigInt(100) * e - n)) / Number(e - n) / 100).toFixed(2));
+  return Number((Math.floor(Number((BigInt(100) * e - n)) / Number(e - n)) / 100));
 }
 
 // // Run through the calculateCrashPoint function with 1000 times and log the result
@@ -52,3 +52,6 @@ export function calculateCrashPoint(randomNumber: number, salt: string) {
 //   const salt = 'test';
 //   console.log(calculateCrashPoint(randomNumber, salt), randomNumber, salt);
 // }
+
+// console.log(calculateCrashPoint('3199639427161852469', 'house_secretsalt'));
+// console.log(calculateCrashPoint('3199639427161852469', '686f7573655f73656372657473616c74'));
