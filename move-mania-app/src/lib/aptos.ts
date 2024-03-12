@@ -112,6 +112,7 @@ export async function placeBet(user: User, betData: BetData) {
 
   return {
     txnHash: txResult.hash,
+    version: (txResult as any).version,
   };
 }
 
@@ -141,5 +142,6 @@ export async function cashOut(user: User, cashOutData: CashOutData) {
 
   return {
     txnHash: txResult.hash,
+    version: (txResult as any).version,
   };
 }

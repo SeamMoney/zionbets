@@ -85,7 +85,7 @@ export default function RootLayout({
             <div className="flex flex-1 flex-col pt-12 lg:pt-20 lg:mr-96">
               <main className="flex-1 overflow-y-auto">
                 {children}
-                <Toaster />
+                <Toaster  />
               </main>
             </div>
 

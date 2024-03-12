@@ -19,6 +19,8 @@ import { Socket, io } from "socket.io-client";
 import { socket } from "@/lib/socket";
 import { gameStatusContext } from "./CrashProvider";
 import { cashOut, placeBet } from "@/lib/aptos";
+import { useToast } from "@/components/ui/use-toast";
+import Link from "next/link";
 
 export type GameStatus = {
   status: "COUNTDOWN" | "IN_PROGRESS" | "END";
@@ -33,6 +35,8 @@ export default function ControlCenter() {
     account,
     latestAction
   } = useContext(gameStatusContext);
+
+  const { toast } = useToast()
 
   const [betAmount, setBetAmount] = useState("");
 
@@ -77,6 +81,10 @@ export default function ControlCenter() {
 
     if (!account) return;
 
+    toast({
+      title: "Placing bet at " + betAmount + " zAPT...",
+    })
+
     const blockchainRes = await placeBet(account, {
       roundId: 1,
       playerEmail: account.email || "",
@@ -86,6 +94,10 @@ export default function ControlCenter() {
 
     if (!blockchainRes) {
       console.error('Error placing bet');
+      toast({
+        title: "Error placing bet",
+        description: "Please try again"
+      })
       return;
     }
 
@@ -96,6 +108,11 @@ export default function ControlCenter() {
       coinType: "APT",
     };
     const success = setNewBet(data);
+
+    toast({
+      title: "Bet placed at " + betAmount + " zAPT",
+      description: <Link href={`https://explorer.aptoslabs.com/txn/${blockchainRes.version}/?network=randomnet`} target="_blank" className="underline">View transaction</Link>
+    })
   };
 
   const onCashOut = async () => {
@@ -105,7 +122,12 @@ export default function ControlCenter() {
 
     if (!gameStatus?.startTime) return;
 
-    const cashoutMultipler = calculateCurrentCrashPoint((Date.now() - gameStatus.startTime) / 1000);
+    const cashoutMultipler = Number(calculateCurrentCrashPoint((Date.now() - gameStatus.startTime) / 1000).toFixed(2));
+
+    toast({
+      title: "Cashing out at " + cashoutMultipler + "x...",
+    })
+
 
     const blockchainRes = await cashOut(account, {
       roundId: 1,
@@ -115,6 +137,10 @@ export default function ControlCenter() {
 
     if (!blockchainRes) {
       console.error('Error cashing out');
+      toast({
+        title: "Error cashing out",
+        description: "Please try again"
+      })
       return;
     }
 
@@ -124,6 +150,11 @@ export default function ControlCenter() {
       cashOutMultiplier: cashoutMultipler,
     };
     const succes = cashOutBet(data);
+
+    toast({
+      title: "Cashed out at " + cashoutMultipler + "x",
+      description: <Link href={`https://explorer.aptoslabs.com/txn/${blockchainRes.version}/?network=randomnet`} target="_blank" className="underline">View transaction</Link>
+    })
 
   };
 
