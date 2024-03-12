@@ -235,11 +235,11 @@ export default function ControlCenter() {
             account && gameStatus?.status === "COUNTDOWN" && (
               <button
                 className={cn(
-                  "border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 w-full",
-                  !(parseFloat(betAmount) > 0) || hasBet
+                  "border border-green-700 px-6 py-1 border-yellow-700 text-yellow-500 bg-neutral-950 w-full",
+                  !hasBet
                     ? "cursor-not-allowed"
-                    : "hover:bg-[#264234]/40 hover:cursor-pointer",
-                  hasBet && "bg-[#264234]/40"
+                    : "bg-[#264234]/40 hover:cursor-pointer border-green-700 text-green-500",
+                    (parseFloat(betAmount) > 0) && !hasBet && "bg-[#404226]/40",
                 )}
                 onClick={onSetBet}
                 disabled={!(parseFloat(betAmount) > 0) || hasBet}
@@ -272,7 +272,7 @@ export default function ControlCenter() {
           {
             account && gameStatus?.status === "IN_PROGRESS" && !hasBet &&  (
               <button
-                className="border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 cursor-not-allowed w-full"
+                className="border px-6 py-1 border-yellow-700 text-yellow-500 bg-neutral-950 cursor-not-allowed w-full"
                 disabled
               >
                 Game in progress
@@ -282,7 +282,7 @@ export default function ControlCenter() {
           {
             account && gameStatus?.status === "END" && (
               <button
-                className="border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 cursor-not-allowed w-full"
+                className="border border-red-700 px-6 py-1 text-red-500 bg-red-500/10 cursor-not-allowed w-full"
                 disabled
               >
                 Game ended
@@ -380,8 +380,8 @@ export default function ControlCenter() {
             account && (
               <button
                 className={cn(
-                  "border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 w-full",
-                    autoCashout && "bg-[#264234]/40"
+                  "border bg-[#404226]/40 border-yellow-700 text-yellow-500 px-6 py-1 w-full",
+                    autoCashout && " bg-[#264234]/40 border-green-700 text-green-500"
                 )}
                 onClick={() => {
                   setAutoCashout(!autoCashout);

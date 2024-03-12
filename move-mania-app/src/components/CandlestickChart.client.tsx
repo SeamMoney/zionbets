@@ -38,7 +38,7 @@ function CandlestickChart ({
             width: chartContainerRef.current.clientWidth,
             layout: {
                 background: { color: '#000' },
-                textColor: '#33cc33',
+                textColor: '#22c55e',
                 fontFamily: "'Roboto Mono', sans-serif",
             },
             grid: {
@@ -93,9 +93,9 @@ function CandlestickChart ({
         // });
 
         const areaSeries = newChart.addAreaSeries({
-            topColor: 'green',
+            topColor: '#AC2F57',
             bottomColor: 'black',
-            lineColor: 'green',
+            lineColor: '#AC2F57',
             lineWidth: 2,
         });
 
