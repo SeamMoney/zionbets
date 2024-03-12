@@ -176,6 +176,13 @@ export default function BalanceButton() {
               Withdraw
             </button>
           </div>
+          {/* <DialogTitle>Running low on funds?</DialogTitle>
+          <DialogDescription>
+            Refer friends to Zion.bet to earn more 500 more zAPT. 
+          </DialogDescription>
+          <div>
+            <Link href="https://twitter.com/intent/tweet?text=Check out https://zion.bet/crash to earn big!">Refer</Link>
+          </div> */}
           <DialogTitle>Aptos on-ramp (COMING SOON)</DialogTitle>
           <DialogDescription>
             Purchase APT with your credit card and deposit it into your account.
