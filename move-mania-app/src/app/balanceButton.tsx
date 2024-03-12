@@ -22,13 +22,16 @@ import { getSession, signIn, signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast"
 import Link from "next/link";
-import { getBalance } from "@/lib/aptos";
+import { getBalance, transferApt } from "@/lib/aptos";
+import { cn } from "@/lib/utils";
 
 
 export default function BalanceButton() {
   const { toast } = useToast()
   const [account, setAccount] = useState<User | null>(null);
   const [balance, setBalance] = useState<number | null>(null);
+  const [recipientAddress, setRecipientAddress] = useState<string>("");
+  const [transferAmount, setTransferAmount] = useState<string>("");
 
   useEffect(() => {
     getSession().then((session) => {
@@ -70,10 +73,22 @@ export default function BalanceButton() {
   });
 
   const onWithdraw = async () => {
+
+    if (!account) return;
+
+    const tx = await transferApt(account.private_key, parseFloat(transferAmount), recipientAddress, '0xead58f20349f8dacf71fe47722a6f14b4f9204c74e078cda7567456a506cd70f::z_apt::ZAPT');
+
+    if (!tx) {
+      toast({
+        title: "Failed to withdraw funds",
+      });
+      return;
+    }
+
     // withdraw funds
     toast({
       title: "Funds withdrawn",
-      description: <Link href='https://explorer.aptoslabs.com/?network=mainnet' target="_blank" className="underline">View transaction</Link>
+      description: <Link href={`https://explorer.aptoslabs.com/txn/${tx.version}/?network=randomnet`} target="_blank" className="underline">View transaction</Link>
     })
   }
   
@@ -86,6 +101,7 @@ export default function BalanceButton() {
         </button>
       </DialogTrigger>
       <DialogContent className="bg-neutral-950">
+          <DialogTitle>Your balance: <span className="font-normal">{balance?.toFixed(2) || parseInt('0').toFixed(2)} zAPT</span></DialogTitle>
           <DialogTitle>Deposit Funds</DialogTitle>
           <DialogDescription>
             Send APT to the public address below to deposit funds into your account.
@@ -123,17 +139,40 @@ export default function BalanceButton() {
                 htmlFor="public_address"
                 className="text-left "
               >
+                Amount
+              </label>
+              <span className=" opacity-50 flex flex-row justify-center items-center gap-1">
+                <input
+                  id="public_address"
+                  placeholder={`${balance?.toFixed(2) || parseInt('0').toFixed(2)}`}
+                  value={parseFloat(transferAmount) > 0 ? transferAmount : ''}
+                  onChange={(e) => setTransferAmount(e.target.value)}
+                  className="bg-transparent border-none outline-none text-right text-ellipsis"
+                />
+                <span>APT</span>
+              </span>
+            </div>
+            <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2 w-full">
+              <label
+                htmlFor="public_address"
+                className="text-left "
+              >
                 Recipient address
               </label>
               <span className=" opacity-50 flex flex-row justify-center items-center gap-1">
                 <input
                   id="public_address"
                   placeholder={account.public_address}
+                  value={recipientAddress}
+                  onChange={(e) => setRecipientAddress(e.target.value)}
                   className="bg-transparent border-none outline-none text-right text-ellipsis"
                 />
               </span>
             </div>
-            <button onClick={onWithdraw} className="border border-green-700 hover:bg-[#264234]/40 hover:bg-noise px-6 py-1 text-green-500">
+            <button onClick={onWithdraw} className={cn(
+              "border border-yellow-700 px-6 py-1 text-yellow-500 bg-neutral-950",
+              parseFloat(transferAmount) > 0 && balance && parseFloat(transferAmount) <= balance && recipientAddress != '' && 'bg-[#404226]/40'
+            )}>
               Withdraw
             </button>
           </div>
