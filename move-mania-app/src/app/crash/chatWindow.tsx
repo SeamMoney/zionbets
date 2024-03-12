@@ -93,7 +93,7 @@ export default function ChatWindow() {
         </button>
       </DrawerTrigger>
       <DrawerContent className="h-[60%] bg-[#020202] bg-noise">
-      <div className="mb-4 border-neutral-700 h-full w-full flex flex-col items-center py-1 px-2 gap-2">
+      <div className="mb-4 border-neutral-700 h-full w-full flex flex-col items-center py-1 px-2 gap-2 overflow-hidden ">
         <div className="grow flex flex-col items-start justify-end w-full gap-1 overflow-hidden">
           {chatMessages.map((message, index) => (
             <ChatBubble key={index} message={message} />
