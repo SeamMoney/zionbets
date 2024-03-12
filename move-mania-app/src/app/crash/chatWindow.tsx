@@ -88,7 +88,7 @@ export default function ChatWindow() {
   return (
     <Drawer>
       <DrawerTrigger asChild>
-        <button className="border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 w-full">
+        <button className="border border-[#2faca2] px-6 py-1 text-[#2faca2] bg-neutral-950 w-full">
           Chat
         </button>
       </DrawerTrigger>
@@ -104,7 +104,7 @@ export default function ChatWindow() {
             <div className="grow bg-noise">
               <input
                 ref={inputRef}
-                className="bg-neutral-950 hover:bg-neutral-800/40 border border-neutral-800 w-full h-full text-white outline-none ps-2"
+                className="bg-neutral-950 border border-neutral-800 w-full h-full text-white outline-none ps-2"
                 type="text"
                 placeholder="Type a message..."
                 onKeyPress={(e) => {
@@ -125,7 +125,7 @@ export default function ChatWindow() {
                   inputRef.current.value = "";
                 }
               }}
-              className="border border-green-700 hover:bg-[#264234]/40 px-6 py-1 text-green-500"
+              className="border border-[#2faca2] bg-neutral-950 hover:bg-[#264234] px-6 py-1 text-[#2faca2]"
             >
               Send
             </button>
