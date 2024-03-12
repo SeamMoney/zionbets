@@ -176,6 +176,10 @@ export default function BalanceButton() {
               Withdraw
             </button>
           </div>
+          <DialogTitle>Aptos on-ramp (COMING SOON)</DialogTitle>
+          <DialogDescription>
+            Purchase APT with your credit card and deposit it into your account.
+          </DialogDescription>
       </DialogContent>
     </Dialog>
     )
