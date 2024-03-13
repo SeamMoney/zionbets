@@ -165,7 +165,7 @@ async function test_crashpoint_calculatation() {
 // test_crashpoint_calculatation()
 
 // createNewGame('house_secret', 'salt')
-endGame('house_secret', 'salt')
+// endGame('house_secret', 'salt')
 
 // console.log(crypto.createHash("SHA3-256").update(`house_secretsalt`).digest('hex'));
 // console.log(crypto.createHash("SHA3-256").update(`salt`).digest('hex'));
