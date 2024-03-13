@@ -22,6 +22,11 @@ const TRANSACTION_OPTIONS = {
   gas_unit_price: '100',
 };
 
+
+function delay(ms: number) {
+  return new Promise( resolve => setTimeout(resolve, ms) );
+}
+
 const fromHexString = (hexString: any) =>
   Uint8Array.from(hexString.match(/.{1,2}/g).map((byte: any) => parseInt(byte, 16)));
 
@@ -80,9 +85,15 @@ export async function createNewGame(house_secret: string, salt: string): Promise
   }
 }
 
-export async function endGame(house_secret: string, salt: string) {
+export async function endGame(house_secret: string, salt: string, crashTime: number): Promise<{ txnHash: string } | null> {
 
   const adminAccount = getAdminAccount();
+
+  // If the crash time is in the future, then wait until the crash time to end the game
+  if (crashTime <= Date.now()) {
+    delay(crashTime - Date.now());
+  }
+    
 
   const createGameTxn = await provider.generateTransaction(
     adminAccount.address(), 
@@ -154,7 +165,7 @@ async function test_crashpoint_calculatation() {
 // test_crashpoint_calculatation()
 
 // createNewGame('house_secret', 'salt')
-// endGame('house_secret', 'salt')
+endGame('house_secret', 'salt')
 
 // console.log(crypto.createHash("SHA3-256").update(`house_secretsalt`).digest('hex'));
 // console.log(crypto.createHash("SHA3-256").update(`salt`).digest('hex'));

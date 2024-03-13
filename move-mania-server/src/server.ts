@@ -81,7 +81,7 @@ io.on("connection", (socket) => {
     console.log(startTime + ((crashPoint == 0 ? 0 : log(EXPONENTIAL_FACTOR, crashPoint)) * 1000) - Date.now())
 
     setTimeout(async () => {
-      const blockchainTxn = await endGameAptos('house_secret', 'salt')
+      const blockchainTxn = await endGameAptos('house_secret', 'salt', startTime + ((crashPoint == 0 ? 0 : log(EXPONENTIAL_FACTOR, crashPoint)) * 1000))
       console.log("blockchainTxn", blockchainTxn)
 
       if (blockchainTxn === null) {
@@ -139,7 +139,7 @@ async function cycleRounds() {
   console.log(startTime + ((crashPoint == 0 ? 0 : log(EXPONENTIAL_FACTOR, crashPoint)) * 1000) - Date.now())
 
   setTimeout(async () => {
-    const blockchainTxn = await endGameAptos('house_secret', 'salt')
+    const blockchainTxn = await endGameAptos('house_secret', 'salt', startTime + ((crashPoint == 0 ? 0 : log(EXPONENTIAL_FACTOR, crashPoint)) * 1000))
     console.log("blockchainTxn", blockchainTxn)
 
     if (blockchainTxn === null) {
