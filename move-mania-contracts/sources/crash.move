@@ -274,7 +274,7 @@ module zion::crash {
     assert!(option::is_some(&state.current_game), 1);
 
     let game_mut_ref = option::borrow_mut(&mut state.current_game);
-    assert!(timestamp::now_microseconds() >= game_mut_ref.start_time_ms, 2);
+    assert!(timestamp::now_microseconds() / 1000 >= game_mut_ref.start_time_ms / 1000, 2);
 
     assert!(
       verify_hashes(
