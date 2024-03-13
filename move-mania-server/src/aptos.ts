@@ -90,8 +90,8 @@ export async function endGame(house_secret: string, salt: string, crashTime: num
   const adminAccount = getAdminAccount();
 
   // If the crash time is in the future, then wait until the crash time to end the game
-  if (crashTime >= Date.now()) {
-    delay(crashTime + 1000 - Date.now());
+  if (crashTime + 500 >= Date.now()) {
+    delay(crashTime + 500 - Date.now());
   }
     
 
