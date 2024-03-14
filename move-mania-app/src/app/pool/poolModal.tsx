@@ -84,7 +84,7 @@ export default function PoolModal() {
           <DialogTitle>Your shares: {balance.toFixed(2)} ({`${(balance / lpCoinSupply * 100).toFixed(2)}`}% of pool)</DialogTitle>
           <DialogTitle>Supply Pool</DialogTitle>
           <DialogDescription>
-            Deposit zAPT into the pool to earn a share of the pool's profits.
+            Deposit zAPT into the pool to earn a share of the pool&apos;s profits.
           </DialogDescription>
           <div className="flex flex-col w-full items-end w-full gap-2">
             <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2 w-full">
@@ -130,7 +130,7 @@ export default function PoolModal() {
           </div>
           <DialogTitle>Redeem Shares</DialogTitle>
           <DialogDescription>
-            Redeem your shares for your share of the pool's zAPT.
+            Redeem your shares for your share of the pool&apos;s zAPT.
           </DialogDescription>
           <div className="flex flex-col w-full items-end w-full gap-2">
             <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2 w-full">
