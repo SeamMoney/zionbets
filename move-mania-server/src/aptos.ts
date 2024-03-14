@@ -2,11 +2,11 @@ import { AptosAccount, AptosClient, HexString, Provider, Network } from "aptos";
 import crypto from 'crypto';
 import { calculateCrashPoint } from "./crashPoint";
 
-const MODULE_ADDRESS = '0xead58f20349f8dacf71fe47722a6f14b4f9204c74e078cda7567456a506cd70f';
-const CRASH_RESOURCE_ACCOUNT_ADDRESS = '0x09a9ee01215961135773c653f6c1a5be29c93cb49c47fb53a583f295796f5b9d';
-const LP_RESOURCE_ACCOUNT_ADDRESS = '0xcd1c7a1f38b173856e3ccc820c37235d9330f83a3b14d3e088df33f2d131053c'
-const Z_APT_RESOURCE_ACCOUNT_ADDRESS = '0x337fdddae41ccb60266741510a22b6b1a630cf934855c22f93a7404267e2b505';
-const ADMIN_ACCOUNT_PRIVATE_KEY = '0xa3b22193740d044585a17a90cb413fbdb6303c0e7f42dce98ee5ffe6dfdac1ac';
+const MODULE_ADDRESS = '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83';
+const CRASH_RESOURCE_ACCOUNT_ADDRESS = '0x44d6cd854567d0bb4fc23ee3df1cb7eec15fea87c8cb844713c6166982826715';
+const LP_RESOURCE_ACCOUNT_ADDRESS = '0xbdd5fb2899ba75294df3b6735b11a9565160e0d0b2327e9ec84979224cf31aa1'
+const Z_APT_RESOURCE_ACCOUNT_ADDRESS = '0x6fc171eb36807e956b56a5c8c7157968f8aee43299e35e6e45f477719c8acd4d';
+const ADMIN_ACCOUNT_PRIVATE_KEY = '0xad136a5224a592705a0f7a18e63ee16653a871e209b3a0b12b1c34dbf2ad6c6a';
 
 const RPC_URL = 'https://fullnode.random.aptoslabs.com';
 const FAUCET_URL = 'https://faucet.random.aptoslabs.com'

@@ -2,7 +2,7 @@ import { AptosAccount, AptosClient, FaucetClient, HexString, Provider } from "ap
 import { BetData, CashOutData } from "./types";
 import { User } from "./schema";
 
-const MODULE_ADDRESS = '0xead58f20349f8dacf71fe47722a6f14b4f9204c74e078cda7567456a506cd70f';
+const MODULE_ADDRESS = '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83';
 const MODULE_NAME = 'crash';
 
 const RPC_URL = 'https://fullnode.random.aptoslabs.com';
