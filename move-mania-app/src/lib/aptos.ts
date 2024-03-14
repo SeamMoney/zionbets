@@ -4,6 +4,9 @@ import { User } from "./schema";
 
 const MODULE_ADDRESS = '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83';
 const MODULE_NAME = 'crash';
+const CRASH_RESOURCE_ACCOUNT_ADDRESS = '0x44d6cd854567d0bb4fc23ee3df1cb7eec15fea87c8cb844713c6166982826715';
+const LP_RESOURCE_ACCOUNT_ADDRESS = '0xbdd5fb2899ba75294df3b6735b11a9565160e0d0b2327e9ec84979224cf31aa1'
+const Z_APT_RESOURCE_ACCOUNT_ADDRESS = '0x6fc171eb36807e956b56a5c8c7157968f8aee43299e35e6e45f477719c8acd4d';
 
 const RPC_URL = 'https://fullnode.random.aptoslabs.com';
 const FAUCET_URL = 'https://faucet.random.aptoslabs.com';
@@ -178,3 +181,207 @@ export async function cashOut(user: User, cashOutData: CashOutData) {
     version: (txResult as any).version,
   };
 }
+
+export async function getDeposits() {
+  try {
+    const response = await provider.getEventsByEventHandle(
+      LP_RESOURCE_ACCOUNT_ADDRESS,
+      `${MODULE_ADDRESS}::liquidity_pool::State`,
+      'deposit_events',
+      {
+        limit: 100, 
+      }
+    );
+  
+    console.log(response);
+  
+    return response;
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+export async function getWithdrawals() {
+  try {
+    const response = await provider.getEventsByEventHandle(
+      LP_RESOURCE_ACCOUNT_ADDRESS,
+      `${MODULE_ADDRESS}::liquidity_pool::State`,
+      'withdraw_events',
+      {
+        limit: 100, 
+      }
+    );
+  
+    console.log(response);
+  
+    return response;
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+export async function getExtracts() {
+  try {
+    const response = await provider.getEventsByEventHandle(
+      LP_RESOURCE_ACCOUNT_ADDRESS,
+      `${MODULE_ADDRESS}::liquidity_pool::State`,
+      'extract_events',
+      {
+        limit: 100, 
+      }
+    );
+  
+    console.log(response);
+  
+    return response;
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+export async function getPuts() {
+  try {
+    const response = await provider.getEventsByEventHandle(
+      LP_RESOURCE_ACCOUNT_ADDRESS,
+      `${MODULE_ADDRESS}::liquidity_pool::State`,
+      'put_events',
+      {
+        limit: 100, 
+      }
+    );
+  
+    console.log(response);
+  
+    return response;
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+export async function getLocks() {
+  try {
+    const response = await provider.getEventsByEventHandle(
+      LP_RESOURCE_ACCOUNT_ADDRESS,
+      `${MODULE_ADDRESS}::liquidity_pool::State`,
+      'lock_events',
+      {
+        limit: 100, 
+      }
+    );
+  
+    console.log(response);
+  
+    return response;
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+export async function getPoolAptSupply(version?: string) {
+  const response = await provider.view(
+    {
+      function: `${MODULE_ADDRESS}::liquidity_pool::get_pool_supply`,
+      type_arguments: [],
+      arguments: [],
+    },
+    version
+  );  
+
+  console.log(response);
+
+  return response;
+}
+
+export async function getLPCoinSupply(version?: string) {
+  const response = await provider.view(
+    {
+      function: `${MODULE_ADDRESS}::liquidity_pool::get_lp_coin_supply`,
+      type_arguments: [],
+      arguments: [],
+    },
+    version
+  );  
+
+  console.log(response);
+
+  return parseInt(response[0].toString()) / APT
+}
+
+export async function getLockedLPCoinSupply(version?: string) {
+  const response = await provider.view(
+    {
+      function: `${MODULE_ADDRESS}::liquidity_pool::get_amount_of_locked_liquidity`,
+      type_arguments: [],
+      arguments: [],
+    },
+    version
+  );  
+
+  console.log(response);
+
+  return parseInt(response[0].toString()) / APT
+}
+
+export async function supplyPool(user: User, amount: number) {
+  const userAccount = await getUserAccount(user.private_key);
+
+  const txn = await provider.generateTransaction(
+    userAccount.address(),
+    {
+      function: `${MODULE_ADDRESS}::liquidity_pool::supply_liquidity`,
+      type_arguments: [],
+      arguments: [
+        Math.floor(amount * APT),
+      ],
+    },
+    TRANSACTION_OPTIONS
+  );
+
+  const tx = await provider.signAndSubmitTransaction(userAccount, txn);
+
+  const txResult = await client.waitForTransactionWithResult(tx);
+
+  console.log(txResult);
+
+  if (!(txResult as any).success) {
+    return null;
+  }
+
+  return {
+    txnHash: txResult.hash,
+    version: (txResult as any).version,
+  };
+}
+
+export async function withdrawPool(user: User, amount: number) {
+  const userAccount = await getUserAccount(user.private_key);
+
+  const txn = await provider.generateTransaction(
+    userAccount.address(),
+    {
+      function: `${MODULE_ADDRESS}::liquidity_pool::withdraw_liquidity`,
+      type_arguments: [],
+      arguments: [
+        Math.floor(amount * APT),
+      ],
+    },
+    TRANSACTION_OPTIONS
+  );
+
+  const tx = await provider.signAndSubmitTransaction(userAccount, txn);
+
+  const txResult = await client.waitForTransactionWithResult(tx);
+
+  console.log(txResult);
+
+  if (!(txResult as any).success) {
+    return null;
+  }
+
+  return {
+    txnHash: txResult.hash,
+    version: (txResult as any).version,
+  };
+}
+
+
