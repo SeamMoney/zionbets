@@ -8,6 +8,18 @@ import { getSession } from "next-auth/react";
 import { getCurrentGame, setUpAndGetUser } from "@/lib/api";
 import { SOCKET_EVENTS } from "@/lib/types";
 import { EXPONENTIAL_FACTOR, log } from "@/lib/utils";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+
 
 interface CrashPageProps {
   gameStatus: GameStatus | null;
@@ -27,6 +39,8 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
   const [account, setAccount] = useState<User | null>(null);
   const [update, setUpdate] = useState(true);
   const [latestAction, setLatestAction] = useState<number | null>(null);
+
+  const [showPWAInstall, setShowPWAInstall] = useState(false);
 
   useEffect(() => {
 
@@ -145,6 +159,26 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
 
   }, [update]);
 
+  /**
+   * Is the page currently in standalone display mode (used by PWA)?
+   * @return {boolean}
+   */
+  function isInStandaloneMode() {
+    return Boolean(
+      (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)
+      || (window.navigator as any).standalone, // Fallback for iOS
+    );
+  }
+
+  useEffect(() => {
+    if (isInStandaloneMode()) {
+      console.log('This is running as standalone.');
+    } else {
+      console.log('This is not running as standalone.');
+      setShowPWAInstall(true);
+    }
+  }, []);
+
   return (
     <gameStatusContext.Provider
       value={{
@@ -154,6 +188,27 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
       }}
     >
       {children}
+      <AlertDialog open={showPWAInstall && localStorage.getItem("pwaPrompt") != 'true'}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Add to Phone Home Screen</AlertDialogTitle>
+            <AlertDialogDescription>
+              For the best experience, add this app to your home screen. <br /><br />
+              In your browser menu, tap the <b>share</b> icon and choose <b>Add to Home Screen</b> in the options.
+              Then open the zion.bet app on your home screen to play.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel 
+              onClick={() => {
+                setShowPWAInstall(false);
+                localStorage.setItem("pwaPrompt", 'true');
+              }}
+              className="border border-red-700 px-6 py-1 text-red-500 bg-neutral-950 w-full focus:outline-none"
+            >I'll stay in my browser</AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </gameStatusContext.Provider>
   );
 }
