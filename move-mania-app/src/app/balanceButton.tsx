@@ -96,7 +96,7 @@ export default function BalanceButton() {
     return (
       <Dialog>
       <DialogTrigger asChild>
-        <button className="bg-neutral-800 hover:bg-neutral-700 px-2 py-1 text-xs text-white font-semibold">
+        <button className="bg-neutral-800 hover:bg-neutral-700 px-2 py-1 text-sm text-white font-semibold">
           {balance?.toFixed(2) || parseInt('0').toFixed(2)} zAPT
         </button>
       </DialogTrigger>

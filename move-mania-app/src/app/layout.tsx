@@ -9,6 +9,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { MenuIcon } from "lucide-react";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Analytics } from "@vercel/analytics/react"
+import Image from "next/image";
+import logo from "@/../public/zionbet_nobackground.png"
 
 const baijamjuree = Bai_Jamjuree({
   weight: ['200', '300', '400', '500', '600'],
@@ -49,9 +51,9 @@ export default function RootLayout({
           <div className="flex h-full min-h-screen overflow-hidden">
             <nav className="fixed w-full h-12 z-30 px-2 border-b border-neutral-700 bg-[#020202] bg-noise">
               <div className="flex flex-row items-center justify-between w-full h-full">
-                <div className="flex flex-row gap-4 items-center ">
-                  <HamburgerNavigation />
-                  <Link href='/' className="text-white text-2xl font-bold font-TheNeue">ZION</Link>
+                <div className="flex flex-row items-center ">
+                  <Link href='/'><Image src={logo} className="" alt="" width={50} height={50} /></Link>
+                  {/* <Link href='/' className="text-white text-2xl font-bold font-TheNeue">ZION</Link> */}
                 </div>
                 <div className="flex flex-row gap-4 items-center">
                   <BalanceButton />
