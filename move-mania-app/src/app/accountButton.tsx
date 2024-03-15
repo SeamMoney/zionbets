@@ -119,7 +119,7 @@ export default function AccountButton() {
                         setUsername(e.target.value);
                       }}
                       placeholder={account.username}
-                      autoFocus
+                      autoFocus={false}
                       className="bg-transparent border-none outline-none text-right text-ellipsis"
                     />
                   </span>
@@ -136,7 +136,7 @@ export default function AccountButton() {
                         setImage(e.target.value);
                       }}
                       placeholder={account.image}
-                      autoFocus
+                      autoFocus={false}
                       className="bg-transparent border-none outline-none text-right text-ellipsis"
                     />
                   </span>
@@ -150,7 +150,7 @@ export default function AccountButton() {
                       id="email"
                       disabled
                       value={account.email}
-                      autoFocus
+                      autoFocus={false}
                       className="bg-transparent border-none outline-none text-right text-ellipsis cursor-not-allowed"
                     />
                   </span>
@@ -167,7 +167,7 @@ export default function AccountButton() {
                       id="public_address"
                       disabled
                       value={account.public_address}
-                      autoFocus
+                      autoFocus={false}
                       className="bg-transparent border-none outline-none text-right text-ellipsis cursor-not-allowed"
                     />
                   </span>
@@ -185,7 +185,7 @@ export default function AccountButton() {
                       hidden={!privateKeyVisible}
                       disabled
                       value={account.private_key}
-                      autoFocus
+                      autoFocus={false}
                       className="bg-transparent border-none outline-none text-right text-ellipsis w-[170px] cursor-not-allowed"
                     />
                     {!privateKeyVisible ? (
