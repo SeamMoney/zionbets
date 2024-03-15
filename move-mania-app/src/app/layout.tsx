@@ -51,14 +51,16 @@ export default function RootLayout({
           <div className="flex h-full min-h-screen overflow-hidden">
             <nav className="fixed w-full h-12 z-30 px-2 border-b border-neutral-700 bg-[#020202] bg-noise">
               <div className="flex flex-row items-center justify-between w-full h-full">
-                <div className="flex flex-row items-center ">
-                  <Link href='/'><Image src={logo} className="" alt="" width={50} height={50} /></Link>
-                  {/* <Link href='/' className="text-white text-2xl font-bold font-TheNeue">ZION</Link> */}
-                </div>
-                <div className="flex flex-row gap-4 items-center">
+                <div className="flex flex-row items-center gap-4">
+                  <div className="flex flex-row items-center justify-start">
+                    <Link href='/'><Image src={logo} className="" alt="" width={50} height={50} /></Link>
+                    <Link href='/' className="text-white text-2xl font-bold">ZION</Link>
+                  </div>
                   <Link href='/pool' className="bg-neutral-800 hover:bg-neutral-700 px-2 py-1 text-xs text-white font-semibold">
                     Pool
                   </Link>
+                </div>
+                <div className="flex flex-row gap-4 items-center">
                   <BalanceButton />
                   <AccountButton />
                 </div>
