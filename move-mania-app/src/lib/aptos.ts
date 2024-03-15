@@ -14,7 +14,7 @@ const FAUCET_URL = 'https://faucet.random.aptoslabs.com';
 const client = new AptosClient(RPC_URL);
 const provider = new Provider({
   fullnodeUrl: RPC_URL,
-  indexerUrl: 'https://indexer.random.aptoslabs.com',
+  // indexerUrl: 'https://indexer.random.aptoslabs.com',
 })
 
 const faucetClient = new FaucetClient(
@@ -359,7 +359,7 @@ export async function withdrawPool(user: User, amount: number) {
   const txn = await provider.generateTransaction(
     userAccount.address(),
     {
-      function: `${MODULE_ADDRESS}::liquidity_pool::withdraw_liquidity`,
+      function: `${MODULE_ADDRESS}::liquidity_pool::remove_liquidity`,
       type_arguments: [],
       arguments: [
         Math.floor(amount * APT),
@@ -385,3 +385,96 @@ export async function withdrawPool(user: User, amount: number) {
 }
 
 
+
+export async function getCrashCalculationEvents() {
+  const res = await provider.getEventsByCreationNumber(
+    '0x44d6cd854567d0bb4fc23ee3df1cb7eec15fea87c8cb844713c6166982826715',
+    "5"
+  );
+
+  console.log(res);
+
+  return res;
+}
+
+export async function simulateDeposit(user: User, amount: number) {
+  try {
+    const userAccount = await getUserAccount(user.private_key);
+
+    const txn = await provider.generateTransaction(
+      userAccount.address(),
+      {
+        function: `${MODULE_ADDRESS}::liquidity_pool::supply_liquidity`,
+        type_arguments: [],
+        arguments: [
+          Math.floor(amount * APT),
+        ],
+      },
+      TRANSACTION_OPTIONS
+    );
+
+    const tx = await provider.simulateTransaction(
+      userAccount,
+      txn
+    );
+
+    // console.log(tx);
+
+    let lp_coin_received = 0;
+
+    tx[0].changes.forEach((change) => {
+      console.log(change);
+      if ((change as any).data && (change as any).data.type === "0x1::coin::CoinStore<0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83::liquidity_pool::LPCoin>") {
+        // console.log((change as any).data);
+        // console.log((change as any).data.data.coin.value);
+        lp_coin_received = parseInt((change as any).data.data.coin.value.toString()) / APT;
+      }
+    });
+
+    return lp_coin_received - await getBalance(user.private_key, '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83::liquidity_pool::LPCoin');
+  } catch (e) {
+    console.error(e);
+    return -1;
+  }
+}
+
+export async function simulateWithdraw(user: User, amount: number) {
+  try {
+    const userAccount = await getUserAccount(user.private_key);
+
+    const txn = await provider.generateTransaction(
+      userAccount.address(),
+      {
+        function: `${MODULE_ADDRESS}::liquidity_pool::remove_liquidity`,
+        type_arguments: [],
+        arguments: [
+          Math.floor(amount * APT),
+        ],
+      },
+      TRANSACTION_OPTIONS
+    );
+
+    const tx = await provider.simulateTransaction(
+      userAccount,
+      txn
+    );
+
+    // console.log(tx);
+
+    let apt_received = 0;
+
+    tx[0].changes.forEach((change) => {
+      console.log(change);
+      if ((change as any).data && (change as any).data.type === "0x1::coin::CoinStore<0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83::z_apt::ZAPT>") {
+        // console.log((change as any).data);
+        // console.log((change as any).data.data.coin.value);
+        apt_received = parseInt((change as any).data.data.coin.value.toString()) / APT;
+      }
+    });
+
+    return apt_received - await getBalance(user.private_key, '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83::z_apt::ZAPT');
+  } catch (e) {
+    console.error(e);
+    return -1;
+  }
+}

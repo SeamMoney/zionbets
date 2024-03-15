@@ -3,7 +3,7 @@
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 import { getUser, setUpAndGetUser } from "@/lib/api";
-import { getBalance, getLPCoinSupply, supplyPool } from "@/lib/aptos";
+import { getBalance, getLPCoinSupply, simulateDeposit, simulateWithdraw, supplyPool, withdrawPool } from "@/lib/aptos";
 import { User } from "@/lib/schema";
 import { cn } from "@/lib/utils";
 import { get } from "http";
@@ -20,7 +20,9 @@ export default function PoolModal() {
   const [aptBalance, setAptBalance] = useState<number>(0)
 
   const [depositAmount, setDepositAmount] = useState<string>('')
+  const [expectedReturnFromDeposit, setExpectedReturnFromDeposit] = useState<number>(0)
   const [withdrawAmount, setWithdrawAmount] = useState<string>('')
+  const [expectedReturnFromWithdraw, setExpectedReturnFromWithdraw] = useState<number>(0)
 
   const { toast } = useToast()
   
@@ -38,9 +40,19 @@ export default function PoolModal() {
             setAccount(user);
             getBalance(user.private_key, '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83::liquidity_pool::LPCoin').then((balance) => {
               setBalance(balance);
+              simulateWithdraw(user, balance).then((txn) => {
+                if (txn) {
+                  setExpectedReturnFromWithdraw(txn);
+                }
+              });
             });
             getBalance(user.private_key, '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83::z_apt::ZAPT').then((balance) => {
               setAptBalance(balance);
+              simulateDeposit(user, balance).then((txn) => {
+                if (txn) {
+                  setExpectedReturnFromDeposit(txn);
+                }
+              });
             });
           }
         });
@@ -90,7 +102,7 @@ export default function PoolModal() {
             <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2 w-full">
               <label
                 htmlFor="public_address"
-                className="text-left "
+                className="text-left whitespace-nowrap "
               >
                 Deposit Amount
               </label>
@@ -99,10 +111,47 @@ export default function PoolModal() {
                   id="public_address"
                   placeholder={`${aptBalance?.toFixed(2) || parseInt('0').toFixed(2)}`}
                   value={depositAmount}
-                  onChange={(e) => setDepositAmount(e.target.value)}
+                  onChange={async (e) => {
+                    setDepositAmount(e.target.value)
+
+                    if (!account) return;
+
+                    if (e.target.value === '') {
+                      await simulateDeposit(account, aptBalance).then((txn) => {
+                        if (txn) {
+                          setExpectedReturnFromDeposit(txn);
+                        }
+                      });
+                      return;
+                    }
+
+
+                    await simulateDeposit(account, parseFloat(e.target.value)).then((txn) => {
+                      if (txn) {
+                        setExpectedReturnFromDeposit(txn);
+                      }
+                    });
+                  }}
                   className="bg-transparent border-none outline-none text-right text-ellipsis"
                 />
                 <span>zAPT</span>
+              </span>
+            </div>
+            <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2 w-full">
+              <label
+                htmlFor="public_address"
+                className="text-left whitespace-nowrap "
+              >
+                Expected Return
+              </label>
+              <span className=" opacity-50 flex flex-row justify-center items-center gap-1">
+                <input
+                  id="public_address"
+                  placeholder={expectedReturnFromDeposit >= 0 ? expectedReturnFromDeposit.toFixed(2) : 'Invalid'}
+                  disabled
+                  className="bg-transparent border-none outline-none text-right text-ellipsis"
+                />
+                <span>shares</span>
               </span>
             </div>
             <button  
@@ -136,7 +185,7 @@ export default function PoolModal() {
             <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2 w-full">
               <label
                 htmlFor="public_address"
-                className="text-left "
+                className="text-left whitespace-nowrap"
               >
                 Withdraw Amount
               </label>
@@ -145,10 +194,46 @@ export default function PoolModal() {
                   id="public_address"
                   placeholder={`${balance?.toFixed(2) || parseInt('0').toFixed(2)}`}
                   value={withdrawAmount}
-                  onChange={(e) => setWithdrawAmount(e.target.value)}
+                  onChange={async (e) => {
+                    setWithdrawAmount(e.target.value)
+
+                    if (!account) return;
+
+                    if (e.target.value === '') {
+                      await simulateWithdraw(account, balance).then((txn) => {
+                        if (txn) {
+                          setExpectedReturnFromWithdraw(txn);
+                        }
+                      });
+                      return;
+                    }
+
+                    simulateWithdraw(account, parseFloat(e.target.value)).then((txn) => {
+                      if (txn) {
+                        setExpectedReturnFromWithdraw(txn);
+                      }
+                    });
+                  }}
                   className="bg-transparent border-none outline-none text-right text-ellipsis"
                 />
                 <span>shares</span>
+              </span>
+            </div>
+            <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2 w-full">
+              <label
+                htmlFor="public_address"
+                className="text-left  whitespace-nowrap"
+              >
+                Expected Return
+              </label>
+              <span className=" opacity-50 flex flex-row justify-center items-center gap-1">
+                <input
+                  id="public_address"
+                  placeholder={expectedReturnFromWithdraw >= 0 ? expectedReturnFromWithdraw.toFixed(2) : 'Invalid'}
+                  disabled
+                  className="bg-transparent border-none outline-none text-right text-ellipsis"
+                />
+                <span>zAPT</span>
               </span>
             </div>
             <button 
@@ -158,7 +243,7 @@ export default function PoolModal() {
               )}
               onClick={async () => {
                 if (!account) return;
-                const tx = await supplyPool(account, parseFloat(withdrawAmount));
+                const tx = await withdrawPool(account, parseFloat(withdrawAmount));
                 if (!tx) {
                   toast({
                     title: "Failed to withdraw funds",
