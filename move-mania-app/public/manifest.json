@@ -6,7 +6,7 @@
   "display": "standalone",
   "orientation": "portrait",
   "scope": "/",
-  "start_url": "/",
+  "start_url": "./?mode=standalone",
   "icons": [
     {
       "src": "icon-512x512.png",
