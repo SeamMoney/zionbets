@@ -1,4 +1,4 @@
-import { PlayerState } from "@/app/crash/playerList";
+import { PlayerState } from "@/app/playerList";
 import { createAptosKeyPair } from "./aptos";
 import { User } from "./schema";
 import { ChatMessage } from "./types";
