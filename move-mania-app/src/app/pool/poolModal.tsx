@@ -102,7 +102,7 @@ export default function PoolModal() {
             <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2 w-full">
               <label
                 htmlFor="public_address"
-                className="text-left whitespace-nowrap "
+                className="text-left "
               >
                 Deposit Amount
               </label>
@@ -140,7 +140,7 @@ export default function PoolModal() {
             <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2 w-full">
               <label
                 htmlFor="public_address"
-                className="text-left whitespace-nowrap "
+                className="text-left "
               >
                 Expected Return
               </label>
@@ -185,7 +185,7 @@ export default function PoolModal() {
             <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2 w-full">
               <label
                 htmlFor="public_address"
-                className="text-left whitespace-nowrap"
+                className="text-left"
               >
                 Withdraw Amount
               </label>
@@ -222,7 +222,7 @@ export default function PoolModal() {
             <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2 w-full">
               <label
                 htmlFor="public_address"
-                className="text-left  whitespace-nowrap"
+                className="text-left "
               >
                 Expected Return
               </label>
