@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Bai_Jamjuree, Inter } from "next/font/google";
 import "./globals.css";
-import ChatWindow from "./crash/chatWindow";
+import ChatWindow from "./chatWindow";
 import Link from "next/link";
 import AccountButton from "./accountButton";
 import BalanceButton from "./balanceButton";
