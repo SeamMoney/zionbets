@@ -1,6 +1,6 @@
 'use client';
 
-import { getDeposits, getExtracts, getLPCoinSupply, getLockedLPCoinSupply, getLocks, getPoolAptSupply, getPuts, getWithdrawals } from "@/lib/aptos";
+import { getCrashCalculationEvents, getDeposits, getExtracts, getLPCoinSupply, getLockedLPCoinSupply, getLocks, getPoolAptSupply, getPuts, getWithdrawals } from "@/lib/aptos";
 import { CrosshairMode, createChart } from "lightweight-charts";
 import { useEffect, useRef } from "react";
 
@@ -105,6 +105,10 @@ export default function PoolGraph() {
 
     getLockedLPCoinSupply().then((supply) => {
       console.log('locked lp coin supply: ', supply);
+    });
+
+    getCrashCalculationEvents().then((events) => {
+      console.log('events: ', events);
     });
   })
 
