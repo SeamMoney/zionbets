@@ -186,7 +186,7 @@ function CandlestickChart ({
         return () => clearInterval(interval);
     }, [])
 
-    return <div ref={chartContainerRef} className="h-[300px] lg:h-[500px] w-full border-b border-neutral-700 overflow-hidden" />
+    return <div ref={chartContainerRef} className="h-[300px] w-full border-b border-neutral-700 overflow-hidden" />
 };
 
 export default CandlestickChart;
