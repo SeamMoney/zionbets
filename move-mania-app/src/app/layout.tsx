@@ -56,6 +56,9 @@ export default function RootLayout({
                   {/* <Link href='/' className="text-white text-2xl font-bold font-TheNeue">ZION</Link> */}
                 </div>
                 <div className="flex flex-row gap-4 items-center">
+                  <Link href='/pool' className="bg-neutral-800 hover:bg-neutral-700 px-2 py-1 text-xs text-white font-semibold">
+                    Pool
+                  </Link>
                   <BalanceButton />
                   <AccountButton />
                 </div>
