@@ -117,7 +117,6 @@ export default function BalanceButton() {
               <input
                 id="public_address"
                 disabled
-                autoFocus={false}
                 value={account.public_address}
                 className="bg-transparent border-none outline-none text-right text-ellipsis cursor-not-allowed"
               />
@@ -145,7 +144,6 @@ export default function BalanceButton() {
               <span className=" opacity-50 flex flex-row justify-center items-center gap-1">
                 <input
                   id="public_address"
-                  autoFocus={false}
                   placeholder={`${balance?.toFixed(2) || parseInt('0').toFixed(2)}`}
                   value={parseFloat(transferAmount) > 0 ? transferAmount : ''}
                   onChange={(e) => setTransferAmount(e.target.value)}
@@ -164,7 +162,6 @@ export default function BalanceButton() {
               <span className=" opacity-50 flex flex-row justify-center items-center gap-1">
                 <input
                   id="public_address"
-                  autoFocus={false}
                   placeholder={account.public_address}
                   value={recipientAddress}
                   onChange={(e) => setRecipientAddress(e.target.value)}
