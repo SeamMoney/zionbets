@@ -220,7 +220,7 @@ export default function ControlCenter() {
             </div>
           </div>
         </div>
-        <div className="flex flex-row items-baseline gap-2 w-full">
+        <div className="flex flex-row items-baseline gap-2 w-full text-lg">
           {
             !account && (
               <button
@@ -365,7 +365,7 @@ export default function ControlCenter() {
             </div>
           </div>
         </div>
-        <div className="flex flex-row items-baseline gap-2 w-full">
+        <div className="flex flex-row items-baseline gap-2 w-full text-lg">
           {
             !account && (
               <button
