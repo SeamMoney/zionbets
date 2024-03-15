@@ -124,7 +124,7 @@ export default function AccountButton() {
                     />
                   </span>
                 </div>
-                <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
+                {/* <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
                   <label htmlFor="profile_pic" className="text-left ">
                     Profile picture
                   </label>
@@ -139,7 +139,7 @@ export default function AccountButton() {
                       className="bg-transparent border-none outline-none text-right text-ellipsis"
                     />
                   </span>
-                </div>
+                </div> */}
                 <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
                   <label htmlFor="email" className="text-left ">
                     Email
