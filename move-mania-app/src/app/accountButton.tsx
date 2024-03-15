@@ -18,7 +18,7 @@ import {
   updateUser,
 } from "@/lib/api";
 import { User } from "@/lib/schema";
-import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { Ellipsis, EyeIcon, EyeOffIcon } from "lucide-react";
 import { getSession, signIn, signOut } from "next-auth/react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -76,13 +76,14 @@ export default function AccountButton() {
       <Sheet>
         {account ? (
           <SheetTrigger className="flex flex-col items-center justify-center">
-            <Image 
+            {/* <Image 
               src={account.image}
               alt="Profile picture"
               width={36}
               height={36}
               className="block rounded-none hover:opacity-80"
-            />
+            /> */}
+            <Ellipsis />
           </SheetTrigger>
         ) : (
           <button
