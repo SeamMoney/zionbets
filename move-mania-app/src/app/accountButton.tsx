@@ -100,6 +100,7 @@ export default function AccountButton() {
           ) : (
             <>
               <SheetHeader>
+                <input type="text" autoFocus className="hidden" />
                 <SheetTitle>Edit profile</SheetTitle>
                 <SheetDescription>
                   Make changes to your profile here. Click save when you&apos;re
