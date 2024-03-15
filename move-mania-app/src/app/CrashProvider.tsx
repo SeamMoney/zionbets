@@ -194,7 +194,7 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
             <AlertDialogTitle>Add to Phone Home Screen</AlertDialogTitle>
             <AlertDialogDescription>
               For the best experience, add this app to your home screen. <br /><br />
-              In your browser menu, tap the <b>share</b> icon and choose <b>Add to Home Screen</b> in the options.
+              In your browser&apos;s menu, tap the <b>share</b> icon and choose <b>Add to Home Screen</b> in the options.
               Then open the zion.bet app on your home screen to play.
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -205,7 +205,7 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
                 localStorage.setItem("pwaPrompt", 'true');
               }}
               className="border border-red-700 px-6 py-1 text-red-500 bg-neutral-950 w-full focus:outline-none"
-            >I'll stay in my browser</AlertDialogCancel>
+            >I&apos;ll stay in my browser</AlertDialogCancel>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
