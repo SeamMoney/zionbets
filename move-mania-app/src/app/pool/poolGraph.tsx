@@ -66,6 +66,21 @@ export default function PoolGraph() {
         lineWidth: 2,
     });    
 
+    // Create some dummy data showing the zAPT supply of the pool over the last two months. Show the 
+    // supply increasing over time, with a few dips here and there. Not a regular pattern, but a
+    // general upward trend.
+    const data = [];
+    let value = 0;
+    for (let i = 0; i < 100; i++) {
+        const time = new Date(Date.now() - (100 - i) * 1000 * 60 * 60 * 24);
+        data.push({ time: time.toISOString().split('T')[0], value });
+        value += Math.random() * 10 - 2;
+    }
+
+    areaSeries.setData(data);
+
+    
+
     // Set timeout to update the chart every 100ms with the next data point
     const interval = setInterval(() => {
         
