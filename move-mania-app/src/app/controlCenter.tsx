@@ -7,6 +7,12 @@ import {
   hasUserCashOut,
   setUpAndGetUser,
 } from "@/lib/api";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 import { User } from "@/lib/schema";
 import { cashOutBet, setNewBet, startRound } from "@/lib/socket";
 import { RoundStart, SOCKET_EVENTS } from "@/lib/types";
@@ -159,7 +165,7 @@ export default function ControlCenter() {
   };
 
   return (
-    <div className="w-full h-full flex flex-col gap-4 items-start gap-1 p-2">
+    <div className="w-full h-full flex flex-col gap-4 items-start p-2">
       <div className=" flex flex-col items-start justify-around px-2 gap-2 w-full">
         <div className="flex flex-col gap-1 w-full">
           <div className="flex flex-row justify-between px-4 py-2 border border-neutral-700 bg-neutral-800/20 bg-noise w-full">
@@ -292,112 +298,120 @@ export default function ControlCenter() {
         </div>
       </div>
 
-
-      <div className=" flex flex-col items-start justify-around px-2 gap-2 w-full">
-        <div className="flex flex-col gap-1 w-full">
-          <div className="flex flex-row justify-between px-4 py-2 border border-neutral-700 bg-neutral-800/20 bg-noise">
-            <span className="font-light">AUTO CASHOUT @</span>
-            <span className="opacity-50 flex flex-row justify-center items-center gap-0">
-              <input
-                className="bg-transparent border-none outline-none text-right max-w-[40px]"
-                value={autoCashoutAmount}
-                onChange={(e) => {
-                  setAutoCashout(false);
-                  setAutoCashoutAmount(e.target.value);
-                }}
-                placeholder="2.50"
-              ></input>
-              <span>x</span>
-            </span>
-          </div>
-          <div className="flex flex-row items-center text-xs">
-            <div
-              className={`text-center border px-2 py-1 cursor-pointer grow ${
-                parseFloat(autoCashoutAmount) === 1.01
-                  ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
-                  : "opacity-50 border-neutral-700"
-              }`}
-              onClick={() => {
-                setAutoCashout(false);
-                setAutoCashoutAmount("1.01");
-              }}
-            >
-              1.01x
-            </div>
-            <div
-              className={`text-center border px-2 py-1 cursor-pointer grow ${
-                parseFloat(autoCashoutAmount) === 1.5
-                  ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
-                  : "opacity-50 border-neutral-700"
-              }`}
-              onClick={() => {
-                setAutoCashout(false);
-                setAutoCashoutAmount("1.5");
-              }}
-            >
-              1.5x
-            </div>
-            <div
-              className={`text-center border px-2 py-1 cursor-pointer grow ${
-                parseFloat(autoCashoutAmount) === 2
-                  ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
-                  : "opacity-50 border-neutral-700"
-              }`}
-              onClick={() => {
-                setAutoCashout(false);
-                setAutoCashoutAmount("2");
-              }}
-            >
-              2x
-            </div>
-            <div
-              className={`text-center border px-2 py-1 cursor-pointer grow ${
-                parseFloat(autoCashoutAmount) === 5
-                  ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
-                  : "opacity-50 border-neutral-700"
-              }`}
-              onClick={() => {
-                setAutoCashout(false);
-                setAutoCashoutAmount("5");
-              }}
-            >
-              5x
-            </div>
-          </div>
-        </div>
-        <div className="flex flex-row items-baseline gap-2 w-full text-lg">
-          {
-            !account && (
-              <button
-                className="border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 cursor-not-allowed w-full"
-                disabled
-              >
-                Log in to set auto cash out
-              </button>
-            )
-          }
-          {
-            account && (
-              <button
-                className={cn(
-                  "border bg-[#404226]/40 border-yellow-700 text-yellow-500 px-6 py-1 w-full",
-                  autoCashout && autoCashoutAmount && "bg-[#264234]/40 border-green-700 text-green-500",
-                  !(parseFloat(autoCashoutAmount) > 0) && "bg-neutral-950"
-                )}
-                onClick={() => {
-                  setAutoCashout(!autoCashout);
-            
-                }}
-              >
+      <Accordion type="single" collapsible className="w-full px-2">
+        <AccordionItem value="item-1">
+          <AccordionTrigger className="opacity-50">Advanced mode</AccordionTrigger>
+          <AccordionContent>
+            <div className=" flex flex-col items-start justify-around pt-2 gap-2 w-full">
+              <div className="flex flex-col gap-1 w-full">
+                <div className="flex flex-row justify-between px-4 py-2 border border-neutral-700 bg-neutral-800/20 bg-noise">
+                  <span className="font-light">AUTO CASHOUT @</span>
+                  <span className="opacity-50 flex flex-row justify-center items-center gap-0">
+                    <input
+                      className="bg-transparent border-none outline-none text-right max-w-[40px]"
+                      value={autoCashoutAmount}
+                      onChange={(e) => {
+                        setAutoCashout(false);
+                        setAutoCashoutAmount(e.target.value);
+                      }}
+                      placeholder="2.50"
+                    ></input>
+                    <span>x</span>
+                  </span>
+                </div>
+                <div className="flex flex-row items-center text-xs">
+                  <div
+                    className={`text-center border px-2 py-1 cursor-pointer grow ${
+                      parseFloat(autoCashoutAmount) === 1.01
+                        ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
+                        : "opacity-50 border-neutral-700"
+                    }`}
+                    onClick={() => {
+                      setAutoCashout(false);
+                      setAutoCashoutAmount("1.01");
+                    }}
+                  >
+                    1.01x
+                  </div>
+                  <div
+                    className={`text-center border px-2 py-1 cursor-pointer grow ${
+                      parseFloat(autoCashoutAmount) === 1.5
+                        ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
+                        : "opacity-50 border-neutral-700"
+                    }`}
+                    onClick={() => {
+                      setAutoCashout(false);
+                      setAutoCashoutAmount("1.5");
+                    }}
+                  >
+                    1.5x
+                  </div>
+                  <div
+                    className={`text-center border px-2 py-1 cursor-pointer grow ${
+                      parseFloat(autoCashoutAmount) === 2
+                        ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
+                        : "opacity-50 border-neutral-700"
+                    }`}
+                    onClick={() => {
+                      setAutoCashout(false);
+                      setAutoCashoutAmount("2");
+                    }}
+                  >
+                    2x
+                  </div>
+                  <div
+                    className={`text-center border px-2 py-1 cursor-pointer grow ${
+                      parseFloat(autoCashoutAmount) === 5
+                        ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
+                        : "opacity-50 border-neutral-700"
+                    }`}
+                    onClick={() => {
+                      setAutoCashout(false);
+                      setAutoCashoutAmount("5");
+                    }}
+                  >
+                    5x
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-row items-baseline gap-2 w-full text-lg">
                 {
-                  autoCashout ? "Turn off auto cashout" : parseFloat(autoCashoutAmount) > 0 ? "Turn on auto cashout" : "Enter auto cashout amount"
+                  !account && (
+                    <button
+                      className="border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 cursor-not-allowed w-full"
+                      disabled
+                    >
+                      Log in to set auto cash out
+                    </button>
+                  )
                 }
-              </button>
-            )
-          }
-        </div>
-      </div>
+                {
+                  account && (
+                    <button
+                      className={cn(
+                        "border bg-[#404226]/40 border-yellow-700 text-yellow-500 px-6 py-1 w-full",
+                        autoCashout && autoCashoutAmount && "bg-[#264234]/40 border-green-700 text-green-500",
+                        !(parseFloat(autoCashoutAmount) > 0) && "bg-neutral-950"
+                      )}
+                      onClick={() => {
+                        setAutoCashout(!autoCashout);
+                  
+                      }}
+                    >
+                      {
+                        autoCashout ? "Turn off auto cashout" : parseFloat(autoCashoutAmount) > 0 ? "Turn on auto cashout" : "Enter auto cashout amount"
+                      }
+                    </button>
+                  )
+                }
+              </div>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
 
+
+      
 
     </div>
   );
