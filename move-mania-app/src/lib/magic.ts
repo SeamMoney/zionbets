@@ -33,9 +33,21 @@ export const magicLogin = async (phoneNumber: string) => {
      });
      console.log(`DID Token: ${did}`);
 
-     const userInfo = await magic.user.getInfo();
-     console.log(`UserInfo: ${userInfo}`);
+     return did;
   } catch(e) {
     console.log('Error logging in', e);
+    return null;
+  }
+}
+
+export const magicLogout = async () => {
+  const errorMessage  = "Error creating magic instance while trying to log out"
+  if (magic === false) {
+      throw new Error(errorMessage)
+  }
+  try {
+      await magic.user.logout()
+  } catch (error) {
+      throw new Error(error as string)
   }
 }

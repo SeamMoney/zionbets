@@ -20,36 +20,18 @@ import { magicLogin } from "@/lib/magic";
 
 export default function NavbarDropdown() {
 
-  const [account, setAccount] = useState<User | null>(null);
-
-  useEffect(() => {
-    getSession().then((session) => {
-      if (session) {
-        if (!session.user) return;
-
-        setUpAndGetUser({
-          username: session.user.name || "",
-          image: session.user.image || "",
-          email: session.user.email || "",
-        }).then((user) => {
-          if (user) {
-            setAccount(user);
-          }
-        });
-      }
-    });
-  }, []);
+  const { isLoggedIn } = useContext(magicContext);
 
   return (
     <div className="flex flex-row items-center gap-2">
       {
-        !account && 
+        !isLoggedIn && 
         <button
           className="bg-white px-6 py-1 text-neutral-950"
           onClick={async () => {
             console.log('logging in')
-            await magicLogin('+12062299029')
-            console.log('logged in')
+            const res = await magicLogin('+12062299029')
+            console.log('res', res)
           }}
         >
           Sign in
