@@ -13,7 +13,9 @@ import { User } from "@/lib/schema";
 import { Ellipsis } from "lucide-react";
 import { getSession, signIn } from "next-auth/react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { magicContext } from "./MagicProvider";
+import { magicLogin } from "@/lib/magic";
 
 
 export default function NavbarDropdown() {
@@ -44,8 +46,10 @@ export default function NavbarDropdown() {
         !account && 
         <button
           className="bg-white px-6 py-1 text-neutral-950"
-          onClick={() => {
-            signIn("google");
+          onClick={async () => {
+            console.log('logging in')
+            await magicLogin('+12062299029')
+            console.log('logged in')
           }}
         >
           Sign in

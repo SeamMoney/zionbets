@@ -8,7 +8,7 @@ const CRASH_RESOURCE_ACCOUNT_ADDRESS = '0x44d6cd854567d0bb4fc23ee3df1cb7eec15fea
 const LP_RESOURCE_ACCOUNT_ADDRESS = '0xbdd5fb2899ba75294df3b6735b11a9565160e0d0b2327e9ec84979224cf31aa1'
 const Z_APT_RESOURCE_ACCOUNT_ADDRESS = '0x6fc171eb36807e956b56a5c8c7157968f8aee43299e35e6e45f477719c8acd4d';
 
-const RPC_URL = 'https://fullnode.random.aptoslabs.com';
+export const RPC_URL = 'https://fullnode.random.aptoslabs.com';
 const FAUCET_URL = 'https://faucet.random.aptoslabs.com';
 
 const client = new AptosClient(RPC_URL);
