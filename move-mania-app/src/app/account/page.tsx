@@ -145,7 +145,7 @@ export default function AccountPage() {
               {
                 COUNTRY_CODES.map((country) => {
                   return (
-                    <option key={country.code} value={country.iso} className="flex flex-row items-center">
+                    <option key={country.code} value={country.iso} className="flex flex-row items-center justify-end text-right">
                       <span>{country.iso} +{country.code} </span><ChevronDown className="w-4"/>
                     </option>
                   )
