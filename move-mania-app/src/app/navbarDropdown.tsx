@@ -16,6 +16,8 @@ import Link from "next/link";
 import { useContext, useEffect, useState } from "react";
 import { magicContext } from "./MagicProvider";
 import { magic, magicLogin, magicLogout } from "@/lib/magic";
+import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 
 
 export default function NavbarDropdown() {
@@ -66,14 +68,54 @@ export default function NavbarDropdown() {
       }
       {
         !isLoggedIn && 
-        <button
-          className="bg-white px-6 py-1 text-neutral-950"
-          onClick={handleLogin}
-        >
-          {
-            isLoggedIn === null ? 'Loading...' : 'Sign in'
-          }
-        </button>
+        
+        <Dialog>
+        <DialogTrigger asChild>
+          <button
+            className="bg-white px-6 py-1 text-neutral-950"
+          >
+            {
+              isLoggedIn === null ? 'Loading...' : 'Sign in'
+            }
+          </button>
+        </DialogTrigger>
+        <DialogContent className="bg-neutral-950">
+          <input type="text" autoFocus className="hidden" />
+          <DialogTitle>Get access to your Zion Bets account</DialogTitle>
+          <DialogDescription>
+            Enter your phone number to receive your one-time sign in code.
+          </DialogDescription>
+          <div className="flex flex-col items-end w-full w-full gap-2">
+            <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2 w-full">
+              <label
+                htmlFor="public_address"
+                className="text-left "
+              >
+                Phone
+              </label>
+              <span className=" opacity-50 flex flex-row justify-center items-center gap-1">
+                <span>APT</span>  
+                <input
+                  id="public_address"
+                  placeholder="(210)555-0123"
+                  // value={parseFloat(transferAmount) > 0 ? transferAmount : ''}
+                  // onChange={(e) => setTransferAmount(e.target.value)}
+                  className="bg-transparent border-none outline-none text-right text-ellipsis"
+                />
+              </span>
+            </div>
+            <button 
+              className={cn(
+                "border border-yellow-700 px-6 py-1 text-yellow-500 bg-neutral-950",
+                // parseFloat(transferAmount) > 0 && balance && parseFloat(transferAmount) <= balance && recipientAddress != '' && 'bg-[#404226]/40'
+              )}
+              onClick={handleLogin}
+            >
+              Submit
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
       }
       <DropdownMenu>
         <DropdownMenuTrigger><Ellipsis /></DropdownMenuTrigger>
