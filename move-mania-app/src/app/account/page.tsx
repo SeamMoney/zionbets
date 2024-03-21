@@ -179,7 +179,7 @@ export default function AccountPage() {
   return (
     <div className="px-2 pt-4">
       <div>
-        <input type="text" autoFocus className="hidden" />
+        {/* <input type="text" autoFocus className="hidden" /> */}
         <span className="text-lg">Edit profile</span>
         <p className="text-sm opacity-50">
           Make changes to your profile here. Click save when you&apos;re
