@@ -8,6 +8,8 @@ import { getSession, signOut } from "next-auth/react";
 import { useContext, useEffect, useState } from "react";
 import { magicContext } from "../MagicProvider";
 import { cn } from "@/lib/utils";
+import { COUNTRY_CODES } from "@/lib/utils";
+import { count } from "console";
 
 
 export default function AccountPage() {
@@ -22,7 +24,6 @@ export default function AccountPage() {
   const { isLoggedIn, userInfo, setIsLoggedIn, setUserInfo } = useContext(magicContext);
 
   const [ phone, setPhone ] = useState<string>('');
-  const [ countryCode, setCountryCode ] = useState<string>('1');
 
   const handleLogin = async () => {
     console.log('logging in')
@@ -34,6 +35,9 @@ export default function AccountPage() {
     }
 
     console.log('deformatedPhone', deformatedPhone)
+
+    const countryIso = (document.getElementById('countries') as any).value;
+    const countryCode = COUNTRY_CODES.find((country) => country.iso === countryIso)?.code;
 
     const res = await magicLogin(`+${countryCode}${deformatedPhone}`);
     console.log('res', res)
@@ -137,7 +141,17 @@ export default function AccountPage() {
             Phone
           </label>
           <span className=" opacity-50 flex flex-row justify-center items-center gap-1">
-            <div className="flex flex-row items-center"><span>US + </span><ChevronDown className="w-4"/></div>  
+            <select name="countries" id="countries" defaultValue="US" className="bg-transparent text-right focus:ring-none focus:outline-0">
+              {
+                COUNTRY_CODES.map((country) => {
+                  return (
+                    <option key={country.code} value={country.iso} className="flex flex-row items-center">
+                      <span>{country.iso} +{country.code} </span><ChevronDown className="w-4"/>
+                    </option>
+                  )
+                })
+              }
+            </select>
             <input
               id="public_address"
               placeholder="(210)555-0123"

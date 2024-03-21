@@ -407,8 +407,4 @@ export const COUNTRY_CODES = [{"country":"Afghanistan","code":"93","iso":"AF"},
 {"country":"Western Sahara","code":"212","iso":"EH"},
 {"country":"Yemen","code":"967","iso":"YE"},
 {"country":"Zambia","code":"260","iso":"ZM"},
-{"country":"Zimbabwe","code":"263","iso":"ZW"}] as {
-  country: string;
-  code: string;
-  iso: string;
-}[];
+{"country":"Zimbabwe","code":"263","iso":"ZW"}]
