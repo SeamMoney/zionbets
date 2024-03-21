@@ -1,6 +1,7 @@
 import { AptosAccount, AptosClient, FaucetClient, HexString, Provider } from "aptos";
 import { BetData, CashOutData } from "./types";
 import { User } from "./schema";
+import { magic } from "./magic";
 
 const MODULE_NAME = 'crash';
 const MODULE_ADDRESS = '0x840ccdef3d9c4b7c076a392d79bf2a87b9c3b6ed7b7f05f7b505df55f5f16cf6';
@@ -30,25 +31,17 @@ const TRANSACTION_OPTIONS = {
 
 const APT = 1_0000_0000;
 
-async function getUserAccount(userPrivateKey: string) {
-  return new AptosAccount(
-    new HexString(userPrivateKey).toUint8Array()
-  );
-}
-
 function getAdminAccount() {
   return new AptosAccount(
     new HexString(ADMIN_ACCOUNT_PRIVATE_KEY).toUint8Array()
   );
 }
 
-export async function getBalance(userPrivateKey: string, type: string) {
-  const userAccount = await getUserAccount(userPrivateKey);
-  console.log('userAccount: ', userAccount.address().toString());
+export async function getBalance(address: string, type: string) {
   const res = await provider.view({
     function: `0x1::coin::balance`,
     type_arguments: [type],
-    arguments: [userAccount.address().toString()],
+    arguments: [address],
   })
   console.log('res: ', res);
 
@@ -56,11 +49,14 @@ export async function getBalance(userPrivateKey: string, type: string) {
 
 }
 
-export async function transferCoin(userPrivateKey: string, amount: number, toAddress: string, type: string) {
-  const userAccount = await getUserAccount(userPrivateKey);
+export async function transferCoin(userInfo: User, amount: number, toAddress: string, type: string) {
+
+  if (!magic) {
+    return null;
+  }
 
   const txn = await provider.generateTransaction(
-    userAccount.address(),
+    userInfo.address,
     {
       function: `0x1::coin::transfer`,
       type_arguments: [type],
@@ -72,9 +68,11 @@ export async function transferCoin(userPrivateKey: string, amount: number, toAdd
     TRANSACTION_OPTIONS
   );
 
-  const tx = await provider.signAndSubmitTransaction(userAccount, txn);
+  const tx = await magic.aptos.signTransaction(userInfo.address, txn as any);
 
-  const txResult = await client.waitForTransactionWithResult(tx);
+  const txResult = await client.waitForTransactionWithResult(
+    new TextDecoder().decode(tx)
+  );
 
   console.log(txResult);
 
@@ -474,7 +472,7 @@ export async function simulateDeposit(user: User, amount: number) {
       }
     });
 
-    return lp_coin_received - await getBalance(user.private_key, '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83::liquidity_pool::LPCoin');
+    return lp_coin_received - await getBalance(user.address, '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83::liquidity_pool::LPCoin');
   } catch (e) {
     console.error(e);
     return -1;
@@ -515,7 +513,7 @@ export async function simulateWithdraw(user: User, amount: number) {
       }
     });
 
-    return apt_received - await getBalance(user.private_key, '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83::z_apt::ZAPT');
+    return apt_received - await getBalance(user.address, '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83::z_apt::ZAPT');
   } catch (e) {
     console.error(e);
     return -1;

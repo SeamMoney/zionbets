@@ -40,10 +40,9 @@ export default function BalanceButton() {
         // console.log('Checking for updates')
         getUser(userInfo.address).then((user) => {
           if (user) {
-            // console.log('balance: ', user.balance)
-            // getBalance(user.private_key, '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83::z_apt::ZAPT').then((balance) => {
-            //   setBalance(balance);
-            // });
+            getBalance(user.address, '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83::z_apt::ZAPT').then((balance) => {
+              setBalance(balance);
+            });
           }
         });
       }, 1000);
@@ -55,20 +54,20 @@ export default function BalanceButton() {
 
     if (!isLoggedIn || !userInfo) return;
 
-    // const tx = await transferCoin(userInfo.private_key, parseFloat(transferAmount), recipientAddress, '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83::z_apt::ZAPT');
+    const tx = await transferCoin(userInfo.private_key, parseFloat(transferAmount), recipientAddress, '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83::z_apt::ZAPT');
 
-    // if (!tx) {
-    //   toast({
-    //     title: "Failed to withdraw funds",
-    //   });
-    //   return;
-    // }
+    if (!tx) {
+      toast({
+        title: "Failed to withdraw funds",
+      });
+      return;
+    }
 
-    // withdraw funds
-    // toast({
-    //   title: "Funds withdrawn",
-    //   description: <Link href={`https://explorer.aptoslabs.com/txn/${tx.version}/?network=randomnet`} target="_blank" className="underline">View transaction</Link>
-    // })
+    withdraw funds
+    toast({
+      title: "Funds withdrawn",
+      description: <Link href={`https://explorer.aptoslabs.com/txn/${tx.version}/?network=randomnet`} target="_blank" className="underline">View transaction</Link>
+    })
   }
   
   if (isLoggedIn && userInfo) {

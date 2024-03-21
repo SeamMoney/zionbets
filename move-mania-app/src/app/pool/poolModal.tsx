@@ -58,23 +58,23 @@ export default function PoolModal() {
   //     }
   //   });
 
-    getLPCoinSupply().then((supply) => {
-      setLpCoinSupply(supply)
-    });
-  }, []);
+  //   getLPCoinSupply().then((supply) => {
+  //     setLpCoinSupply(supply)
+  //   });
+  // }, []);
 
   useEffect(() => {
     if (account) {
       const interval = setInterval(() => {
         // console.log('Checking for updates')
-        getUser(account.email).then((user) => {
+        getUser(account.address).then((user) => {
           if (user) {
             // console.log('balance: ', user.balance)
             setAccount(user);
-            getBalance(user.private_key, '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83::liquidity_pool::LPCoin').then((balance) => {
+            getBalance(user.address, '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83::liquidity_pool::LPCoin').then((balance) => {
               setBalance(balance);
             });
-            getBalance(user.private_key, '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83::z_apt::ZAPT').then((balance) => {
+            getBalance(user.address, '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83::z_apt::ZAPT').then((balance) => {
               setAptBalance(balance);
             });
           }

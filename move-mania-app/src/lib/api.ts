@@ -33,13 +33,17 @@ export async function setUpUser(
       },
       body: JSON.stringify(userToSetup),
     });
+
+    console.log('funding account')
+    await fundAccountWithGas(userToSetup.address);
+    console.log('minting zapt')
+    await mintUserZAPT(userToSetup.address, 100);
     return response.ok;
   } catch (e) {
     return false;
   }
 
-  // await fundAccountWithGas(userToSetup.address);
-  // await mintUserZAPT(userToSetup.address, 100);
+  
 
   return true;
 }
