@@ -24,9 +24,21 @@ export default function NavbarDropdown() {
 
   const { isLoggedIn, setIsLoggedIn, setUserInfo } = useContext(magicContext);
 
+  const [ phone, setPhone ] = useState<string>('');
+  const [ countryCode, setCountryCode ] = useState<string>('1');
+
   const handleLogin = async () => {
     console.log('logging in')
-    const res = await magicLogin('+12062299029')
+
+    const deformatedPhone = phone.replace(/[^0-9]/g, '');
+    if (deformatedPhone.length < 10) {
+      console.error('Invalid phone number');
+      return;
+    }
+
+    console.log('deformatedPhone', deformatedPhone)
+
+    const res = await magicLogin(`+${countryCode}${deformatedPhone}`);
     console.log('res', res)
 
     if (!magic) {
@@ -50,6 +62,25 @@ export default function NavbarDropdown() {
         })
       }
     });
+  }
+
+  /**
+   *
+   * @param phone the phone number to format
+   * 
+   * @returns the formatted phone number in the format (210)555-0123. If the phone number is less 
+   * than 10 digits, it will return the phone number as formatted as possible. Such as (210)5 or
+   * (210)555-012 or (21
+   */
+  const formatPhoneNumberInput = (phone: string) => {
+    const formatted = phone.replace(/[^0-9]/g, '');
+    if (formatted.length < 4) {
+      return `(${formatted}`;
+    } else if (formatted.length < 7) {
+      return `(${formatted.slice(0, 3)})${formatted.slice(3)}`;
+    } else {
+      return `(${formatted.slice(0, 3)})${formatted.slice(3, 6)}-${formatted.slice(6, 10)}`;
+    }
   }
 
 
@@ -98,9 +129,9 @@ export default function NavbarDropdown() {
                 <input
                   id="public_address"
                   placeholder="(210)555-0123"
-                  // value={parseFloat(transferAmount) > 0 ? transferAmount : ''}
-                  // onChange={(e) => setTransferAmount(e.target.value)}
-                  className="bg-transparent border-none outline-none text-right text-ellipsis"
+                  value={formatPhoneNumberInput(phone)}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="bg-transparent border-none outline-none text-left text-ellipsis"
                 />
               </span>
             </div>
