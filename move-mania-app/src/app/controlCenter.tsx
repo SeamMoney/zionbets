@@ -59,11 +59,11 @@ export default function ControlCenter() {
 
   useEffect(() => {
     if (isLoggedIn && userInfo) {
-      hasUserBet(userInfo.phoneNumber).then((bet) => {
+      hasUserBet(userInfo.address).then((bet) => {
         setHasBet(bet);
       });
 
-      hasUserCashOut(userInfo.phoneNumber).then((cashout) => {
+      hasUserCashOut(userInfo.address).then((cashout) => {
         setHasCashOut(cashout);
       });
 
@@ -96,9 +96,9 @@ export default function ControlCenter() {
       title: "Placing bet at " + betAmount + " zAPT...",
     })
 
-    const blockchainRes = await placeBet(account, {
+    const blockchainRes = await placeBet(userInfo, {
       roundId: 1,
-      playerEmail: account.email || "",
+      playerEmail: userInfo.address,
       betAmount: parseFloat(betAmount),
       coinType: "APT",
     })
@@ -114,7 +114,7 @@ export default function ControlCenter() {
 
     const data = {
       roundId: 1,
-      playerEmail: account.email || "",
+      playerEmail: userInfo.address,
       betAmount: parseFloat(betAmount),
       coinType: "APT",
     };
@@ -129,7 +129,7 @@ export default function ControlCenter() {
   const onCashOut = async () => {
     if (!socket) return;
 
-    if (!account) return;
+    if (!isLoggedIn || !userInfo) return;
 
     if (!gameStatus?.startTime) return;
 
@@ -140,9 +140,9 @@ export default function ControlCenter() {
     })
 
 
-    const blockchainRes = await cashOut(account, {
+    const blockchainRes = await cashOut(userInfo, {
       roundId: 1,
-      playerEmail: account.email,
+      playerEmail: userInfo.address,
       cashOutMultiplier: cashoutMultipler,
     });
 
@@ -157,7 +157,7 @@ export default function ControlCenter() {
 
     const data = {
       roundId: 1,
-      playerEmail: account.email || "",
+      playerEmail: userInfo.address,
       cashOutMultiplier: cashoutMultipler,
     };
     const succes = cashOutBet(data);
@@ -233,17 +233,19 @@ export default function ControlCenter() {
         </div>
         <div className="flex flex-row items-baseline gap-2 w-full text-lg">
           {
-            !account && (
+            !isLoggedIn && (
               <button
                 className="border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 cursor-not-allowed w-full"
                 disabled
               >
-                Log in to play
+                {
+                  isLoggedIn == null ? "Loading..." : "Log in to place bet"
+                }
               </button>
             )
           }
           {
-            account && gameStatus?.status === "COUNTDOWN" && (
+            isLoggedIn && userInfo && gameStatus?.status === "COUNTDOWN" && (
               <button
                 className={cn(
                   "border border-green-700 px-6 py-1 border-yellow-700 text-yellow-500 bg-neutral-950 w-full",
@@ -262,7 +264,7 @@ export default function ControlCenter() {
             )
           }
           {
-            account && gameStatus?.status === "IN_PROGRESS" && hasBet &&  (
+            isLoggedIn && userInfo && gameStatus?.status === "IN_PROGRESS" && hasBet &&  (
               <button
                 className={cn(
                   "border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 w-full ",
@@ -281,7 +283,7 @@ export default function ControlCenter() {
             )
           }
           {
-            account && gameStatus?.status === "IN_PROGRESS" && !hasBet &&  (
+            isLoggedIn && userInfo && gameStatus?.status === "IN_PROGRESS" && !hasBet &&  (
               <button
                 className="border px-6 py-1 border-yellow-700 text-yellow-500 bg-neutral-950 cursor-not-allowed w-full"
                 disabled
@@ -291,7 +293,7 @@ export default function ControlCenter() {
             )
           }
           {
-            account && gameStatus?.status === "END" && (
+            isLoggedIn && userInfo && gameStatus?.status === "END" && (
               <button
                 className="border border-yellow-700 px-6 py-1 text-yellow-500 bg-neutral-950 cursor-not-allowed w-full"
                 disabled
@@ -381,17 +383,19 @@ export default function ControlCenter() {
               </div>
               <div className="flex flex-row items-baseline gap-2 w-full text-lg">
                 {
-                  !account && (
+                  !isLoggedIn && (
                     <button
                       className="border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 cursor-not-allowed w-full"
                       disabled
                     >
-                      Log in to set auto cash out
+                      {
+                        isLoggedIn == null ? "Loading..." : "Log in to set auto cash out"
+                      }
                     </button>
                   )
                 }
                 {
-                  account && (
+                  isLoggedIn && userInfo && (
                     <button
                       className={cn(
                         "border bg-[#404226]/40 border-yellow-700 text-yellow-500 px-6 py-1 w-full",
