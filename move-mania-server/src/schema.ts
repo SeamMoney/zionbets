@@ -8,6 +8,7 @@ export type Game = {
   start_time: number;
   secret_crash_point: number;
   status: "IN_PROGRESS" | "END";
+  txnHash: string | null;
 };
 
 export type PlayerListEntry = {
@@ -34,7 +35,8 @@ export const GameSchema = `CREATE TABLE IF NOT EXISTS games (
   game_id TEXT PRIMARY KEY,
   start_time TIMESTAMP,
   secret_crash_point FLOAT,
-  status TEXT CHECK (status IN ('IN_PROGRESS', 'ENDED'))
+  status TEXT CHECK (status IN ('IN_PROGRESS', 'ENDED')),
+  txnHash TEXT default NULL
 )`;
 
 export const PlayerListSchema = `CREATE TABLE IF NOT EXISTS player_list (
