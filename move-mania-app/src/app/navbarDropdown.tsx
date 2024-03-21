@@ -22,6 +22,35 @@ export default function NavbarDropdown() {
 
   const { isLoggedIn, setIsLoggedIn, setUserInfo } = useContext(magicContext);
 
+  const handleLogin = async () => {
+    console.log('logging in')
+    const res = await magicLogin('+12062299029')
+    console.log('res', res)
+
+    if (!magic) {
+      console.error('Magic not yet initialized');
+      return;
+    }
+    console.log('magic', magic)
+    magic.user.isLoggedIn().then((isLoggedIn) => {
+      console.log('isLoggedIn', isLoggedIn)
+      setIsLoggedIn(isLoggedIn);
+
+      if (!magic) {
+        console.error('Magic not yet initialized');
+        return;
+      }
+
+      if (isLoggedIn) {
+        magic.user.getMetadata().then((metadata) => {
+          console.log('metadata', metadata)
+          setUserInfo(metadata);
+        })
+      }
+    });
+  }
+
+
   return (
     <div className="flex flex-row items-center gap-2">
       {
@@ -39,33 +68,7 @@ export default function NavbarDropdown() {
         !isLoggedIn && 
         <button
           className="bg-white px-6 py-1 text-neutral-950"
-          onClick={async () => {
-            console.log('logging in')
-            const res = await magicLogin('+12062299029')
-            console.log('res', res)
-
-            if (!magic) {
-              console.error('Magic not yet initialized');
-              return;
-            }
-            console.log('magic', magic)
-            magic.user.isLoggedIn().then((isLoggedIn) => {
-              console.log('isLoggedIn', isLoggedIn)
-              setIsLoggedIn(isLoggedIn);
-        
-              if (!magic) {
-                console.error('Magic not yet initialized');
-                return;
-              }
-        
-              if (isLoggedIn) {
-                magic.user.getMetadata().then((metadata) => {
-                  console.log('metadata', metadata)
-                  setUserInfo(metadata);
-                })
-              }
-            });
-          }}
+          onClick={handleLogin}
         >
           {
             isLoggedIn === null ? 'Loading...' : 'Sign in'
