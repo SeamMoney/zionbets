@@ -141,7 +141,7 @@ export default function AccountPage() {
             Phone
           </label>
           <span className=" opacity-50 flex flex-row justify-center items-center gap-1">
-            <select name="countries" id="countries" defaultValue="US" className="bg-transparent text-right focus:ring-none focus:outline-0">
+            <select name="countries" id="countries" defaultValue="US" className="bg-transparent text-right focus:ring-none focus:outline-0 max-w-[100px]">
               {
                 COUNTRY_CODES.map((country) => {
                   return (
