@@ -20,7 +20,7 @@ export const magicContext = createContext<MagicProviderProps>({
 
 export default function MagicProvider({ children }: { children: React.ReactNode }) {
 
-  const [ isLoggedIn, setIsLoggedIn ] = useState<boolean | null>(false);
+  const [ isLoggedIn, setIsLoggedIn ] = useState<boolean | null>(null);
   const [ userInfo, setUserInfo ] = useState<any>(null);
 
   useEffect(() => {

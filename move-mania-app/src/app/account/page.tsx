@@ -1,10 +1,13 @@
 'use client';
 
 import { setUpAndGetUser, updateUser } from "@/lib/api";
+import { magic, magicLogin } from "@/lib/magic";
 import { User } from "@/lib/schema";
-import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { ChevronDown, EyeIcon, EyeOffIcon } from "lucide-react";
 import { getSession, signOut } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { magicContext } from "../MagicProvider";
+import { cn } from "@/lib/utils";
 
 
 export default function AccountPage() {
@@ -15,6 +18,67 @@ export default function AccountPage() {
 
   const [username, setUsername] = useState("");
   const [image, setImage] = useState("");
+
+  const { isLoggedIn, userInfo, setIsLoggedIn, setUserInfo } = useContext(magicContext);
+
+  const [ phone, setPhone ] = useState<string>('');
+  const [ countryCode, setCountryCode ] = useState<string>('1');
+
+  const handleLogin = async () => {
+    console.log('logging in')
+
+    const deformatedPhone = phone.replace(/[^0-9]/g, '');
+    if (deformatedPhone.length < 10) {
+      console.error('Invalid phone number');
+      return;
+    }
+
+    console.log('deformatedPhone', deformatedPhone)
+
+    const res = await magicLogin(`+${countryCode}${deformatedPhone}`);
+    console.log('res', res)
+
+    if (!magic) {
+      console.error('Magic not yet initialized');
+      return;
+    }
+    console.log('magic', magic)
+    magic.user.isLoggedIn().then((isLoggedIn) => {
+      console.log('isLoggedIn', isLoggedIn)
+      setIsLoggedIn(isLoggedIn);
+
+      if (!magic) {
+        console.error('Magic not yet initialized');
+        return;
+      }
+
+      if (isLoggedIn) {
+        magic.user.getMetadata().then((metadata) => {
+          console.log('metadata', metadata)
+          setUserInfo(metadata);
+        })
+      }
+    });
+  }
+
+  /**
+   *
+   * @param phone the phone number to format
+   * 
+   * @returns the formatted phone number in the format (210)555-0123. If the phone number is less 
+   * than 10 digits, it will return the phone number as formatted as possible. Such as (210)5 or
+   * (210)555-012 or (21
+   */
+  const formatPhoneNumberInput = (phone: string) => {
+    const formatted = phone.replace(/[^0-9]/g, '');
+    if (formatted.length < 4) {
+      return `(${formatted}`;
+    } else if (formatted.length < 7) {
+      return `(${formatted.slice(0, 3)})${formatted.slice(3)}`;
+    } else {
+      return `(${formatted.slice(0, 3)})${formatted.slice(3, 6)}-${formatted.slice(6, 10)}`;
+    }
+  }
 
   useEffect(() => {
     getSession().then((session) => {
@@ -52,7 +116,51 @@ export default function AccountPage() {
     setAccount(user);
   };
 
-  if (!account) return <></>;
+  if (isLoggedIn === null) return (
+    <div className="px-2 pt-4">
+      <span className="text-lg">Loading...</span>
+    </div>
+  )
+
+  if (!isLoggedIn || !userInfo) return (
+    <div className="px-2 pt-4">
+      <span className="text-lg">Get access to your Zion Bets account</span>
+      <p className="text-sm opacity-50">
+        Enter your phone number to receive your one-time sign in code.
+      </p>
+      <div className="flex flex-col items-end w-full w-full gap-2 mt-8">
+        <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2 w-full">
+          <label
+            htmlFor="public_address"
+            className="text-left "
+          >
+            Phone
+          </label>
+          <span className=" opacity-50 flex flex-row justify-center items-center gap-1">
+            <div className="flex flex-row items-center"><span>US + </span><ChevronDown className="w-4"/></div>  
+            <input
+              id="public_address"
+              placeholder="(210)555-0123"
+              value={formatPhoneNumberInput(phone)}
+              onChange={(e) => setPhone(e.target.value)}
+              className="bg-transparent border-none outline-none text-left text-ellipsis"
+              autoFocus
+              inputMode="numeric"
+            />
+          </span>
+        </div>
+        <button 
+          className={cn(
+            "border border-yellow-700 px-6 py-1 text-yellow-500 bg-neutral-950",
+            // parseFloat(transferAmount) > 0 && balance && parseFloat(transferAmount) <= balance && recipientAddress != '' && 'bg-[#404226]/40'
+          )}
+          onClick={handleLogin}
+        >
+          Submit
+        </button>
+      </div>
+    </div>
+  );
 
   return (
     <div className="px-2 pt-4">
@@ -76,7 +184,7 @@ export default function AccountPage() {
               onChange={(e) => {
                 setUsername(e.target.value);
               }}
-              placeholder={account.username}
+              // placeholder={account.username}
               className="bg-transparent border-none outline-none text-right text-ellipsis"
             />
           </span>
@@ -105,7 +213,7 @@ export default function AccountPage() {
             <input
               id="email"
               disabled
-              value={account.email}
+              // value={account.email}
               className="bg-transparent border-none outline-none text-right text-ellipsis cursor-not-allowed"
             />
           </span>
@@ -121,7 +229,7 @@ export default function AccountPage() {
             <input
               id="public_address"
               disabled
-              value={account.public_address}
+              // value={account.public_address}
               className="bg-transparent border-none outline-none text-right text-ellipsis cursor-not-allowed"
             />
           </span>
@@ -138,7 +246,7 @@ export default function AccountPage() {
               id="private_key"
               hidden={!privateKeyVisible}
               disabled
-              value={account.private_key}
+              // value={account.private_key}
               className="bg-transparent border-none outline-none text-right text-ellipsis w-[170px] cursor-not-allowed"
             />
             {!privateKeyVisible ? (
