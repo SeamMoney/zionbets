@@ -8,6 +8,8 @@ const CRASH_RESOURCE_ACCOUNT_ADDRESS = '0x44d6cd854567d0bb4fc23ee3df1cb7eec15fea
 const LP_RESOURCE_ACCOUNT_ADDRESS = '0xbdd5fb2899ba75294df3b6735b11a9565160e0d0b2327e9ec84979224cf31aa1'
 const Z_APT_RESOURCE_ACCOUNT_ADDRESS = '0x6fc171eb36807e956b56a5c8c7157968f8aee43299e35e6e45f477719c8acd4d';
 
+const ADMIN_ACCOUNT_PRIVATE_KEY = '0xad136a5224a592705a0f7a18e63ee16653a871e209b3a0b12b1c34dbf2ad6c6a';
+
 export const RPC_URL = 'https://fullnode.random.aptoslabs.com';
 const FAUCET_URL = 'https://faucet.random.aptoslabs.com';
 
@@ -35,6 +37,12 @@ async function getUserAccount(userPrivateKey: string) {
   );
 }
 
+function getAdminAccount() {
+  return new AptosAccount(
+    new HexString(ADMIN_ACCOUNT_PRIVATE_KEY).toUint8Array()
+  );
+}
+
 export async function getBalance(userPrivateKey: string, type: string) {
   const userAccount = await getUserAccount(userPrivateKey);
   console.log('userAccount: ', userAccount.address().toString());
@@ -49,7 +57,7 @@ export async function getBalance(userPrivateKey: string, type: string) {
 
 }
 
-export async function transferApt(userPrivateKey: string, amount: number, toAddress: string, type: string) {
+export async function transferCoin(userPrivateKey: string, amount: number, toAddress: string, type: string) {
   const userAccount = await getUserAccount(userPrivateKey);
 
   const txn = await provider.generateTransaction(
@@ -80,6 +88,42 @@ export async function transferApt(userPrivateKey: string, amount: number, toAddr
     version: (txResult as any).version,
   };
 
+}
+
+export async function fundAccountWithGas(publicAddress: string) {
+  await faucetClient.fundAccount(publicAddress, 1_0000_0000, 5)
+}
+
+export async function mintUserZAPT(publicAddress: string, amount: number) {
+  const adminWallet = getAdminAccount();
+
+  const txn = await provider.generateTransaction(
+    adminWallet.address(),
+    {
+      function: `${MODULE_ADDRESS}::z_apt::actual_mint`,
+      type_arguments: [],
+      arguments: [
+        Math.floor(amount * APT),
+        publicAddress
+      ],
+    },
+    TRANSACTION_OPTIONS
+  );
+
+  const tx = await provider.signAndSubmitTransaction(adminWallet, txn);
+
+  const txResult = await client.waitForTransactionWithResult(tx);
+
+  console.log(txResult);
+
+  if (!(txResult as any).success) {
+    return null;
+  }
+
+  return {
+    txnHash: txResult.hash,
+    version: (txResult as any).version,
+  };
 }
 
 export async function createAptosKeyPair(): Promise<{

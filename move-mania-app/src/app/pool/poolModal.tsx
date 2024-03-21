@@ -7,7 +7,6 @@ import { getBalance, getLPCoinSupply, simulateDeposit, simulateWithdraw, supplyP
 import { User } from "@/lib/schema";
 import { cn } from "@/lib/utils";
 import { get } from "http";
-import { getSession } from "next-auth/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -26,38 +25,38 @@ export default function PoolModal() {
 
   const { toast } = useToast()
   
-  useEffect(() => {
-    getSession().then((session) => {
-      if (session) {
-        if (!session.user) return;
+  // useEffect(() => {
+  //   getSession().then((session) => {
+  //     if (session) {
+  //       if (!session.user) return;
 
-        setUpAndGetUser({
-          username: session.user.name || "",
-          image: session.user.image || "",
-          email: session.user.email || "",
-        }).then((user) => {
-          if (user) {
-            setAccount(user);
-            getBalance(user.private_key, '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83::liquidity_pool::LPCoin').then((balance) => {
-              setBalance(balance);
-              simulateWithdraw(user, balance).then((txn) => {
-                if (txn) {
-                  setExpectedReturnFromWithdraw(txn);
-                }
-              });
-            });
-            getBalance(user.private_key, '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83::z_apt::ZAPT').then((balance) => {
-              setAptBalance(balance);
-              simulateDeposit(user, balance).then((txn) => {
-                if (txn) {
-                  setExpectedReturnFromDeposit(txn);
-                }
-              });
-            });
-          }
-        });
-      }
-    });
+  //       setUpAndGetUser({
+  //         username: session.user.name || "",
+  //         image: session.user.image || "",
+  //         email: session.user.email || "",
+  //       }).then((user) => {
+  //         if (user) {
+  //           setAccount(user);
+  //           getBalance(user.private_key, '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83::liquidity_pool::LPCoin').then((balance) => {
+  //             setBalance(balance);
+  //             simulateWithdraw(user, balance).then((txn) => {
+  //               if (txn) {
+  //                 setExpectedReturnFromWithdraw(txn);
+  //               }
+  //             });
+  //           });
+  //           getBalance(user.private_key, '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83::z_apt::ZAPT').then((balance) => {
+  //             setAptBalance(balance);
+  //             simulateDeposit(user, balance).then((txn) => {
+  //               if (txn) {
+  //                 setExpectedReturnFromDeposit(txn);
+  //               }
+  //             });
+  //           });
+  //         }
+  //       });
+  //     }
+  //   });
 
     getLPCoinSupply().then((supply) => {
       setLpCoinSupply(supply)

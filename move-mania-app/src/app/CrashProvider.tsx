@@ -2,9 +2,8 @@
 
 import { User } from "@/lib/schema";
 import { GameStatus } from "./controlCenter";
-import { ReactNode, createContext, useEffect, useState } from "react";
+import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 import { socket } from "@/lib/socket";
-import { getSession } from "next-auth/react";
 import { getCurrentGame, setUpAndGetUser } from "@/lib/api";
 import { SOCKET_EVENTS } from "@/lib/types";
 import { EXPONENTIAL_FACTOR, log } from "@/lib/utils";
@@ -19,16 +18,15 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { magicContext } from "./MagicProvider";
 
 
 interface CrashPageProps {
   gameStatus: GameStatus | null;
-  account: User | null;
   latestAction: number | null;
 }
 export const gameStatusContext = createContext<CrashPageProps>({
   gameStatus: null, 
-  account: null,
   latestAction: null,
 });
 
@@ -36,30 +34,12 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
 
   const [isConnected, setIsConnected] = useState(socket.connected);
   const [gameStatus, setGameStatus] = useState<GameStatus | null>(null);
-  const [account, setAccount] = useState<User | null>(null);
   const [update, setUpdate] = useState(true);
   const [latestAction, setLatestAction] = useState<number | null>(null);
 
   const [showPWAInstall, setShowPWAInstall] = useState(false);
 
   useEffect(() => {
-
-    getSession().then((session) => {
-      if (session) {
-        if (!session.user) return;
-
-        setUpAndGetUser({
-          username: session.user.name || "",
-          image: session.user.image || "",
-          email: session.user.email || "",
-        }).then((user) => {
-          if (user) {
-            setAccount(user);
-          }
-        });
-      }
-    });
-
     function onConnect() {
       setIsConnected(true);
     }
@@ -183,7 +163,6 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
     <gameStatusContext.Provider
       value={{
         gameStatus,
-        account,
         latestAction,
       }}
     >

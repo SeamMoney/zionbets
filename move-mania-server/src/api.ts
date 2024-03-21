@@ -10,7 +10,6 @@ import {
   getGames,
   getPlayerList,
   getUser,
-  getUserBalance,
   getUsers,
   hasUserBet,
   hasUserCashOut,
@@ -61,18 +60,14 @@ app.get("/chat", async (req, res) => {
 
 app.get("/users/:email", async (req, res) => {
   const email = req.params.email;
+  console.log('api /users/:email email', email)
   const user = await getUser(email);
+  console.log('api /users/:email user', user)
   if (user) {
     res.send(user);
   } else {
     res.status(404).send("User not found");
   }
-});
-
-app.get("/users/balance/:email", async (req, res) => {
-  const email = req.params.email;
-  const balance = await getUserBalance(email);
-  res.send(balance);
 });
 
 app.get("/games/current", async (req, res) => {

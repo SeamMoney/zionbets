@@ -1,11 +1,12 @@
 import { PlayerState } from "@/app/playerList";
-import { createAptosKeyPair } from "./aptos";
+import { createAptosKeyPair, fundAccountWithGas, mintUserZAPT } from "./aptos";
 import { User } from "./schema";
 import { ChatMessage } from "./types";
 
 const API_URL = process.env.API_URL || "http://localhost:3008";
 
 export async function doesUserExist(username: string) {
+  console.log('sending response to', `${API_URL}/users/${username}`)
   try {
     const response = await fetch(`${API_URL}/users/${username}`, {
       method: "GET",
@@ -15,30 +16,32 @@ export async function doesUserExist(username: string) {
     });
     return response.ok;
   } catch (e) {
+    console.log('error', e)
     return false;
   }
 }
 
 export async function setUpUser(
-  userToSetup: Omit<User, "public_address" | "private_key" | "balance">
+  userToSetup: Omit<User, 'username' | 'phone'>
 ) {
-  const keyPair = await createAptosKeyPair();
-
+  console.log('setting up user', userToSetup)
   try {
     const response = await fetch(`${API_URL}/users`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        ...userToSetup,
-        ...keyPair,
-      }),
+      body: JSON.stringify(userToSetup),
     });
     return response.ok;
   } catch (e) {
     return false;
   }
+
+  // await fundAccountWithGas(userToSetup.address);
+  // await mintUserZAPT(userToSetup.address, 100);
+
+  return true;
 }
 
 export async function getUser(email: string): Promise<User | null> {
@@ -56,18 +59,23 @@ export async function getUser(email: string): Promise<User | null> {
 }
 
 export async function setUpAndGetUser(
-  userToSetup: Omit<User, "public_address" | "private_key" | "balance">
-): Promise<User | null> {
-  const userExists = await doesUserExist(userToSetup.email);
+  userToSetup: Omit<User, 'username' | 'phone'>
+): Promise<{username:string,address:string} | null> {
+  console.log('checking if user exists', userToSetup.address)
+  const userExists = await doesUserExist(userToSetup.address);
+  console.log('user exists', userExists)
   if (!userExists) {
+    console.log('setting up user')
     const res = await setUpUser(userToSetup);
+    console.log('user set up', res)
     if (res) {
-      return getUser(userToSetup.email);
+      console.log('getting user')
+      return getUser(userToSetup.address);
     } else {
       return null;
     }
   } else {
-    return getUser(userToSetup.email);
+    return getUser(userToSetup.address);
   }
 }
 

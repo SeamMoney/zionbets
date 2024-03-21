@@ -18,7 +18,6 @@ import { cashOutBet, setNewBet, startRound } from "@/lib/socket";
 import { RoundStart, SOCKET_EVENTS } from "@/lib/types";
 import { EXPONENTIAL_FACTOR, calculateCurrentCrashPoint, cn, log } from "@/lib/utils";
 import { time } from "console";
-import { getSession } from "next-auth/react";
 import { useContext, useEffect, useState } from "react";
 import { Socket, io } from "socket.io-client";
 
@@ -27,6 +26,7 @@ import { gameStatusContext } from "./CrashProvider";
 import { cashOut, placeBet } from "@/lib/aptos";
 import { useToast } from "@/components/ui/use-toast";
 import Link from "next/link";
+import { magicContext } from "./MagicProvider";
 
 export type GameStatus = {
   status: "COUNTDOWN" | "IN_PROGRESS" | "END";
@@ -36,9 +36,14 @@ export type GameStatus = {
 };
 
 export default function ControlCenter() {
+
+  const { 
+    isLoggedIn, 
+    userInfo
+  } = useContext(magicContext);
+
   const {
     gameStatus,
-    account,
     latestAction
   } = useContext(gameStatusContext);
 
@@ -53,17 +58,17 @@ export default function ControlCenter() {
   const [hasCashOut, setHasCashOut] = useState(false);
 
   useEffect(() => {
-    if (account) {
-      hasUserBet(account?.email || "").then((bet) => {
+    if (isLoggedIn && userInfo) {
+      hasUserBet(userInfo.phoneNumber).then((bet) => {
         setHasBet(bet);
       });
 
-      hasUserCashOut(account?.email || "").then((cashout) => {
+      hasUserCashOut(userInfo.phoneNumber).then((cashout) => {
         setHasCashOut(cashout);
       });
 
     }
-  }, [gameStatus, account, latestAction]);
+  }, [gameStatus, latestAction, isLoggedIn, userInfo]);
 
   useEffect(() => {
     if (gameStatus?.status === "IN_PROGRESS") {
@@ -85,7 +90,7 @@ export default function ControlCenter() {
 
     if (!socket) return;
 
-    if (!account) return;
+    if (!isLoggedIn || !userInfo) return;
 
     toast({
       title: "Placing bet at " + betAmount + " zAPT...",

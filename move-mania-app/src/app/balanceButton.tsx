@@ -18,53 +18,32 @@ import {
 } from "@/lib/api";
 import { User } from "@/lib/schema";
 import { Clipboard, EyeIcon, EyeOffIcon } from "lucide-react";
-import { getSession, signIn, signOut } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast"
 import Link from "next/link";
-import { getBalance, transferApt } from "@/lib/aptos";
+import { getBalance, transferCoin } from "@/lib/aptos";
 import { cn } from "@/lib/utils";
+import { magicContext } from "./MagicProvider";
 
 
 export default function BalanceButton() {
   const { toast } = useToast()
-  const [account, setAccount] = useState<User | null>(null);
   const [balance, setBalance] = useState<number | null>(null);
   const [recipientAddress, setRecipientAddress] = useState<string>("");
   const [transferAmount, setTransferAmount] = useState<string>("");
 
-  useEffect(() => {
-    getSession().then((session) => {
-      if (session) {
-        if (!session.user) return;
-
-        setUpAndGetUser({
-          username: session.user.name || "",
-          image: session.user.image || "",
-          email: session.user.email || "",
-        }).then((user) => {
-          if (user) {
-            setAccount(user);
-            getBalance(user.private_key, '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83::z_apt::ZAPT').then((balance) => {
-              setBalance(balance);
-            });
-          }
-        });
-      }
-    });
-  }, []);
+  const { isLoggedIn, userInfo } = useContext(magicContext);
 
   useEffect(() => {
-    if (account) {
+    if (isLoggedIn && userInfo) {
       const interval = setInterval(() => {
         // console.log('Checking for updates')
-        getUser(account.email).then((user) => {
+        getUser(userInfo.address).then((user) => {
           if (user) {
             // console.log('balance: ', user.balance)
-            setAccount(user);
-            getBalance(user.private_key, '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83::z_apt::ZAPT').then((balance) => {
-              setBalance(balance);
-            });
+            // getBalance(user.private_key, '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83::z_apt::ZAPT').then((balance) => {
+            //   setBalance(balance);
+            // });
           }
         });
       }, 1000);
@@ -74,25 +53,25 @@ export default function BalanceButton() {
 
   const onWithdraw = async () => {
 
-    if (!account) return;
+    if (!isLoggedIn || !userInfo) return;
 
-    const tx = await transferApt(account.private_key, parseFloat(transferAmount), recipientAddress, '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83::z_apt::ZAPT');
+    // const tx = await transferCoin(userInfo.private_key, parseFloat(transferAmount), recipientAddress, '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83::z_apt::ZAPT');
 
-    if (!tx) {
-      toast({
-        title: "Failed to withdraw funds",
-      });
-      return;
-    }
+    // if (!tx) {
+    //   toast({
+    //     title: "Failed to withdraw funds",
+    //   });
+    //   return;
+    // }
 
     // withdraw funds
-    toast({
-      title: "Funds withdrawn",
-      description: <Link href={`https://explorer.aptoslabs.com/txn/${tx.version}/?network=randomnet`} target="_blank" className="underline">View transaction</Link>
-    })
+    // toast({
+    //   title: "Funds withdrawn",
+    //   description: <Link href={`https://explorer.aptoslabs.com/txn/${tx.version}/?network=randomnet`} target="_blank" className="underline">View transaction</Link>
+    // })
   }
   
-  if (account) {
+  if (isLoggedIn && userInfo) {
     return (
       <Dialog>
       <DialogTrigger asChild>
@@ -118,12 +97,12 @@ export default function BalanceButton() {
             <input
               id="public_address"
               disabled
-              value={account.public_address}
+              value={userInfo.address}
               className="bg-transparent border-none outline-none text-right text-ellipsis cursor-not-allowed"
             />
             <Clipboard className="w-4 h-4 cursor-pointer opacity-80 hover:opacity-100" onClick={() => {
               // copy public address to clipboard
-              navigator.clipboard.writeText(account.public_address);
+              navigator.clipboard.writeText(userInfo.address);
               toast({
                 title: "Address copied to clipboard",
               });
@@ -163,7 +142,7 @@ export default function BalanceButton() {
             <span className=" opacity-50 flex flex-row justify-center items-center gap-1">
               <input
                 id="public_address"
-                placeholder={account.public_address}
+                placeholder={userInfo.address}
                 value={recipientAddress}
                 onChange={(e) => setRecipientAddress(e.target.value)}
                 className="bg-transparent border-none outline-none text-right text-ellipsis"

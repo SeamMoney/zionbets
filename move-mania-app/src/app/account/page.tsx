@@ -4,26 +4,23 @@ import { setUpAndGetUser, updateUser } from "@/lib/api";
 import { magic, magicLogin, magicLogout } from "@/lib/magic";
 import { User } from "@/lib/schema";
 import { ChevronDown, EyeIcon, EyeOffIcon } from "lucide-react";
-import { getSession, signOut } from "next-auth/react";
 import { useContext, useEffect, useState } from "react";
 import { magicContext } from "../MagicProvider";
 import { cn } from "@/lib/utils";
 import { COUNTRY_CODES } from "@/lib/utils";
 import { count } from "console";
+import { Clipboard,  } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+
 
 
 export default function AccountPage() {
 
-  const [account, setAccount] = useState<User | null>(null);
-
-  const [privateKeyVisible, setPrivateKeyVisible] = useState(false);
-
-  const [username, setUsername] = useState("");
-  const [image, setImage] = useState("");
-
-  const { isLoggedIn, userInfo, setIsLoggedIn, setUserInfo } = useContext(magicContext);
-
   const [ phone, setPhone ] = useState<string>('');
+  const { isLoggedIn, userInfo, setIsLoggedIn } = useContext(magicContext);
+
+  const { toast } = useToast();
+
 
   const handleLogin = async () => {
     console.log('logging in')
@@ -50,18 +47,6 @@ export default function AccountPage() {
     magic.user.isLoggedIn().then((isLoggedIn) => {
       console.log('isLoggedIn', isLoggedIn)
       setIsLoggedIn(isLoggedIn);
-
-      if (!magic) {
-        console.error('Magic not yet initialized');
-        return;
-      }
-
-      if (isLoggedIn) {
-        magic.user.getMetadata().then((metadata) => {
-          console.log('metadata', metadata)
-          setUserInfo(metadata);
-        })
-      }
     });
   }
 
@@ -83,42 +68,6 @@ export default function AccountPage() {
       return `(${formatted.slice(0, 3)})${formatted.slice(3, 6)}-${formatted.slice(6, 10)}`;
     }
   }
-
-  useEffect(() => {
-    getSession().then((session) => {
-      if (session) {
-        if (!session.user) return;
-
-        setUpAndGetUser({
-          username: session.user.name || "",
-          image: session.user.image || "",
-          email: session.user.email || "",
-        }).then((user) => {
-          if (user) {
-            setAccount(user);
-          }
-        });
-      }
-    });
-  }, []);
-
-  const onSubmit = async () => {
-    const newUsername = username == "" ? account?.username : username;
-    const newImage = image == "" ? account?.image : image;
-
-    const user: User = {
-      username: newUsername || "",
-      email: account?.email || "",
-      image: newImage || "",
-      public_address: account?.public_address || "",
-      private_key: account?.private_key || "",
-      balance: account?.balance || 0,
-    };
-
-    await updateUser(account?.email || "", user);
-
-    setAccount(user);
-  };
 
   if (isLoggedIn === null) return (
     <div className="px-2 pt-4">
@@ -194,11 +143,8 @@ export default function AccountPage() {
           <span className=" opacity-50 flex flex-row justify-center items-center gap-1">
             <input
               id="username"
-              value={username}
-              onChange={(e) => {
-                setUsername(e.target.value);
-              }}
-              // placeholder={account.username}
+              value={userInfo.username}
+              disabled
               className="bg-transparent border-none outline-none text-right text-ellipsis"
             />
           </span>
@@ -211,7 +157,7 @@ export default function AccountPage() {
             <input
               id="email"
               disabled
-              value={userInfo.phoneNumber}
+              value={userInfo.phone}
               className="bg-transparent border-none outline-none text-right text-ellipsis cursor-not-allowed"
             />
           </span>
@@ -227,9 +173,16 @@ export default function AccountPage() {
             <input
               id="public_address"
               disabled
-              value={userInfo.publicAddress}
+              value={userInfo.address}
               className="bg-transparent border-none outline-none text-right text-ellipsis cursor-not-allowed"
             />
+            <Clipboard className="w-4 h-4 cursor-pointer opacity-80 hover:opacity-100" onClick={() => {
+              // copy public address to clipboard
+              navigator.clipboard.writeText(userInfo.address);
+              toast({
+                title: "Address copied to clipboard",
+              });
+            }} />
           </span>
         </div>
       </div>
@@ -240,18 +193,18 @@ export default function AccountPage() {
           onClick={async () => {
             await magicLogout();
             setIsLoggedIn(false);
-            setUserInfo(null);
+            // setUserInfo(null);
           }}
         >
           Sign out
         </button>
-          <button
+          {/* <button
             type="submit"
             className="border border-green-700 hover:bg-[#264234]/40 hover:bg-noise px-6 py-1 text-green-500 w-full"
             onClick={onSubmit}
           >
             Save changes
-          </button>
+          </button> */}
       </div>
     </div>
   )

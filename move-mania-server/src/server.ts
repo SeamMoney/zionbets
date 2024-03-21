@@ -10,7 +10,6 @@ import {
   createGame,
   endGame,
   getUser,
-  payOutPlayers,
 } from "./database";
 
 import crypto from 'crypto';
@@ -90,7 +89,6 @@ io.on("connection", (socket) => {
       }
 
       await endGame(gameId);
-      await payOutPlayers();
       console.log("end rounded")
       io.emit(SOCKET_EVENTS.ROUND_RESULT, { roundId: gameId, crashPoint });
       setTimeout(async () => {
@@ -148,7 +146,6 @@ async function cycleRounds() {
     }
     
     await endGame(gameId);
-    await payOutPlayers();
     console.log("end rounded")
     io.emit(SOCKET_EVENTS.ROUND_RESULT, { roundId: gameId, crashPoint });
     setTimeout(async () => {

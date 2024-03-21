@@ -4,8 +4,7 @@ import { getChatMessages, setUpAndGetUser } from "@/lib/api";
 import { User } from "@/lib/schema";
 import { sendMessage } from "@/lib/socket";
 import { ChatMessage, SOCKET_EVENTS } from "@/lib/types";
-import { getSession } from "next-auth/react";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Socket, io } from "socket.io-client";
 import {
   Drawer,
@@ -20,32 +19,15 @@ import {
 
 
 import { socket } from "@/lib/socket";
+import { magicContext } from "./MagicProvider";
 
 export default function ChatWindow() {
   const [newMessage, setNewMessage] = useState<ChatMessage | null>(null);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
 
-  const [account, setAccount] = useState<User | null>(null);
+  const { isLoggedIn, userInfo } = useContext(magicContext);
 
   const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    getSession().then((session) => {
-      if (session) {
-        if (!session.user) return;
-
-        setUpAndGetUser({
-          username: session.user.name || "",
-          image: session.user.image || "",
-          email: session.user.email || "",
-        }).then((user) => {
-          if (user) {
-            setAccount(user);
-          }
-        });
-      }
-    });
-  }, []);
 
   useEffect(() => {
     if (newMessage) {
@@ -72,16 +54,16 @@ export default function ChatWindow() {
       return;
     }
 
-    if (!account) {
+    if (!isLoggedIn || !userInfo) {
       console.error("User not signed in");
       return;
     }
 
     // Send message to server
     sendMessage({
-      authorEmail: account?.email,
+      authorEmail: userInfo.address,
       message,
-      authorUsername: account?.username,
+      authorUsername: userInfo.username,
     });
   };
 
@@ -99,7 +81,7 @@ export default function ChatWindow() {
             <ChatBubble key={index} message={message} />
           ))}
         </div>
-        {account ? (
+        {userInfo ? (
           <div className="w-full min-h-[30px] flex flex-row gap-1">
             <div className="grow bg-noise">
               <input
@@ -132,7 +114,9 @@ export default function ChatWindow() {
           </div>
         ) : (
           <div className="w-full min-h-[30px] flex flex-row gap-1 justify-center opacity-50">
-            Sign in to chat with other players
+            {
+              isLoggedIn == null ? "Loading..." : "Please sign in to chat"
+            }
           </div>
         )}
       </div>

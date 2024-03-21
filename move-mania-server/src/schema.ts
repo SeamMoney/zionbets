@@ -1,10 +1,6 @@
 export type User = {
-  username: string;
-  image: string;
-  email: string;
-  public_address: string;
-  private_key: string;
-  balance: number;
+  address: string;
+  username: string | null;
 };
 
 export type Game = {
@@ -30,12 +26,8 @@ export type ChatMessage = {
 };
 
 export const UserSchema = `CREATE TABLE IF NOT EXISTS users (
-  email TEXT PRIMARY KEY,
-  username TEXT,
-  image TEXT,
-  public_address TEXT,
-  private_key TEXT,
-  balance FLOAT
+  address TEXT PRIMARY KEY,
+  username TEXT default NULL
 )`;
 
 export const GameSchema = `CREATE TABLE IF NOT EXISTS games (
@@ -50,7 +42,7 @@ export const PlayerListSchema = `CREATE TABLE IF NOT EXISTS player_list (
   bet_amount FLOAT,
   crash_point FLOAT DEFAULT NULL,
   user_id TEXT PRIMARY KEY,
-  FOREIGN KEY (user_id) REFERENCES users(email)
+  FOREIGN KEY (user_id) REFERENCES users(address)
 )`;
 
 export const ChatMessageSchema = `CREATE TABLE IF NOT EXISTS chat_messages (
@@ -58,7 +50,7 @@ export const ChatMessageSchema = `CREATE TABLE IF NOT EXISTS chat_messages (
   message TEXT,
   sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   user_id TEXT,
-  FOREIGN KEY (user_id) REFERENCES users(email)
+  FOREIGN KEY (user_id) REFERENCES users(address)
 )`;
 
 export const AllSchemas = [

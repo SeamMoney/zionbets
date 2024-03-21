@@ -11,7 +11,6 @@ import {
 import { setUpAndGetUser } from "@/lib/api";
 import { User } from "@/lib/schema";
 import { ChevronDown, Ellipsis } from "lucide-react";
-import { getSession, signIn } from "next-auth/react";
 import Link from "next/link";
 import { useContext, useEffect, useState } from "react";
 import { magicContext } from "./MagicProvider";
@@ -24,7 +23,7 @@ import { COUNTRY_CODES } from "@/lib/utils";
 
 export default function NavbarDropdown() {
 
-  const { isLoggedIn } = useContext(magicContext);
+  const { isLoggedIn, userInfo } = useContext(magicContext);
 
   return (
     <div className="flex flex-row items-center gap-2">
