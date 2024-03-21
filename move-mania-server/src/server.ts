@@ -69,6 +69,7 @@ io.on("connection", (socket) => {
       start_time: startTime,
       secret_crash_point: crashPoint,
       status: "IN_PROGRESS",
+      txnHash: null
     });
     console.log("start rounded")
     io.emit(SOCKET_EVENTS.ROUND_START, {
@@ -126,6 +127,7 @@ async function cycleRounds() {
     start_time: startTime,
     secret_crash_point: crashPoint,
     status: "IN_PROGRESS",
+    txnHash: null
   });
   console.log("start rounded")
   io.emit(SOCKET_EVENTS.ROUND_START, {
