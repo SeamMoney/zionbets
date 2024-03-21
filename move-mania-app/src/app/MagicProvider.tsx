@@ -4,19 +4,23 @@ import { magic } from "@/lib/magic";
 import { createContext, useEffect, useState } from "react";
 
 interface MagicProviderProps {
-  isLoggedIn: boolean;
+  isLoggedIn: boolean | null;
   userInfo: any;
+  setUserInfo: (info: any) => void;
+  setIsLoggedIn: (loggedIn: boolean) => void;
 }
 
 export const magicContext = createContext<MagicProviderProps>({
-  isLoggedIn: false,
+  isLoggedIn: null,
   userInfo: null,
+  setUserInfo: () => {},
+  setIsLoggedIn: () => {}
 }); 
 
 
 export default function MagicProvider({ children }: { children: React.ReactNode }) {
 
-  const [ isLoggedIn, setIsLoggedIn ] = useState(false);
+  const [ isLoggedIn, setIsLoggedIn ] = useState<boolean | null>(false);
   const [ userInfo, setUserInfo ] = useState<any>(null);
 
   useEffect(() => {
@@ -48,7 +52,9 @@ export default function MagicProvider({ children }: { children: React.ReactNode 
   return (
     <magicContext.Provider value={{
       isLoggedIn,
-      userInfo
+      userInfo,
+      setUserInfo,
+      setIsLoggedIn
     }}>
       {children}
     </magicContext.Provider>

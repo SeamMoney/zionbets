@@ -15,15 +15,26 @@ import { getSession, signIn } from "next-auth/react";
 import Link from "next/link";
 import { useContext, useEffect, useState } from "react";
 import { magicContext } from "./MagicProvider";
-import { magicLogin } from "@/lib/magic";
+import { magic, magicLogin, magicLogout } from "@/lib/magic";
 
 
 export default function NavbarDropdown() {
 
-  const { isLoggedIn } = useContext(magicContext);
+  const { isLoggedIn, setIsLoggedIn, setUserInfo } = useContext(magicContext);
 
   return (
     <div className="flex flex-row items-center gap-2">
+      {
+        isLoggedIn && 
+        <button
+          className="bg-white px-6 py-1 text-neutral-950"
+          onClick={async () => {
+            await magicLogout()
+          }}
+        >
+          Sign out
+        </button>
+      }
       {
         !isLoggedIn && 
         <button
@@ -32,9 +43,33 @@ export default function NavbarDropdown() {
             console.log('logging in')
             const res = await magicLogin('+12062299029')
             console.log('res', res)
+
+            if (!magic) {
+              console.error('Magic not yet initialized');
+              return;
+            }
+            console.log('magic', magic)
+            magic.user.isLoggedIn().then((isLoggedIn) => {
+              console.log('isLoggedIn', isLoggedIn)
+              setIsLoggedIn(isLoggedIn);
+        
+              if (!magic) {
+                console.error('Magic not yet initialized');
+                return;
+              }
+        
+              if (isLoggedIn) {
+                magic.user.getMetadata().then((metadata) => {
+                  console.log('metadata', metadata)
+                  setUserInfo(metadata);
+                })
+              }
+            });
           }}
         >
-          Sign in
+          {
+            isLoggedIn === null ? 'Loading...' : 'Sign in'
+          }
         </button>
       }
       <DropdownMenu>
