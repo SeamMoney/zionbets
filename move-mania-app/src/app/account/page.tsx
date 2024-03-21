@@ -1,7 +1,7 @@
 'use client';
 
 import { setUpAndGetUser, updateUser } from "@/lib/api";
-import { magic, magicLogin } from "@/lib/magic";
+import { magic, magicLogin, magicLogout } from "@/lib/magic";
 import { User } from "@/lib/schema";
 import { ChevronDown, EyeIcon, EyeOffIcon } from "lucide-react";
 import { getSession, signOut } from "next-auth/react";
@@ -189,31 +189,15 @@ export default function AccountPage() {
             />
           </span>
         </div>
-        {/* <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
-          <label htmlFor="profile_pic" className="text-left ">
-            Profile picture
-          </label>
-          <span className=" opacity-50 flex flex-row justify-center items-center gap-1">
-            <input
-              id="profile_pic"
-              value={image}
-              onChange={(e) => {
-                setImage(e.target.value);
-              }}
-              placeholder={account.image}
-              className="bg-transparent border-none outline-none text-right text-ellipsis"
-            />
-          </span>
-        </div> */}
         <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
           <label htmlFor="email" className="text-left ">
-            Email
+            Phone Number
           </label>
           <span className=" opacity-50 flex flex-row justify-end items-center gap-1">
             <input
               id="email"
               disabled
-              // value={account.email}
+              value={userInfo.phoneNumber}
               className="bg-transparent border-none outline-none text-right text-ellipsis cursor-not-allowed"
             />
           </span>
@@ -229,37 +213,9 @@ export default function AccountPage() {
             <input
               id="public_address"
               disabled
-              // value={account.public_address}
+              value={userInfo.publicAddress}
               className="bg-transparent border-none outline-none text-right text-ellipsis cursor-not-allowed"
             />
-          </span>
-        </div>
-        <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
-          <label
-            htmlFor="private_key"
-            className=" font-light w-[100px]"
-          >
-            Private key
-          </label>
-          <span className=" opacity-50 flex flex-row justify-center items-center gap-1">
-            <input
-              id="private_key"
-              hidden={!privateKeyVisible}
-              disabled
-              // value={account.private_key}
-              className="bg-transparent border-none outline-none text-right text-ellipsis w-[170px] cursor-not-allowed"
-            />
-            {!privateKeyVisible ? (
-              <EyeIcon
-                className="cursor-pointer"
-                onClick={() => setPrivateKeyVisible(true)}
-              />
-            ) : (
-              <EyeOffIcon
-                className="cursor-pointer"
-                onClick={() => setPrivateKeyVisible(false)}
-              />
-            )}
           </span>
         </div>
       </div>
@@ -267,7 +223,11 @@ export default function AccountPage() {
         <button
           type="submit"
           className="border border-neutral-700 hover:bg-neutral-800/80 hover:bg-noise px-6 py-1 text-neutral-500 w-full"
-          onClick={() => signOut()}
+          onClick={async () => {
+            await magicLogout();
+            setIsLoggedIn(false);
+            setUserInfo(null);
+          }}
         >
           Sign out
         </button>

@@ -24,32 +24,17 @@ import { COUNTRY_CODES } from "@/lib/utils";
 
 export default function NavbarDropdown() {
 
-  const { isLoggedIn, setIsLoggedIn, setUserInfo } = useContext(magicContext);
-
-
+  const { isLoggedIn } = useContext(magicContext);
 
   return (
     <div className="flex flex-row items-center gap-2">
       {
-        isLoggedIn && 
-        <button
-          className="bg-white px-6 py-1 text-neutral-950"
-          onClick={async () => {
-            await magicLogout()
-          }}
-        >
-          Sign out
-        </button>
-      }
-      {
-        !isLoggedIn && 
+        !isLoggedIn && isLoggedIn !== null &&
           <Link href='/account'>
             <button
               className="bg-white px-6 py-1 text-neutral-950"
             >
-              {
-                isLoggedIn === null ? 'Loading...' : 'Sign in'
-              }
+              Sign in
             </button>
           </Link>
       }
