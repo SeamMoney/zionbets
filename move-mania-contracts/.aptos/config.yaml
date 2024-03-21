@@ -6,3 +6,8 @@ profiles:
     account: 718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83
     rest_url: "https://fullnode.random.aptoslabs.com/"
     faucet_url: "https://faucet.random.aptoslabs.com/"
+  test:
+    private_key: "0xf7ed930cbe0223b922803207723162f4691eac6431b59bf1129806f340050788"
+    public_key: "0x6ada6972d8d7c83298730c6d0a4b8f75d1f64a6dcf3cb46fbf695fa5958a3364"
+    account: 840ccdef3d9c4b7c076a392d79bf2a87b9c3b6ed7b7f05f7b505df55f5f16cf6
+    rest_url: "https://fullnode.random.aptoslabs.com/"
