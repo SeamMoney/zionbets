@@ -54,22 +54,23 @@ export default function AccountButton() {
   };
 
   const onSubmit = async () => {
+    
+    if (!account) return;
+
     const newUsername = username == "" ? account?.username : username;
-    const newImage = image == "" ? account?.image : image;
 
     const user: User = {
-      username: newUsername || "",
-      email: account?.email || "",
-      image: newImage || "",
-      public_address: account?.public_address || "",
-      private_key: account?.private_key || "",
-      balance: account?.balance || 0,
+      username: newUsername,
+      email: account.email,
+      image: account.image,
+      public_address: account.public_address,
+      private_key: account.private_key,
+      balance: account.balance,
     };
 
     await updateUser(account?.email || "", user);
-
-    // setAccount(user);
-
+    console.log("User updated")
+    
     window.location.reload();
   };
 
