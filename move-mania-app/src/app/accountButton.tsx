@@ -69,6 +69,8 @@ export default function AccountButton() {
     await updateUser(account?.email || "", user);
 
     setAccount(user);
+
+    window.location.reload();
   };
 
   return (
