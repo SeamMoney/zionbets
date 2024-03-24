@@ -26,8 +26,6 @@ export default function ChatWindow() {
   const [newMessage, setNewMessage] = useState<ChatMessage | null>(null);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
 
-  const [pulse, setPulse] = useState(false);
-
   const [account, setAccount] = useState<User | null>(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -60,7 +58,6 @@ export default function ChatWindow() {
 
     socket.on(SOCKET_EVENTS.CHAT_NOTIFICATION, (data: ChatMessage) => {
       setNewMessage(data);
-      setPulse(true);
     });
   }, []);
 
@@ -95,11 +92,10 @@ export default function ChatWindow() {
         <button 
           className={
             cn(
-              "border border-[#2faca2] px-6 py-1 text-[#2faca2] bg-neutral-950 w-full", 
-              pulse && "animate-pulse"
+              "border border-[#2faca2] px-6 py-1 text-[#2faca2] bg-neutral-950 w-full"
             )
           }
-          onClick={() => setPulse(false)}
+
         >
           Chat
         </button>
