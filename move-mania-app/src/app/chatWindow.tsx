@@ -125,7 +125,7 @@ export default function ChatWindow() {
                   inputRef.current.value = "";
                 }
               }}
-              className="border border-[#2faca2] bg-neutral-950 hover:bg-[#264234] px-6 py-1 text-[#2faca2] flex flex-col items-center"
+              className="border border-[#2faca2] bg-neutral-950 hover:bg-[#264234] px-6 text-[#2faca2] flex flex-col items-center"
             >
               Send
             </button>
