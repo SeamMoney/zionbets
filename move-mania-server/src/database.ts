@@ -384,18 +384,26 @@ export async function addBetToPlayerList(bet: BetData) {
     driver: require("sqlite3").Database,
   });
 
-  await db.run(
-    "INSERT INTO player_list (bet_type, bet_amount, user_id) VALUES (?, ?, ?)",
-    bet.coinType,
-    bet.betAmount,
-    bet.playerEmail
-  );
+  try {
+    await db.run(
+      "INSERT INTO player_list (bet_type, bet_amount, user_id) VALUES (?, ?, ?)",
+      bet.coinType,
+      bet.betAmount,
+      bet.playerEmail
+    );
+  } catch (e) {
+    console.log(e);
+  }
 
-  await db.run(
-    'UPDATE users SET balance = balance - ? WHERE email = ?',
-    bet.betAmount,
-    bet.playerEmail
-  );
+  try {
+    await db.run(
+      'UPDATE users SET balance = balance - ? WHERE email = ?',
+      bet.betAmount,
+      bet.playerEmail
+    );
+  } catch (e) {
+    console.log(e);
+  }
 
   await db.close();
 }
