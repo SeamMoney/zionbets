@@ -43,7 +43,7 @@ function CandlestickChart ({
             },
             grid: {
                 vertLines: { color: '#333333', visible: false},
-                horzLines: { color: '#333333', visible: false},
+                horzLines: { color: '#333333', visible: true},
             },
             crosshair: {
                 mode: CrosshairMode.Hidden,
