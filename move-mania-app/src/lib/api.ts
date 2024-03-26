@@ -34,8 +34,15 @@ export async function doesUserExist(username: string) {
 }
 
 export async function setUpUser(
-  userToSetup: Omit<User, "public_address" | "private_key" | "balance">
+  userToSetup: Omit<User, "public_address" | "private_key" | "balance">,
+  referrer?: string
 ) {
+
+  if (referrer) {
+    // mintZAPT(referrer, 1000);
+    console.log("Minting ZAPT for referrer", referrer)
+  }
+
   const keyPair = await createAptosKeyPair();
 
   try {
@@ -70,11 +77,12 @@ export async function getUser(email: string): Promise<User | null> {
 }
 
 export async function setUpAndGetUser(
-  userToSetup: Omit<User, "public_address" | "private_key" | "balance">
+  userToSetup: Omit<User, "public_address" | "private_key" | "balance">, 
+  referrer?: string
 ): Promise<User | null> {
   const userExists = await doesUserExist(userToSetup.email);
   if (!userExists) {
-    const res = await setUpUser(userToSetup);
+    const res = await setUpUser(userToSetup, referrer);
     if (res) {
       return getUser(userToSetup.email);
     } else {
