@@ -5,6 +5,20 @@ import { ChatMessage } from "./types";
 
 const API_URL = process.env.API_URL || "http://localhost:3008";
 
+export async function getUsers() {
+  try {
+    const response = await fetch(`${API_URL}/users`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response.json();
+  } catch (e) {
+    return [];
+  }
+}
+
 export async function doesUserExist(username: string) {
   try {
     const response = await fetch(`${API_URL}/users/${username}`, {
