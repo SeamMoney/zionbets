@@ -21,6 +21,7 @@ import { User } from "@/lib/schema";
 import { Ellipsis, EyeIcon, EyeOffIcon } from "lucide-react";
 import { getSession, signIn, signOut } from "next-auth/react";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function AccountButton() {
