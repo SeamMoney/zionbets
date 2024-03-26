@@ -42,8 +42,8 @@ function CandlestickChart ({
                 fontFamily: "'Roboto Mono', sans-serif",
             },
             grid: {
-                vertLines: { color: '#333333' },
-                horzLines: { color: '#333333' },
+                vertLines: { color: '#333333', visible: false},
+                horzLines: { color: '#333333', visible: false},
             },
             crosshair: {
                 mode: CrosshairMode.Hidden,
