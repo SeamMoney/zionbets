@@ -42,7 +42,7 @@ function CandlestickChart ({
                 fontFamily: "'Roboto Mono', sans-serif",
             },
             grid: {
-                vertLines: { color: '#333333', visible: false},
+                vertLines: { color: '#333333', visible: true},
                 horzLines: { color: '#333333', visible: true},
             },
             crosshair: {
