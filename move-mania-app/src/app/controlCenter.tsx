@@ -241,7 +241,7 @@ export default function ControlCenter() {
             account && gameStatus?.status === "COUNTDOWN" && (
               <button
                 className={cn(
-                  "border border-green-700 px-6 py-1 border-yellow-700 text-yellow-500 bg-neutral-950 w-full",
+                  "border border-green-700 px-6 py-1 border-yellow-700 text-yellow-500 bg-neutral-950 w-full active:scale-95 active:opacity-80 transition-transform",
                   !hasBet
                     ? "cursor-not-allowed"
                     : "bg-[#264234]/40 hover:cursor-pointer border-green-700 text-green-500",
