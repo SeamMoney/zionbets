@@ -14,7 +14,6 @@ export default function AccountPage() {
   const [privateKeyVisible, setPrivateKeyVisible] = useState(false);
 
   const [username, setUsername] = useState("");
-  const [image, setImage] = useState("");
 
   useEffect(() => {
     getSession().then((session) => {

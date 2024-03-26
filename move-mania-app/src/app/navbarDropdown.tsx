@@ -13,10 +13,14 @@ import { User } from "@/lib/schema";
 import { Ellipsis } from "lucide-react";
 import { getSession, signIn } from "next-auth/react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 
 export default function NavbarDropdown() {
+
+  const searchParams = useSearchParams();
+  const referredBy = searchParams.get("ref");
 
   const [account, setAccount] = useState<User | null>(null);
 
@@ -29,7 +33,7 @@ export default function NavbarDropdown() {
           username: session.user.name || "",
           image: session.user.image || "",
           email: session.user.email || "",
-        }).then((user) => {
+        }, referredBy || undefined).then((user) => {
           if (user) {
             setAccount(user);
           }
@@ -45,7 +49,8 @@ export default function NavbarDropdown() {
         <button
           className="bg-white px-6 py-1 text-neutral-950"
           onClick={() => {
-            signIn("google");
+            signIn("google", {callbackUrl: `/${referredBy ? `?ref=${referredBy}` : ''}`});
+            console.log('sign in')
           }}
         >
           Sign in
