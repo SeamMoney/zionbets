@@ -70,7 +70,10 @@ export default function Leaderboard() {
             <tr key={index} className="text-white text-sm  h-8">
               <td className="ps-4 w-[200px] text-left ps-4 bg-neutral-800/40 bg-[#264234]/40 border-b border-neutral-800">{player.username}</td>
               <td className="text-right pr-4 w-[100px] text-right pr-4  bg-neutral-800/40 bg-[#264234]/40 border-b border-neutral-800">
-                {player.balance.toFixed(2)}
+                {player.balance.toLocaleString(undefined, {
+                  maximumFractionDigits: 2,
+                  minimumFractionDigits: 2,
+                })}
               </td>
             </tr>
           ))}
