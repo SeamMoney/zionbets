@@ -44,7 +44,6 @@ export async function setUpUser(
 
     const referrerUser = await getUserFromReferralCode(referrer);
 
-
     mintZAPT(referrerUser.private_key, 100);
   }
 
