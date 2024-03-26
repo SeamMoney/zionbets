@@ -10,6 +10,8 @@ import { cn } from "@/lib/utils";
 import { socket } from "@/lib/socket";
 import { gameStatusContext } from "./CrashProvider";
 import { getBalance } from "@/lib/aptos";
+import { InfoIcon } from "lucide-react";
+import Link from "next/link";
 
 export type PlayerState = {
   username: string;
@@ -49,10 +51,11 @@ export default function Leaderboard() {
 
   return (
     <div className="border border-neutral-700 h-full flex flex-col items-left gap-2 w-full min-h-[200px] max-h-[700px]">
-      <span className="font-semibold text-lg pt-1 ps-4">zAPT Leaderboard</span>
+      <span className="font-semibold text-lg pt-1 ps-4 flex flex-row items-center"><span>zAPT Leaderboard</span><Link href='https://x.com/zionbets/status/1770459737076953351?s=20' target="_blank"><InfoIcon className="h-4 opacity-50 hover:opacity-100 hover:cursor-pointer"/></Link></span>
       <table className="w-full scroll">
         <thead className="">
           <tr className="border-b border-neutral-800 text-neutral-400">
+            <th className="w-[50px] text-center ps-4">Place</th>
             <th className="w-[200px] text-left ps-4">Username</th>
             <th className="w-[100px] text-right pr-4">
               Balance{" "}
@@ -68,6 +71,9 @@ export default function Leaderboard() {
           .slice(0, 10)
           .map((player, index) => (
             <tr key={index} className="text-white text-sm  h-8">
+              <td className="w-[50px] text-center ps-4 bg-neutral-800/40 bg-[#264234]/40 border-b border-neutral-800">
+                {index + 1}
+              </td>
               <td className="ps-4 w-[200px] text-left ps-4 bg-neutral-800/40 bg-[#264234]/40 border-b border-neutral-800">{player.username}</td>
               <td className="text-right pr-4 w-[100px] text-right pr-4  bg-neutral-800/40 bg-[#264234]/40 border-b border-neutral-800">
                 {player.balance.toLocaleString(undefined, {
