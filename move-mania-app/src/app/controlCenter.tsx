@@ -260,7 +260,7 @@ export default function ControlCenter() {
             account && gameStatus?.status === "IN_PROGRESS" && hasBet &&  (
               <button
                 className={cn(
-                  "border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 w-full ",
+                  "border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 w-full active:scale-95 active:opacity-80 transition-transform",
                   hasCashOut
                     ? "cursor-not-allowed bg-[#264234]/40"
                     : "hover:bg-[#404226]/40 hover:cursor-pointer bg-[#404226]/40 border-yellow-700 text-yellow-500",
@@ -389,8 +389,8 @@ export default function ControlCenter() {
                   account && (
                     <button
                       className={cn(
-                        "border bg-[#404226]/40 border-yellow-700 text-yellow-500 px-6 py-1 w-full",
-                        autoCashout && autoCashoutAmount && "bg-[#264234]/40 border-green-700 text-green-500",
+                        "border bg-[#404226]/40 border-yellow-700 text-yellow-500 px-6 py-1 w-full active:scale-95 active:opacity-80 transition-transform",
+                        autoCashout && autoCashoutAmount && "bg-[#264234]/40 border-green-700 text-green-500 ",
                         !(parseFloat(autoCashoutAmount) > 0) && "bg-neutral-950"
                       )}
                       onClick={() => {
