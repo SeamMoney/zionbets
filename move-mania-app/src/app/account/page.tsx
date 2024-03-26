@@ -158,14 +158,14 @@ export default function AccountPage() {
       <div className="flex flex-col items-center gap-2 w-full">
         <button
           type="submit"
-          className="border border-neutral-700 hover:bg-neutral-800/80 hover:bg-noise px-6 py-1 text-neutral-500 w-full"
+          className="border border-neutral-700 hover:bg-neutral-800/80 hover:bg-noise px-6 py-1 text-neutral-500 w-full active:scale-95 active:opacity-50 transition-transform"
           onClick={() => signOut()}
         >
           Sign out
         </button>
           <button
             type="submit"
-            className="border border-green-700 hover:bg-[#264234]/40 hover:bg-noise px-6 py-1 text-green-500 w-full"
+            className="border border-green-700 hover:bg-[#264234]/40 hover:bg-noise px-6 py-1 text-green-500 w-full active:scale-95 active:opacity-50 transition-transform"
             onClick={onSubmit}
           >
             Save changes

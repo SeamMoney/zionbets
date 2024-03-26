@@ -241,11 +241,11 @@ export default function ControlCenter() {
             account && gameStatus?.status === "COUNTDOWN" && (
               <button
                 className={cn(
-                  "border border-green-700 px-6 py-1 border-yellow-700 text-yellow-500 bg-neutral-950 w-full active:scale-95 active:opacity-80 transition-transform",
+                  "border border-green-700 px-6 py-1 border-yellow-700 text-yellow-500 bg-neutral-950 w-full",
                   !hasBet
                     ? "cursor-not-allowed"
                     : "bg-[#264234]/40 hover:cursor-pointer border-green-700 text-green-500",
-                    (parseFloat(betAmount) > 0) && !hasBet && "bg-[#404226]/40",
+                    (parseFloat(betAmount) > 0) && !hasBet && "bg-[#404226]/40 active:scale-95 active:opacity-80 transition-transform",
                 )}
                 onClick={onSetBet}
                 disabled={!(parseFloat(betAmount) > 0) || hasBet}
@@ -260,11 +260,11 @@ export default function ControlCenter() {
             account && gameStatus?.status === "IN_PROGRESS" && hasBet &&  (
               <button
                 className={cn(
-                  "border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 w-full active:scale-95 active:opacity-80 transition-transform",
+                  "border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 w-full",
                   hasCashOut
                     ? "cursor-not-allowed bg-[#264234]/40"
                     : "hover:bg-[#404226]/40 hover:cursor-pointer bg-[#404226]/40 border-yellow-700 text-yellow-500",
-                  hasCashOut && "bg-[#264234]/40"
+                  hasCashOut && "bg-[#264234]/40 active:scale-95 active:opacity-80 transition-transform"
                 )}
                 onClick={onCashOut}
                 disabled={hasCashOut}
@@ -389,11 +389,15 @@ export default function ControlCenter() {
                   account && (
                     <button
                       className={cn(
-                        "border bg-[#404226]/40 border-yellow-700 text-yellow-500 px-6 py-1 w-full active:scale-95 active:opacity-80 transition-transform",
+                        "border bg-[#404226]/40 border-yellow-700 text-yellow-500 px-6 py-1 w-full",
                         autoCashout && autoCashoutAmount && "bg-[#264234]/40 border-green-700 text-green-500 ",
-                        !(parseFloat(autoCashoutAmount) > 0) && "bg-neutral-950"
+                        !(parseFloat(autoCashoutAmount) > 0) && "bg-neutral-950",
+                        (parseFloat(autoCashoutAmount) > 0) && " active:scale-95 active:opacity-80 transition-transform",
                       )}
                       onClick={() => {
+                        if (!autoCashoutAmount || parseFloat(autoCashoutAmount) <= 0){
+                          return 
+                        }
                         setAutoCashout(!autoCashout);
                   
                       }}
