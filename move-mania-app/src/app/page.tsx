@@ -2,6 +2,7 @@ import ControlCenter from "./controlCenter";
 import GameScreen from "./gameScreen";
 import PlayerList from "./playerList";
 import CrashProvider from "./CrashProvider";
+import Leaderboard from "./leaderboard";
 
 export default function CrashPage() {
 
@@ -21,7 +22,9 @@ export default function CrashPage() {
             <PlayerList />
           </div>
         </div>
-        <div className="border border-neutral-700 p-2 w-full h-[800px]"></div>
+        <div className="w-full h-full">
+          <Leaderboard />
+        </div>
       </div>
     </CrashProvider>
   );
