@@ -17,7 +17,7 @@ import {
   updateUser,
 } from "@/lib/api";
 import { User } from "@/lib/schema";
-import { Clipboard, EyeIcon, EyeOffIcon } from "lucide-react";
+import { Clipboard, EyeIcon, EyeOffIcon, Loader2Icon } from "lucide-react";
 import { getSession, signIn, signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast"
@@ -32,6 +32,8 @@ export default function BalanceButton() {
   const [balance, setBalance] = useState<number | null>(null);
   const [recipientAddress, setRecipientAddress] = useState<string>("");
   const [transferAmount, setTransferAmount] = useState<string>("");
+
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     getSession().then((session) => {
@@ -74,7 +76,27 @@ export default function BalanceButton() {
 
   const onWithdraw = async () => {
 
-    if (!account) return;
+    if (!account || !balance || transferAmount == '') return;
+    if (parseFloat(transferAmount) <= 0) {
+      toast({
+        title: "Please enter a valid amount",
+      });
+      return;
+    }
+    if (parseFloat(transferAmount) > balance) {
+      toast({
+        title: "Insufficient funds",
+      });
+      return;
+    }
+    if (recipientAddress == '') {
+      toast({
+        title: "Please enter a recipient address",
+      });
+      return;
+    }
+
+    setLoading(true);
 
     const tx = await transferApt(account.private_key, parseFloat(transferAmount), recipientAddress, '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83::z_apt::ZAPT');
 
@@ -82,6 +104,7 @@ export default function BalanceButton() {
       toast({
         title: "Failed to withdraw funds",
       });
+      setLoading(false);
       return;
     }
 
@@ -90,6 +113,13 @@ export default function BalanceButton() {
       title: "Funds withdrawn",
       description: <Link href={`https://explorer.aptoslabs.com/txn/${tx.version}/?network=randomnet`} target="_blank" className="underline">View transaction</Link>
     })
+    setLoading(false);
+
+    // clear input fields
+    setRecipientAddress('');
+    setTransferAmount('');
+
+
   }
   
   if (account) {
@@ -146,7 +176,7 @@ export default function BalanceButton() {
               <input
                 id="public_address"
                 placeholder={`${balance?.toFixed(2) || parseInt('0').toFixed(2)}`}
-                value={parseFloat(transferAmount) > 0 ? transferAmount : ''}
+                value={transferAmount}
                 onChange={(e) => setTransferAmount(e.target.value)}
                 className="bg-transparent border-none outline-none text-right text-ellipsis"
               />
@@ -172,9 +202,12 @@ export default function BalanceButton() {
           </div>
           <button onClick={onWithdraw} className={cn(
             "border border-yellow-700 px-6 py-1 text-yellow-500 bg-neutral-950",
-            parseFloat(transferAmount) > 0 && balance && parseFloat(transferAmount) <= balance && recipientAddress != '' && 'bg-[#404226]/40'
+            parseFloat(transferAmount) > 0 && balance && parseFloat(transferAmount) <= balance && recipientAddress != '' && 'bg-[#404226]/40  active:scale-95 active:opacity-80 transition-transform',
+            loading && 'scale-95 opacity-80 cursor-not-allowed'
           )}>
-            Withdraw
+            {
+              loading ? <Loader2Icon className="animate-spin" /> : 'Withdraw'
+            }
           </button>
         </div>
         {/* <DialogTitle>Running low on funds?</DialogTitle>

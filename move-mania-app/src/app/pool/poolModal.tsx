@@ -157,10 +157,18 @@ export default function PoolModal() {
             <button  
               className={cn(
                 "border border-yellow-700 px-6 py-1 text-yellow-500 bg-neutral-950",
-                parseFloat(depositAmount) > 0 && aptBalance && parseFloat(depositAmount) <= aptBalance && 'bg-[#404226]/40'
+                parseFloat(depositAmount) > 0 && aptBalance && parseFloat(depositAmount) <= aptBalance && 'bg-[#404226]/40 active:scale-95 active:opacity-50 transition-transform'
               )}
               onClick={async () => {
                 if (!account) return;
+
+                if (depositAmount === '') {
+                  toast({
+                    title: "Please enter a valid amount to deposit",
+                  });
+                  return;
+                }
+
                 const tx = await supplyPool(account, parseFloat(depositAmount));
                 if (!tx) {
                   toast({
@@ -239,10 +247,18 @@ export default function PoolModal() {
             <button 
               className={cn(
                 "border border-yellow-700 px-6 py-1 text-yellow-500 bg-neutral-950",
-                parseFloat(withdrawAmount) > 0 && balance && parseFloat(withdrawAmount) <= balance && 'bg-[#404226]/40'
+                parseFloat(withdrawAmount) > 0 && balance && parseFloat(withdrawAmount) <= balance && 'bg-[#404226]/40 active:scale-95 active:opacity-50 transition-transform'
               )}
               onClick={async () => {
                 if (!account) return;
+
+                if (withdrawAmount === '') {
+                  toast({
+                    title: "Please enter a valid amount to withdraw",
+                  });
+                  return;
+                }
+
                 const tx = await withdrawPool(account, parseFloat(withdrawAmount));
                 if (!tx) {
                   toast({

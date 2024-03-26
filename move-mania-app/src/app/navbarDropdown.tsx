@@ -47,7 +47,7 @@ export default function NavbarDropdown() {
       {
         !account && 
         <button
-          className="bg-white px-6 py-1 text-neutral-950"
+          className="bg-white px-6 py-1 text-neutral-950 active:scale-95 active:opacity-50 transition-transform"
           onClick={() => {
             signIn("google", {callbackUrl: `/${referredBy ? `?ref=${referredBy}` : ''}`});
             console.log('sign in')
