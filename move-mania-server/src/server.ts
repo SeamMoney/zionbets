@@ -17,6 +17,8 @@ import crypto from 'crypto';
 import { calculateCrashPoint } from "./crashPoint";
 import { createNewGame, endGame as endGameAptos } from "./aptos";
 
+require('dotenv').config();
+
 const COUNTDOWN = 20 * 1000;
 const SUMMARY = 5 * 1000;
 
@@ -29,7 +31,7 @@ const PORT = 8080,
 
 const io = new Server(httpServer, {
   cors: {
-    origin: "https://app.zion.bet", // or a list of origins you want to allow, e.g. ["http://localhost:3000"]
+    origin: process.env.ZION_APP_URL || "http://localhost:3000",
     credentials: true,
   },
   connectionStateRecovery: {}
