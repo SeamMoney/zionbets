@@ -11,6 +11,7 @@ export async function getUsers() {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+        "api-key": process.env.ZION_API_KEY || "",
       },
     });
     return response.json();
@@ -25,6 +26,7 @@ export async function doesUserExist(username: string) {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+        "api-key": process.env.ZION_API_KEY || "",
       },
     });
     return response.ok;
@@ -50,6 +52,7 @@ export async function setUpUser(
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "api-key": process.env.ZION_API_KEY || "",
       },
       body: JSON.stringify({
         ...userToSetup,
@@ -68,6 +71,7 @@ export async function getUser(email: string): Promise<User | null> {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+        "api-key": process.env.ZION_API_KEY || "",
       },
     });
     return response.json();
@@ -99,6 +103,7 @@ export async function updateUser(email: string, user: User): Promise<boolean> {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
+        "api-key": process.env.ZION_API_KEY || "",
       },
       body: JSON.stringify(user),
     });
@@ -114,6 +119,7 @@ export async function getChatMessages(): Promise<ChatMessage[]> {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+        "api-key": process.env.ZION_API_KEY || "",
       },
     });
     const res = await response.json();
@@ -133,6 +139,7 @@ export async function getPlayerList(): Promise<PlayerState[]> {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+        "api-key": process.env.ZION_API_KEY || "",
       },
     });
     const res = await response.json();
@@ -153,6 +160,7 @@ export async function getCurrentGame() {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+        "api-key": process.env.ZION_API_KEY || "",
       },
     });
     const res = await response.json();
@@ -168,6 +176,7 @@ export async function getUserBalance(email: string) {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+        "api-key": process.env.ZION_API_KEY || "",
       },
     });
     const res = await response.json();
@@ -183,6 +192,7 @@ export async function hasUserBet(email: string) {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+        "api-key": process.env.ZION_API_KEY || "",
       },
     });
     return response.json();
@@ -197,6 +207,7 @@ export async function hasUserCashOut(email: string) {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+        "api-key": process.env.ZION_API_KEY || "",
       },
     });
     return response.json();
