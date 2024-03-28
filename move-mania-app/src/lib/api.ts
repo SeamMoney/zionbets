@@ -3,7 +3,7 @@ import { createAptosKeyPair } from "./aptos";
 import { User } from "./schema";
 import { ChatMessage } from "./types";
 
-const API_URL = process.env.API_URL || "http://localhost:3008";
+const API_URL = process.env.ZION_API_URL || "http://localhost:3008";
 
 export async function getUsers() {
   try {
