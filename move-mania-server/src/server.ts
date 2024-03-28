@@ -29,7 +29,7 @@ const PORT = 8080,
 
 const io = new Server(httpServer, {
   cors: {
-    origin: "*", // or a list of origins you want to allow, e.g. ["http://localhost:3000"]
+    origin: "https://app.zion.bet", // or a list of origins you want to allow, e.g. ["http://localhost:3000"]
     credentials: true,
   },
   connectionStateRecovery: {}
