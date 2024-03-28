@@ -20,16 +20,11 @@ require('dotenv').config();
 var cors = require("cors");
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: process.env.ZION_APP_URL || "http://localhost:3000",
+}));
 
 const PORT = 3008;
-
-const authenticateKey = (req: any) => {
-  const apiKey = req.headers["api-key"];
-  console.log('apiKey', apiKey);
-  console.log('process.env.ZION_API_KEY', process.env.ZION_API_KEY);
-  return apiKey == process.env.ZION_API_KEY
-};
 
 /* 
   This is the entry point for the server. 
@@ -43,11 +38,6 @@ app.get("/", (req, res) => {
  */
 app.get("/users", async (req, res) => {
 
-  if (!authenticateKey(req)) {
-    res.status(401).send("Unauthorized");
-    return;
-  }
-
   const users = await getUsers();
   res.send(users);
 });
@@ -55,11 +45,7 @@ app.get("/users", async (req, res) => {
  * This is the endpoint to get all games
  */
 app.get("/games", async (req, res) => {
-  
-  if (!authenticateKey(req)) {
-    res.status(401).send("Unauthorized");
-    return;
-  }
+
 
   const games = await getGames();
   res.send(games);
@@ -69,11 +55,6 @@ app.get("/games", async (req, res) => {
  */
 app.get("/playerlist", async (req, res) => {
 
-  if (!authenticateKey(req)) {
-    res.status(401).send("Unauthorized");
-    return;
-  }
-
   const playerList = await getPlayerList();
   res.send(playerList);
 });
@@ -82,21 +63,11 @@ app.get("/playerlist", async (req, res) => {
  */
 app.get("/chat", async (req, res) => {
 
-  if (!authenticateKey(req)) {
-    res.status(401).send("Unauthorized");
-    return;
-  }
-
   const chatMessages = await getChatMessages();
   res.send(chatMessages);
 });
 
 app.get("/users/:email", async (req, res) => {
-
-  if (!authenticateKey(req)) {
-    res.status(401).send("Unauthorized");
-    return;
-  }
 
   const email = req.params.email;
   const user = await getUser(email);
@@ -109,11 +80,6 @@ app.get("/users/:email", async (req, res) => {
 
 app.get("/users/balance/:email", async (req, res) => {
 
-  if (!authenticateKey(req)) {
-    res.status(401).send("Unauthorized");
-    return;
-  }
-
   const email = req.params.email;
   const balance = await getUserBalance(email);
   res.send(balance);
@@ -121,21 +87,11 @@ app.get("/users/balance/:email", async (req, res) => {
 
 app.get("/games/current", async (req, res) => {
 
-  if (!authenticateKey(req)) {
-    res.status(401).send("Unauthorized");
-    return;
-  }
-
   const game = await getCurrentGame();
   res.send(game);
 });
 
 app.delete("/games", async (req, res) => {
-
-  if (!authenticateKey(req)) {
-    res.status(401).send("Unauthorized");
-    return;
-  }
 
   await clearGames();
   res.send("Games cleared");
@@ -143,21 +99,11 @@ app.delete("/games", async (req, res) => {
 
 app.delete("/playerlist", async (req, res) => {
 
-  if (!authenticateKey(req)) {
-    res.status(401).send("Unauthorized");
-    return;
-  }
-
   await clearPlayerList();
   res.send("Player list cleared");
 });
 
 app.get("/playerlist/:email/hasbet", async (req, res) => {
-
-  if (!authenticateKey(req)) {
-    res.status(401).send("Unauthorized");
-    return;
-  }
 
   const email = req.params.email;
   const hasBet = await hasUserBet(email);
@@ -166,22 +112,12 @@ app.get("/playerlist/:email/hasbet", async (req, res) => {
 
 app.get("/playerlist/:email/hascashout", async (req, res) => {
 
-  if (!authenticateKey(req)) {
-    res.status(401).send("Unauthorized");
-    return;
-  }
-
   const email = req.params.email;
   const hasCashOut = await hasUserCashOut(email);
   res.send(hasCashOut);
 });
 
 app.post("/users", async (req, res) => {
-
-  if (!authenticateKey(req)) {
-    res.status(401).send("Unauthorized");
-    return;
-  }
 
   const user = req.body;
   try {
@@ -195,22 +131,12 @@ app.post("/users", async (req, res) => {
 
 app.post("/chat", async (req, res) => {
 
-  if (!authenticateKey(req)) {
-    res.status(401).send("Unauthorized");
-    return;
-  }
-
   const chatMessage = req.body;
   await addChatMessage(chatMessage);
   res.send("Chat message added");
 });
 
 app.put("/users/:email", async (req, res) => {
-
-  if (!authenticateKey(req)) {
-    res.status(401).send("Unauthorized");
-    return;
-  }
 
   const email = req.params.email;
   const user = req.body;
@@ -219,11 +145,6 @@ app.put("/users/:email", async (req, res) => {
 });
 
 app.delete("/users/:email", async (req, res) => {
-
-  if (!authenticateKey(req)) {
-    res.status(401).send("Unauthorized");
-    return;
-  }
 
   const email = req.params.email;
   await deleteUser(email);
@@ -235,4 +156,5 @@ app.delete("/users/:email", async (req, res) => {
 */
 app.listen(PORT, () => {
   console.log("Server is running on port " + PORT);
+  console.log("CORS-enabled for ", process.env.ZION_APP_URL || "http://localhost:3000");
 });
