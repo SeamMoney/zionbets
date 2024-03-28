@@ -162,6 +162,21 @@ export async function getCurrentGame() {
   }
 }
 
+export async function clearGames() {
+  try {
+    const response = await fetch(`${API_URL}/games`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "api-key": process.env.ZION_API_KEY || "",
+      },
+    });
+    return response.ok;
+  } catch (e) {
+    return false;
+  }
+}
+
 export async function getUserBalance(email: string) {
   try {
     const response = await fetch(`${API_URL}/users/balance/${email}`, {

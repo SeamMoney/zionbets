@@ -120,6 +120,35 @@ export async function createAptosKeyPair(): Promise<{
   };
 }
 
+export async function quickRemoveGame() {
+  const adminAccount = await getUserAccount(process.env.ADMIN_ACCOUNT_PRIVATE_KEY || '');
+
+  const txn = await provider.generateTransaction(
+    adminAccount.address(),
+    {
+      function: `${MODULE_ADDRESS}::crash::hackathon_remove_game`,
+      type_arguments: [],
+      arguments: [],
+    },
+    TRANSACTION_OPTIONS
+  );
+
+  const tx = await provider.signAndSubmitTransaction(adminAccount, txn);
+
+  const txResult = await client.waitForTransactionWithResult(tx);
+
+  console.log(txResult);
+
+  if (!(txResult as any).success) {
+    return null;
+  }
+
+  return {
+    txnHash: txResult.hash,
+    version: (txResult as any).version,
+  };
+}
+
 export async function placeBet(user: User, betData: BetData) {
   const userAccount = await getUserAccount(user.private_key);
 
