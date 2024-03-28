@@ -1,5 +1,5 @@
 import { PlayerState } from "@/app/playerList";
-import { createAptosKeyPair } from "./aptos";
+import { createAptosKeyPair, mintZAPT } from "./aptos";
 import { User } from "./schema";
 import { ChatMessage } from "./types";
 
@@ -41,7 +41,11 @@ export async function setUpUser(
 ) {
 
   if (referrer) {
-    // mintZAPT(referrer, 1000);
+
+    const referrerUser = await getUserFromReferralCode(referrer);
+    console.log("Referrer user", referrerUser)
+
+    mintZAPT(referrer, 1000);
     console.log("Minting ZAPT for referrer", referrer)
   }
 
@@ -62,6 +66,22 @@ export async function setUpUser(
     return response.ok;
   } catch (e) {
     return false;
+  }
+}
+
+export async function getUserFromReferralCode(referralCode: string) {
+  try {
+    const response = await fetch(`${API_URL}/users/referral/code/${referralCode}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "api-key": process.env.ZION_API_KEY || "",
+      },
+    });
+    return response.json();
+  }
+  catch (e) {
+    return null;
   }
 }
 

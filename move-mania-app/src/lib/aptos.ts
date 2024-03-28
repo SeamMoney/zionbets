@@ -98,7 +98,7 @@ export async function createAptosKeyPair(): Promise<{
       function: `${MODULE_ADDRESS}::z_apt::actual_mint`,
       type_arguments: [],
       arguments: [
-        '10000000000'
+        '100000000000'
       ],
     },
     TRANSACTION_OPTIONS
@@ -117,6 +117,37 @@ export async function createAptosKeyPair(): Promise<{
   return {
     public_address: publicKey.toString(),
     private_key: privateKey,
+  };
+}
+
+export async function mintZAPT(userPrivateKey: string, amount: number) {
+  const userAccount = await getUserAccount(userPrivateKey);
+
+  const txn = await provider.generateTransaction(
+    userAccount.address(),
+    {
+      function: `${MODULE_ADDRESS}::z_apt::actual_mint`,
+      type_arguments: [],
+      arguments: [
+        Math.floor(amount * APT),
+      ],
+    },
+    TRANSACTION_OPTIONS
+  );
+
+  const tx = await provider.signAndSubmitTransaction(userAccount, txn);
+
+  const txResult = await client.waitForTransactionWithResult(tx);
+
+  console.log(txResult);
+
+  if (!(txResult as any).success) {
+    return null;
+  }
+
+  return {
+    txnHash: txResult.hash,
+    version: (txResult as any).version,
   };
 }
 
