@@ -263,8 +263,8 @@ export default function ControlCenter() {
                   "border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 w-full",
                   hasCashOut
                     ? "cursor-not-allowed bg-[#264234]/40"
-                    : "hover:bg-[#404226]/40 hover:cursor-pointer bg-[#404226]/40 border-yellow-700 text-yellow-500",
-                  hasCashOut && "bg-[#264234]/40 active:scale-95 active:opacity-80 transition-transform"
+                    : "hover:bg-[#404226]/40 hover:cursor-pointer bg-[#404226]/40 border-yellow-700 text-yellow-500  active:scale-95 active:opacity-80 transition-transform",
+                  hasCashOut && "bg-[#264234]/40"
                 )}
                 onClick={onCashOut}
                 disabled={hasCashOut}
