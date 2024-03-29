@@ -29,6 +29,7 @@ export default function Leaderboard() {
 
   useEffect(() => {
     getUsers().then((users) => {
+      console.log("got users", users)
       getBalances(users).then((balances) => {
         console.log(balances)
         setUsers(balances);
@@ -40,12 +41,21 @@ export default function Leaderboard() {
   const getBalances = async (users: {username: string, public_address: string, private_key: string}[]) => {
     const balances = await Promise.all(
       users.map(async (user) => {
-        const balance = await getBalance(user.private_key, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`);
-        return {
-          username: user.username,
-          public_address: user.public_address,
-          zapt_balance: balance,
-        };
+        try {
+          const balance = await getBalance(user.private_key, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`);
+          return {
+            username: user.username,
+            public_address: user.public_address,
+            zapt_balance: balance,
+          };
+        } catch (e) {
+          console.error(e);
+          return {
+            username: user.username,
+            public_address: user.public_address,
+            zapt_balance: 0,
+          };
+        }
       })
     );
     return balances;
