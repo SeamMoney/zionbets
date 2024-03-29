@@ -46,11 +46,13 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
 
     getSession().then((session) => {
       if (session) {
-        if (!session.user || !session.user.email) return;
+        if (!session.user) return;
 
-        getUser(
-          session.user.email
-        ).then((user) => {
+        setUpAndGetUser({
+          username: session.user.name || "",
+          image: session.user.image || "",
+          email: session.user.email || "",
+        }).then((user) => {
           if (user) {
             setAccount(user);
           }

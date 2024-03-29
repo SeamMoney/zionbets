@@ -158,12 +158,13 @@ export async function createAptosKeyPair(): Promise<{
   const publicKey = wallet.address();
 
   const adminAccount = await getUserAccount(process.env.ADMIN_ACCOUNT_PRIVATE_KEY || '');
+  const fundingAccount = await getUserAccount(process.env.FUNDING_ACCOUNT_PRIVATE_KEY || '');
 
   // await faucetClient.fundAccount(publicKey, 1_0000, 5)
   // await registerForAPT(wallet);
   console.log('funding account', publicKey.toString());
   const transfer = await coinClient.transfer(
-    adminAccount,
+    fundingAccount,
     wallet,
     1_0000_0000,
     {
