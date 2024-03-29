@@ -91,39 +91,30 @@ export default function PoolGraph() {
 
   useEffect(() => {
     getDeposits().then((deposits) => {
-      console.log('deposits: ', deposits);
     });
 
     getWithdrawals().then((withdrawals) => {
-      console.log('withdrawals: ', withdrawals);
     });
 
     getExtracts().then((extracts) => {
-      console.log('extracts: ', extracts);
     });
 
     getPuts().then((puts) => {
-      console.log('puts: ', puts);
     });
 
     getLocks().then((locks) => {
-      console.log('locks: ', locks);
     });
 
     getPoolAptSupply().then((supply) => {
-      console.log('supply: ', supply);
     });
 
     getLPCoinSupply().then((supply) => {
-      console.log('lp coin supply: ', supply);
     });
 
     getLockedLPCoinSupply().then((supply) => {
-      console.log('locked lp coin supply: ', supply);
     });
 
     getCrashCalculationEvents().then((events) => {
-      console.log('events: ', events);
     });
   })
 

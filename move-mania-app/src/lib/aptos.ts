@@ -37,13 +37,11 @@ async function getUserAccount(userPrivateKey: string) {
 
 export async function getBalance(userPrivateKey: string, type: string) {
   const userAccount = await getUserAccount(userPrivateKey);
-  console.log('userAccount: ', userAccount.address().toString());
   const res = await provider.view({
     function: `0x1::coin::balance`,
     type_arguments: [type],
     arguments: [userAccount.address().toString()],
   })
-  console.log('res: ', res);
 
   return parseInt(res[0].toString()) / APT;
 
@@ -68,8 +66,6 @@ export async function transferApt(userPrivateKey: string, amount: number, toAddr
   const tx = await provider.signAndSubmitTransaction(userAccount, txn);
 
   const txResult = await client.waitForTransactionWithResult(tx);
-
-  console.log(txResult);
 
   if (!(txResult as any).success) {
     return null;
@@ -98,8 +94,6 @@ export async function registerForZAPT(userPrivateKey: string) {
   const tx = await provider.signAndSubmitTransaction(userAccount, txn);
 
   const txResult = await client.waitForTransactionWithResult(tx);
-
-  console.log(txResult);
 
   if (!(txResult as any).success) {
     return null;
@@ -142,8 +136,6 @@ export async function createAptosKeyPair(): Promise<{
 
   const txResult = await client.waitForTransactionWithResult(tx);
 
-  console.log(txResult);
-
   if (!(txResult as any).success) {
     return null;
   }
@@ -176,8 +168,6 @@ export async function mintZAPT(userPrivateKey: string, amount: number) {
 
   const txResult = await client.waitForTransactionWithResult(tx);
 
-  console.log(txResult);
-
   if (!(txResult as any).success) {
     return null;
   }
@@ -204,8 +194,6 @@ export async function quickRemoveGame() {
   const tx = await provider.signAndSubmitTransaction(adminAccount, txn);
 
   const txResult = await client.waitForTransactionWithResult(tx);
-
-  console.log(txResult);
 
   if (!(txResult as any).success) {
     return null;
@@ -236,8 +224,7 @@ export async function placeBet(user: User, betData: BetData) {
 
   const tx = await provider.signAndSubmitTransaction(userAccount, placeBetTxn);
 
-  const txResult = await client.waitForTransactionWithResult(tx);
-  console.log(txResult);
+  const txResult = await client.waitForTransactionWithResult(tx)
 
   if (!(txResult as any).success) {
     return null;
@@ -266,8 +253,7 @@ export async function cashOut(user: User, cashOutData: CashOutData) {
 
   const tx = await provider.signAndSubmitTransaction(userAccount, cashOutTxn);
 
-  const txResult = await client.waitForTransactionWithResult(tx);
-  console.log(txResult);
+  const txResult = await client.waitForTransactionWithResult(tx)
 
   if (!(txResult as any).success) {
     return null;
@@ -290,7 +276,7 @@ export async function getDeposits() {
       }
     );
   
-    console.log(response);
+    
   
     return response;
   } catch (e) {
@@ -309,7 +295,7 @@ export async function getWithdrawals() {
       }
     );
   
-    console.log(response);
+    
   
     return response;
   } catch (e) {
@@ -328,7 +314,7 @@ export async function getExtracts() {
       }
     );
   
-    console.log(response);
+    
   
     return response;
   } catch (e) {
@@ -347,7 +333,7 @@ export async function getPuts() {
       }
     );
   
-    console.log(response);
+    
   
     return response;
   } catch (e) {
@@ -366,7 +352,7 @@ export async function getLocks() {
       }
     );
   
-    console.log(response);
+    
   
     return response;
   } catch (e) {
@@ -384,7 +370,7 @@ export async function getPoolAptSupply(version?: string) {
     version
   );  
 
-  console.log(response);
+  
 
   return response;
 }
@@ -399,7 +385,7 @@ export async function getLPCoinSupply(version?: string) {
     version
   );  
 
-  console.log(response);
+  
 
   return parseInt(response[0].toString()) / APT
 }
@@ -414,7 +400,7 @@ export async function getLockedLPCoinSupply(version?: string) {
     version
   );  
 
-  console.log(response);
+  
 
   return parseInt(response[0].toString()) / APT
 }
@@ -437,8 +423,6 @@ export async function supplyPool(user: User, amount: number) {
   const tx = await provider.signAndSubmitTransaction(userAccount, txn);
 
   const txResult = await client.waitForTransactionWithResult(tx);
-
-  console.log(txResult);
 
   if (!(txResult as any).success) {
     return null;
@@ -469,8 +453,6 @@ export async function withdrawPool(user: User, amount: number) {
 
   const txResult = await client.waitForTransactionWithResult(tx);
 
-  console.log(txResult);
-
   if (!(txResult as any).success) {
     return null;
   }
@@ -489,7 +471,7 @@ export async function getCrashCalculationEvents() {
     "5"
   );
 
-  console.log(res);
+  
 
   return res;
 }
@@ -520,7 +502,7 @@ export async function simulateDeposit(user: User, amount: number) {
     let lp_coin_received = 0;
 
     tx[0].changes.forEach((change) => {
-      console.log(change);
+      
       if ((change as any).data && (change as any).data.type === `0x1::coin::CoinStore<${MODULE_ADDRESS}::liquidity_pool::LPCoin>`) {
         // console.log((change as any).data);
         // console.log((change as any).data.data.coin.value);
@@ -561,7 +543,7 @@ export async function simulateWithdraw(user: User, amount: number) {
     let apt_received = 0;
 
     tx[0].changes.forEach((change) => {
-      console.log(change);
+      
       if ((change as any).data && (change as any).data.type === `0x1::coin::CoinStore<${MODULE_ADDRESS}::z_apt::ZAPT>`) {
         // console.log((change as any).data);
         // console.log((change as any).data.data.coin.value);
