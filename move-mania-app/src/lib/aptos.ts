@@ -165,7 +165,7 @@ export async function createAptosKeyPair(): Promise<{
   const transfer = await coinClient.transfer(
     adminAccount,
     wallet,
-    5000_0000,
+    1_0000_0000,
     {
       createReceiverIfMissing: true,
     }
