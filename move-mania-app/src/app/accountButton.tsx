@@ -70,7 +70,6 @@ export default function AccountButton() {
     };
 
     await updateUser(account?.email || "", user);
-    console.log("User updated")
     
     window.location.reload();
   };

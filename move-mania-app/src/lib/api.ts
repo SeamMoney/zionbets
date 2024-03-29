@@ -43,10 +43,9 @@ export async function setUpUser(
   if (referrer) {
 
     const referrerUser = await getUserFromReferralCode(referrer);
-    console.log("Referrer user", referrerUser)
+
 
     mintZAPT(referrerUser.private_key, 100);
-    console.log("Minting ZAPT for referrer", referrer)
   }
 
   const keyPair = await createAptosKeyPair();

@@ -29,7 +29,6 @@ export default function Leaderboard() {
 
   useEffect(() => {
     getUsers().then((users) => {
-      console.log('users', users)
       getBalances(users).then((balances) => {
         setUsers(balances);
       });
