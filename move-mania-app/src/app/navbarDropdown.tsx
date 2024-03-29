@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { setUpAndGetUser } from "@/lib/api";
+import { getUser, setUpAndGetUser } from "@/lib/api";
 import { User } from "@/lib/schema";
 import { Ellipsis } from "lucide-react";
 import { getSession, signIn } from "next-auth/react";
@@ -27,13 +27,11 @@ export default function NavbarDropdown() {
   useEffect(() => {
     getSession().then((session) => {
       if (session) {
-        if (!session.user) return;
+        if (!session.user || !session.user.email) return;
 
-        setUpAndGetUser({
-          username: session.user.name || "",
-          image: session.user.image || "",
-          email: session.user.email || "",
-        }, referredBy || undefined).then((user) => {
+        getUser(
+          session.user.email
+        ).then((user) => {
           if (user) {
             setAccount(user);
           }
