@@ -14,6 +14,7 @@ import NavbarDropdown from "./navbarDropdown";
 import { Suspense } from "react";
 import CrashProvider from "./CrashProvider";
 import KeylessProvider from "./KeylessProvider";
+import { SessionProvider } from "next-auth/react";
 
 const baijamjuree = Bai_Jamjuree({
   weight: ['200', '300', '400', '500', '600'],
@@ -47,11 +48,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <Analytics/>
+      <Analytics />
       <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"></meta>
       <body className={baijamjuree.className + " text-white bg-[#020202] bg-noise"}>
-        <KeylessProvider>
-          <CrashProvider>
+        <SessionProvider>
+          <KeylessProvider>
+            <CrashProvider>
               <div className="flex h-full min-h-screen overflow-hidden">
                 <nav className="fixed w-full h-12 z-30 px-2 border-b border-neutral-700 bg-[#020202] bg-noise">
                   <div className="flex flex-row items-center justify-between w-full h-full">
@@ -76,7 +78,7 @@ export default function RootLayout({
                 <div className="flex flex-col pt-12 w-full items-center">
                   <main className="overflow-y-auto max-w-5xl">
                     {children}
-                    <Toaster  />
+                    <Toaster />
                   </main>
                 </div>
 
@@ -86,7 +88,8 @@ export default function RootLayout({
               </div>
             </CrashProvider>
           </KeylessProvider>
-        </body>
+        </SessionProvider>
+      </body>
     </html>
   );
 }
@@ -99,7 +102,7 @@ function HamburgerNavigation() {
       </SheetTrigger>
       <SheetContent className="w-[70%] bg-neutral-950 border-neutral-700 flex flex-col items-start gap-2 pt-8" side={"left"}>
         <SheetClose asChild>
-          <Link href='/' className="text-white text-2xl font-bold">Home</Link>  
+          <Link href='/' className="text-white text-2xl font-bold">Home</Link>
         </SheetClose>
         <SheetClose asChild>
           <Link href='/crash' className="text-sm opacity-50">

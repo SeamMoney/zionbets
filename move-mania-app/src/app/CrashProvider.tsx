@@ -5,7 +5,7 @@ import { GameStatus } from "./controlCenter";
 import { ReactNode, createContext, useEffect, useState } from "react";
 import { socket } from "@/lib/socket";
 import { getSession } from "next-auth/react";
-import { getCurrentGame } from "@/lib/api";
+import { getCurrentGame, getUser, setUpAndGetUser } from "@/lib/api";
 import { SOCKET_EVENTS } from "@/lib/types";
 import { EXPONENTIAL_FACTOR, log } from "@/lib/utils";
 import {
@@ -27,7 +27,7 @@ interface CrashPageProps {
   latestAction: number | null;
 }
 export const gameStatusContext = createContext<CrashPageProps>({
-  gameStatus: null, 
+  gameStatus: null,
   account: null,
   latestAction: null,
 });
@@ -44,21 +44,22 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
 
-    // getSession().then((session) => {
-    //   if (session) {
-    //     if (!session.user) return;
-
-    //     setUpAndGetUser({
-    //       username: session.user.name || "",
-    //       image: session.user.image || "",
-    //       email: session.user.email || "",
-    //     }).then((user) => {
-    //       if (user) {
-    //         setAccount(user);
-    //       }
-    //     });
-    //   }
-    // });
+    getSession().then((session) => {
+      if (session && session.user) {
+        setUpAndGetUser({
+          username: session.user.name || "",
+          image: session.user.image || "",
+          email: session.user.email || "",
+          address: "", // We'll generate this on the backend
+          referral_code: "", // We'll generate this on the backend
+          referred_by: null, // This can be null initially
+        }).then((user) => {
+          if (user) {
+            setAccount(user);
+          }
+        });
+      }
+    });
 
     function onConnect() {
       setIsConnected(true);
@@ -103,7 +104,7 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
       socket.off(SOCKET_EVENTS.ROUND_START, onRoundStart);
       socket.off(SOCKET_EVENTS.BET_CONFIRMED, onBetConfirmed);
       socket.off(SOCKET_EVENTS.CASH_OUT_CONFIRMED, onCashOutConfirmed);
-      socket.off(SOCKET_EVENTS.ROUND_RESULT, onRoundResult); 
+      socket.off(SOCKET_EVENTS.ROUND_RESULT, onRoundResult);
     };
   }, []);
 
@@ -144,7 +145,7 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
           }
         }
       });
-  
+
       setUpdate(false);
     }
 
@@ -190,7 +191,7 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel 
+            <AlertDialogCancel
               onClick={() => {
                 setShowPWAInstall(false);
                 localStorage.setItem("pwaPrompt", 'true');

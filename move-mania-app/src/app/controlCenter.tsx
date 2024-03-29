@@ -13,21 +13,15 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"
 import { User } from "@/lib/schema";
-import { cashOutBet, setNewBet, startRound } from "@/lib/socket";
-import { RoundStart, SOCKET_EVENTS } from "@/lib/types";
+import { cashOutBet, setNewBet } from "@/lib/socket";
+import { SOCKET_EVENTS } from "@/lib/types";
 import { EXPONENTIAL_FACTOR, calculateCurrentCrashPoint, cn, log } from "@/lib/utils";
-import { time } from "console";
-import { getSession } from "next-auth/react";
 import { useContext, useEffect, useState } from "react";
-import { Socket, io } from "socket.io-client";
-
 import { socket } from "@/lib/socket";
 import { gameStatusContext } from "./CrashProvider";
 import { cashOut, placeBet } from "@/lib/aptos";
 import { useToast } from "@/components/ui/use-toast";
 import Link from "next/link";
-import { keylessContext } from "./KeylessProvider";
-import { CHAIN_MODE } from "@/constants";
 
 export type GameStatus = {
   status: "COUNTDOWN" | "IN_PROGRESS" | "END";
@@ -39,32 +33,29 @@ export type GameStatus = {
 export default function ControlCenter() {
   const {
     gameStatus,
+    account,
     latestAction
   } = useContext(gameStatusContext);
-  const { isLoggedIn, userInfo, keylessAccount } = useContext(keylessContext);
 
   const { toast } = useToast()
 
   const [betAmount, setBetAmount] = useState("");
-
   const [autoCashout, setAutoCashout] = useState(false);
   const [autoCashoutAmount, setAutoCashoutAmount] = useState("");
-
   const [hasBet, setHasBet] = useState(false);
   const [hasCashOut, setHasCashOut] = useState(false);
 
   useEffect(() => {
-    if (isLoggedIn && userInfo) {
-      hasUserBet(userInfo.address || "").then((bet) => {
+    if (account) {
+      hasUserBet(account.public_address).then((bet) => {
         setHasBet(bet);
       });
 
-      hasUserCashOut(userInfo.address || "").then((cashout) => {
+      hasUserCashOut(account.public_address).then((cashout) => {
         setHasCashOut(cashout);
       });
-
     }
-  }, [gameStatus, isLoggedIn, userInfo, latestAction]);
+  }, [gameStatus, account, latestAction]);
 
   useEffect(() => {
     if (gameStatus?.status === "IN_PROGRESS") {
@@ -83,51 +74,48 @@ export default function ControlCenter() {
   }
 
   const onSetBet = async () => {
-
-    if (!socket) return;
-
-    if (!isLoggedIn || !userInfo || !keylessAccount) return;
+    if (!socket || !account || !gameStatus) return;
 
     toast({
       title: "Placing bet at " + betAmount + " GMOVE...",
     })
 
-    const blockchainRes = await placeBet(keylessAccount, {
-      roundId: 1,
-      playerEmail: userInfo.address,
-      betAmount: parseFloat(betAmount),
-      coinType: "MOVE",
-    })
+    try {
+      const blockchainRes = await placeBet(account.private_key, {
+        roundId: parseInt(gameStatus.roundId),
+        playerEmail: account.email,
+        betAmount: parseFloat(betAmount),
+        coinType: "GMOVE",
+      });
 
-    if (!blockchainRes) {
-      console.error('Error placing bet');
+      if (!blockchainRes) {
+        throw new Error('Error placing bet');
+      }
+
+      const data = {
+        roundId: parseInt(gameStatus.roundId),
+        playerEmail: account.email,
+        betAmount: parseFloat(betAmount),
+        coinType: "GMOVE",
+      };
+      setNewBet(data);
+
+      toast({
+        title: "Bet placed at " + betAmount + " GMOVE",
+        description: <Link href={`https://blue.explorer.movementlabs.xyz/txn/${blockchainRes.txnHash}/?network=testnet`} target="_blank" className="underline">View transaction</Link>
+      })
+      setHasBet(true);
+    } catch (error) {
+      console.error('Error placing bet:', error);
       toast({
         title: "Error placing bet",
         description: "Please try again"
       })
-      return;
     }
-
-    const data = {
-      roundId: 1,
-      playerEmail: userInfo.address,
-      betAmount: parseFloat(betAmount),
-      coinType: "MOVE",
-    };
-    const success = setNewBet(data);
-
-    toast({
-      title: "Bet placed at " + betAmount + " GMOVE",
-      description: <Link href={`https://blue.explorer.movementlabs.xyz/txn/${blockchainRes.version}/?network=testnet`} target="_blank" className="underline">View transaction</Link>
-    })
   };
 
   const onCashOut = async () => {
-    if (!socket) return;
-
-    if (!userInfo || !isLoggedIn || !keylessAccount) return;
-
-    if (!gameStatus?.startTime) return;
+    if (!socket || !account || !gameStatus?.startTime) return;
 
     const cashoutMultipler = Number(calculateCurrentCrashPoint((Date.now() - gameStatus.startTime) / 1000).toFixed(2));
 
@@ -135,34 +123,36 @@ export default function ControlCenter() {
       title: "Cashing out at " + cashoutMultipler + "x...",
     })
 
+    try {
+      const blockchainRes = await cashOut(account.private_key, {
+        roundId: parseInt(gameStatus.roundId),
+        playerEmail: account.email,
+        cashOutMultiplier: cashoutMultipler,
+      });
 
-    const blockchainRes = await cashOut(keylessAccount, {
-      roundId: 1,
-      playerEmail: userInfo.address,
-      cashOutMultiplier: cashoutMultipler,
-    });
+      if (!blockchainRes) {
+        throw new Error('Error cashing out');
+      }
 
-    if (!blockchainRes) {
-      console.error('Error cashing out');
+      const data = {
+        roundId: parseInt(gameStatus.roundId),
+        playerEmail: account.email,
+        cashOutMultiplier: cashoutMultipler,
+      };
+      cashOutBet(data);
+
+      toast({
+        title: "Cashed out at " + cashoutMultipler + "x",
+        description: <Link href={`https://blue.explorer.movementlabs.xyz/txn/${blockchainRes.txnHash}/?network=testnet`} target="_blank" className="underline">View transaction</Link>
+      })
+      setHasCashOut(true);
+    } catch (error) {
+      console.error('Error cashing out:', error);
       toast({
         title: "Error cashing out",
         description: "Please try again"
       })
-      return;
     }
-
-    const data = {
-      roundId: 1,
-      playerEmail: userInfo.address,
-      cashOutMultiplier: cashoutMultipler,
-    };
-    const succes = cashOutBet(data);
-
-    toast({
-      title: "Cashed out at " + cashoutMultipler + "x",
-      description: <Link href={`https://blue.explorer.movementlabs.xyz/txn/${blockchainRes.version}/?network=testnet`} target="_blank" className="underline">View transaction</Link>
-    })
-
   };
 
   return (
@@ -225,7 +215,7 @@ export default function ControlCenter() {
         </div>
         <div className="flex flex-row items-baseline gap-2 w-full text-lg">
           {
-            !(isLoggedIn && userInfo) && (
+            !account && (
               <button
                 className="border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 cursor-not-allowed w-full"
                 disabled
@@ -235,7 +225,7 @@ export default function ControlCenter() {
             )
           }
           {
-            isLoggedIn && userInfo && gameStatus?.status === "COUNTDOWN" && (
+            account && gameStatus?.status === "COUNTDOWN" && (
               <button
                 className={cn(
                   "border border-green-700 px-6 py-1 border-yellow-700 text-yellow-500 bg-neutral-950 w-full",
@@ -254,7 +244,7 @@ export default function ControlCenter() {
             )
           }
           {
-            isLoggedIn && userInfo && gameStatus?.status === "IN_PROGRESS" && hasBet && (
+            account && gameStatus?.status === "IN_PROGRESS" && hasBet && (
               <button
                 className={cn(
                   "border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 w-full",
@@ -273,7 +263,7 @@ export default function ControlCenter() {
             )
           }
           {
-            isLoggedIn && userInfo && gameStatus?.status === "IN_PROGRESS" && !hasBet && (
+            account && gameStatus?.status === "IN_PROGRESS" && !hasBet && (
               <button
                 className="border px-6 py-1 border-yellow-700 text-yellow-500 bg-neutral-950 cursor-not-allowed w-full"
                 disabled
@@ -283,7 +273,7 @@ export default function ControlCenter() {
             )
           }
           {
-            isLoggedIn && userInfo && gameStatus?.status === "END" && (
+            account && gameStatus?.status === "END" && (
               <button
                 className="border border-yellow-700 px-6 py-1 text-yellow-500 bg-neutral-950 cursor-not-allowed w-full"
                 disabled
@@ -369,7 +359,7 @@ export default function ControlCenter() {
               </div>
               <div className="flex flex-row items-baseline gap-2 w-full text-lg">
                 {
-                  (!isLoggedIn || !userInfo) && (
+                  !account && (
                     <button
                       className="border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 cursor-not-allowed w-full"
                       disabled
@@ -379,7 +369,7 @@ export default function ControlCenter() {
                   )
                 }
                 {
-                  isLoggedIn && userInfo && (
+                  account && (
                     <button
                       className={cn(
                         "border bg-[#404226]/40 border-yellow-700 text-yellow-500 px-6 py-1 w-full",
@@ -392,7 +382,6 @@ export default function ControlCenter() {
                           return
                         }
                         setAutoCashout(!autoCashout);
-
                       }}
                     >
                       {
@@ -406,10 +395,6 @@ export default function ControlCenter() {
           </AccordionContent>
         </AccordionItem>
       </Accordion>
-
-
-
-
     </div>
   );
 }
