@@ -82,6 +82,35 @@ export async function transferApt(userPrivateKey: string, amount: number, toAddr
 
 }
 
+export async function registerForZAPT(userPrivateKey: string) {
+  const userAccount = await getUserAccount(userPrivateKey);
+
+  const txn = await provider.generateTransaction(
+    userAccount.address(),
+    {
+      function: `${MODULE_ADDRESS}::z_apt::register`,
+      type_arguments: [],
+      arguments: [],
+    },
+    TRANSACTION_OPTIONS
+  );
+
+  const tx = await provider.signAndSubmitTransaction(userAccount, txn);
+
+  const txResult = await client.waitForTransactionWithResult(tx);
+
+  console.log(txResult);
+
+  if (!(txResult as any).success) {
+    return null;
+  }
+
+  return {
+    txnHash: txResult.hash,
+    version: (txResult as any).version,
+  };
+}
+
 export async function createAptosKeyPair(): Promise<{
   public_address: string;
   private_key: string;
@@ -92,19 +121,24 @@ export async function createAptosKeyPair(): Promise<{
 
   await faucetClient.fundAccount(publicKey, 1_0000_0000, 5)
 
+  await registerForZAPT(privateKey);
+
+  const adminAccount = await getUserAccount(process.env.ADMIN_ACCOUNT_PRIVATE_KEY || '');
+
   const txn = await provider.generateTransaction(
-    wallet.address(),
+    adminAccount.address(),
     {
-      function: `${MODULE_ADDRESS}::z_apt::actual_mint`,
+      function: `${MODULE_ADDRESS}::z_apt::mint`,
       type_arguments: [],
       arguments: [
-        '100000000000'
+        '100000000000',
+        wallet.address()
       ],
     },
     TRANSACTION_OPTIONS
   );
 
-  const tx = await provider.signAndSubmitTransaction(wallet, txn);
+  const tx = await provider.signAndSubmitTransaction(adminAccount, txn);
 
   const txResult = await client.waitForTransactionWithResult(tx);
 
@@ -123,19 +157,22 @@ export async function createAptosKeyPair(): Promise<{
 export async function mintZAPT(userPrivateKey: string, amount: number) {
   const userAccount = await getUserAccount(userPrivateKey);
 
+  const adminAccount = await getUserAccount(process.env.ADMIN_ACCOUNT_PRIVATE_KEY || '');
+
   const txn = await provider.generateTransaction(
-    userAccount.address(),
+    adminAccount.address(),
     {
-      function: `${MODULE_ADDRESS}::z_apt::actual_mint`,
+      function: `${MODULE_ADDRESS}::z_apt::mint`,
       type_arguments: [],
       arguments: [
         Math.floor(amount * APT),
+        userAccount.address()
       ],
     },
     TRANSACTION_OPTIONS
   );
 
-  const tx = await provider.signAndSubmitTransaction(userAccount, txn);
+  const tx = await provider.signAndSubmitTransaction(adminAccount, txn);
 
   const txResult = await client.waitForTransactionWithResult(tx);
 
