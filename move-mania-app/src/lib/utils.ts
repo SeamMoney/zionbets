@@ -46,7 +46,6 @@ export function generateChartData(gameRoundId: string, crashPoint: number): any[
   const gameLengthMs = log(exponentialBase, crashPoint) * 1000;
   const gameEndMs = 5 * 1000;
   const gameTicks = (countdownMs + gameLengthMs + gameEndMs) / tickMs;
-  console.log("gameTicks:", gameTicks)
 
 
   const hasher = crypto.createHash("sha256");
