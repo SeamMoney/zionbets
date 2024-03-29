@@ -16,7 +16,7 @@ import Link from "next/link";
 export type PlayerState = {
   username: string;
   public_address: string;
-  balance: number;
+  zapt_balance: number;
 };
 
 export default function Leaderboard() {
@@ -30,7 +30,9 @@ export default function Leaderboard() {
   useEffect(() => {
     getUsers().then((users) => {
       getBalances(users).then((balances) => {
+        console.log(balances)
         setUsers(balances);
+        console.log("Updated leaderboard")
       });
     });
   }, [latestAction]);
@@ -40,8 +42,9 @@ export default function Leaderboard() {
       users.map(async (user) => {
         const balance = await getBalance(user.private_key, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`);
         return {
-          ...user,
-          balance,
+          username: user.username,
+          public_address: user.public_address,
+          zapt_balance: balance,
         };
       })
     );
@@ -65,7 +68,7 @@ export default function Leaderboard() {
         <tbody>
           {users
           .sort((a, b) => {
-            return b.balance - a.balance;
+            return b.zapt_balance - a.zapt_balance;
           })
           .slice(0, 10)
           .map((player, index) => (
@@ -75,7 +78,7 @@ export default function Leaderboard() {
               </td>
               <td className="ps-4 w-[200px] text-left ps-4 bg-neutral-800/40 bg-[#264234]/40 border-b border-neutral-800">{player.username}</td>
               <td className="text-right pr-4 w-[100px] text-right pr-4  bg-neutral-800/40 bg-[#264234]/40 border-b border-neutral-800">
-                {player.balance.toLocaleString(undefined, {
+                {player.zapt_balance.toLocaleString(undefined, {
                   maximumFractionDigits: 2,
                   minimumFractionDigits: 2,
                 })}
