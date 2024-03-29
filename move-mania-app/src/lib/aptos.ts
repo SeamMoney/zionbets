@@ -113,7 +113,7 @@ export async function createAptosKeyPair(): Promise<{
   const privateKey = wallet.toPrivateKeyObject().privateKeyHex;
   const publicKey = wallet.address();
 
-  await faucetClient.fundAccount(publicKey, 1_0000_0000, 5)
+  await faucetClient.fundAccount(publicKey, 1_0000, 5)
 
   await registerForZAPT(privateKey);
 
