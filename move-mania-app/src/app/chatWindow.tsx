@@ -1,6 +1,6 @@
 "use client";
 
-import { getChatMessages, setUpAndGetUser } from "@/lib/api";
+import { getChatMessages, getUser, setUpAndGetUser } from "@/lib/api";
 import { User } from "@/lib/schema";
 import { sendMessage } from "@/lib/socket";
 import { ChatMessage, SOCKET_EVENTS } from "@/lib/types";
@@ -33,13 +33,11 @@ export default function ChatWindow() {
   useEffect(() => {
     getSession().then((session) => {
       if (session) {
-        if (!session.user) return;
+        if (!session.user || !session.user.email) return;
 
-        setUpAndGetUser({
-          username: session.user.name || "",
-          image: session.user.image || "",
-          email: session.user.email || "",
-        }).then((user) => {
+        getUser(
+          session.user.email
+        ).then((user) => {
           if (user) {
             setAccount(user);
           }

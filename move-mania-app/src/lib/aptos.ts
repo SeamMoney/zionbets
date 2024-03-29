@@ -1,4 +1,4 @@
-import { AptosAccount, AptosClient, FaucetClient, HexString, Provider } from "aptos";
+import { AptosAccount, AptosClient, CoinClient, FaucetClient, HexString, Provider } from "aptos";
 import { BetData, CashOutData } from "./types";
 import { User } from "./schema";
 
@@ -12,10 +12,14 @@ const RPC_URL = 'https://fullnode.random.aptoslabs.com';
 const FAUCET_URL = 'https://faucet.random.aptoslabs.com';
 
 const client = new AptosClient(RPC_URL);
+const coinClient = new CoinClient(client);
 const provider = new Provider({
   fullnodeUrl: RPC_URL,
   // indexerUrl: 'https://indexer.random.aptoslabs.com',
 })
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 
 const faucetClient = new FaucetClient(
   RPC_URL,
@@ -78,6 +82,32 @@ export async function transferApt(userPrivateKey: string, amount: number, toAddr
 
 }
 
+export async function registerForAPT(userAccount: AptosAccount) {
+
+  const txn = await provider.generateTransaction(
+    userAccount.address(),
+    {
+      function: `0x01::managed_coin::register`,
+      type_arguments: ['0x1::aptos_coin::AptosCoin'],
+      arguments: [],
+    },
+    TRANSACTION_OPTIONS
+  );
+
+  const tx = await provider.signAndSubmitTransaction(userAccount, txn);
+
+  const txResult = await client.waitForTransactionWithResult(tx);
+
+  if (!(txResult as any).success) {
+    return null;
+  }
+
+  return {
+    txnHash: txResult.hash,
+    version: (txResult as any).version,
+  };
+}
+
 export async function registerForZAPT(userPrivateKey: string) {
   const userAccount = await getUserAccount(userPrivateKey);
 
@@ -105,6 +135,20 @@ export async function registerForZAPT(userPrivateKey: string) {
   };
 }
 
+async function fundAccountWithAdmin(userAccount: string, amount: number) {
+  const adminAccount = await getUserAccount(process.env.ADMIN_ACCOUNT_PRIVATE_KEY || '');
+
+  // const transfer = await coinClient.transfer(
+  //   adminAccount,
+  //   accountToFund,
+  //   2500_0000,
+  //   {
+  //     createReceiverIfMissing: true,
+  //   }
+  // );
+  // await client.waitForTransaction(transfer, { checkSuccess: true });
+}
+
 export async function createAptosKeyPair(): Promise<{
   public_address: string;
   private_key: string;
@@ -113,11 +157,24 @@ export async function createAptosKeyPair(): Promise<{
   const privateKey = wallet.toPrivateKeyObject().privateKeyHex;
   const publicKey = wallet.address();
 
-  await faucetClient.fundAccount(publicKey, 1_0000, 5)
-
-  await registerForZAPT(privateKey);
-
   const adminAccount = await getUserAccount(process.env.ADMIN_ACCOUNT_PRIVATE_KEY || '');
+
+  // await faucetClient.fundAccount(publicKey, 1_0000, 5)
+  // await registerForAPT(wallet);
+  console.log('funding account', publicKey.toString());
+  const transfer = await coinClient.transfer(
+    adminAccount,
+    wallet,
+    5000_0000,
+    {
+      createReceiverIfMissing: true,
+    }
+  );
+  const fundTx = await client.waitForTransactionWithResult(transfer, { checkSuccess: true });
+  console.log('fund', fundTx);
+  // await sleep(5000);
+  
+  await registerForZAPT(privateKey);
 
   const txn = await provider.generateTransaction(
     adminAccount.address(),
