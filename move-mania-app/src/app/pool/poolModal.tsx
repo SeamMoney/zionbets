@@ -9,12 +9,14 @@ import { cn } from "@/lib/utils";
 import { get } from "http";
 import { getSession } from "next-auth/react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { gameStatusContext } from "../CrashProvider";
 
 
 export default function PoolModal() {
 
-  const [account, setAccount] = useState<User | null>(null);
+  const { account } = useContext(gameStatusContext);
+  // const [account, setAccount] = useState<User | null>(null);
   const [balance, setBalance] = useState<number>(0)
   const [lpCoinSupply, setLpCoinSupply] = useState<number>(0)
   const [aptBalance, setAptBalance] = useState<number>(0)
@@ -27,59 +29,67 @@ export default function PoolModal() {
   const { toast } = useToast()
   
   useEffect(() => {
-    getSession().then((session) => {
-      if (session) {
-        if (!session.user) return;
-
-        setUpAndGetUser({
-          username: session.user.name || "",
-          image: session.user.image || "",
-          email: session.user.email || "",
-        }).then((user) => {
-          if (user) {
-            setAccount(user);
-            getBalance(user.private_key, `${process.env.MODULE_ADDRESS}::liquidity_pool::LPCoin`).then((balance) => {
-              setBalance(balance);
-              simulateWithdraw(user, balance).then((txn) => {
-                if (txn) {
-                  setExpectedReturnFromWithdraw(txn);
-                }
-              });
-            });
-            getBalance(user.private_key, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`).then((balance) => {
-              setAptBalance(balance);
-              simulateDeposit(user, balance).then((txn) => {
-                if (txn) {
-                  setExpectedReturnFromDeposit(txn);
-                }
-              });
-            });
-          }
+    if (account) {
+      try {
+        getBalance(account.private_key, `${process.env.MODULE_ADDRESS}::liquidity_pool::LPCoin`).then((balance) => {
+          setBalance(balance);
+          simulateWithdraw(account, balance).then((txn) => {
+            if (txn) {
+              setExpectedReturnFromWithdraw(txn);
+            }
+          });
         });
+      } catch (e) {
+        console.log(e)
       }
-    });
+      try {
+        getBalance(account.private_key, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`).then((balance) => {
+          setAptBalance(balance);
+          simulateDeposit(account, balance).then((txn) => {
+            if (txn) {
+              setExpectedReturnFromDeposit(txn);
+            }
+          });
+        });
+      } catch (e) {
+        console.log(e)
+      }
+    }
 
     getLPCoinSupply().then((supply) => {
       setLpCoinSupply(supply)
     });
-  }, []);
+  }, [account]);
+
 
   useEffect(() => {
     if (account) {
       const interval = setInterval(() => {
         // console.log('Checking for updates')
-        getUser(account.email).then((user) => {
-          if (user) {
-            // console.log('balance: ', user.balance)
-            setAccount(user);
-            getBalance(user.private_key, `${process.env.MODULE_ADDRESS}::liquidity_pool::LPCoin`).then((balance) => {
-              setBalance(balance);
+        try {
+          getBalance(account.private_key, `${process.env.MODULE_ADDRESS}::liquidity_pool::LPCoin`).then((balance) => {
+            setBalance(balance);
+            simulateWithdraw(account, balance).then((txn) => {
+              if (txn) {
+                setExpectedReturnFromWithdraw(txn);
+              }
             });
-            getBalance(user.private_key, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`).then((balance) => {
-              setAptBalance(balance);
+          });
+        } catch (e) {
+          console.log(e)
+        }
+        try {
+          getBalance(account.private_key, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`).then((balance) => {
+            setAptBalance(balance);
+            simulateDeposit(account, balance).then((txn) => {
+              if (txn) {
+                setExpectedReturnFromDeposit(txn);
+              }
             });
-          }
-        });
+          });
+        } catch (e) {
+          console.log(e)
+        }
       }, 1000);
       return () => clearInterval(interval);
     }

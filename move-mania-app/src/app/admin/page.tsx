@@ -6,29 +6,31 @@ import { User } from "@/lib/schema";
 import { startRound } from "@/lib/socket";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { getSession, signOut } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { gameStatusContext } from "../CrashProvider";
 
 const admins = process.env.ADMIN_ACCOUNTS ? process.env.ADMIN_ACCOUNTS.split("@@@") : [];
 
 export default function AdminPage() {
 
-  const [account, setAccount] = useState<User | null>(null);
+  const { account } = useContext(gameStatusContext);
+  // const [account, setAccount] = useState<User | null>(null);
 
-  useEffect(() => {
-    getSession().then((session) => {
-      if (session) {
-        if (!session.user || !session.user.email) return;
+  // useEffect(() => {
+  //   getSession().then((session) => {
+  //     if (session) {
+  //       if (!session.user || !session.user.email) return;
 
-        getUser(
-          session.user.email
-        ).then((user) => {
-          if (user) {
-            setAccount(user);
-          }
-        });
-      }
-    });
-  }, []);
+  //       getUser(
+  //         session.user.email
+  //       ).then((user) => {
+  //         if (user) {
+  //           setAccount(user);
+  //         }
+  //       });
+  //     }
+  //   });
+  // }, []);
 
   if (!account) return <></>;
 
