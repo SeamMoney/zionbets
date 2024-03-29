@@ -467,6 +467,26 @@ export async function payOutPlayers() {
   await db.close();
 }
 
+export async function getUserByReferralCode(referralCode: string) {
+  await initializeAllTables(); // initialize tables if not yet initialized
+
+  // Open the database
+  const db = await open({
+    filename: "games.db",
+    driver: require("sqlite3").Database,
+  });
+
+  // Get the user with the given referral code
+  const user = await db.get(
+    "SELECT * FROM users WHERE public_address LIKE CONCAT('%', ?)",
+    referralCode
+  );
+
+  await db.close();
+
+  return user;
+}
+
 /**
  * @description Removes all of the players from the player list.
  * This function is to be used on the server side to remove all of the players from the player list.

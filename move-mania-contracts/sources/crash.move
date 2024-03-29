@@ -1154,6 +1154,10 @@ module zion::z_apt {
     coin::deposit(recipient, minted_coin);
   }
 
+  public entry fun register(recipient: &signer) {
+    coin::register<ZAPT>(recipient);
+  }
+
   public entry fun actual_mint(
     recipient: &signer,
     amount: u64

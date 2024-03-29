@@ -11,6 +11,7 @@ import {
   getPlayerList,
   getUser,
   getUserBalance,
+  getUserByReferralCode,
   getUsers,
   hasUserBet,
   hasUserCashOut,
@@ -65,6 +66,16 @@ app.get("/chat", async (req, res) => {
 
   const chatMessages = await getChatMessages();
   res.send(chatMessages);
+});
+
+app.get("/users/referral/code/:code", async (req, res) => {
+  const code = req.params.code;
+  const user = await getUserByReferralCode(code);
+  if (user) {
+    res.send(user);
+  } else {
+    res.status(404).send("User not found");
+  }
 });
 
 app.get("/users/:email", async (req, res) => {

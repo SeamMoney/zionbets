@@ -69,24 +69,20 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
     }
 
     function onRoundStart() {
-      console.log('Round Start')
       setUpdate(true);
       setLatestAction(Date.now());
     }
 
     function onRoundResult() {
-      console.log('Round Result')
       setUpdate(true);
       setLatestAction(Date.now());
     }
 
     function onBetConfirmed() {
-      console.log('Bet Confirmed')
       setLatestAction(Date.now());
     }
 
     function onCashOutConfirmed() {
-      console.log('Cash Out Confirmed')
       setLatestAction(Date.now());
     }
 
@@ -115,7 +111,6 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
 
     if (update) {
       getCurrentGame().then((game) => {
-        console.log('crashProvider - getCurrentGame', game)
         if (game == null) {
           setGameStatus(null);
         } else {
@@ -127,11 +122,9 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
               crashPoint: game.secret_crash_point,
             });
             setTimeout(() => {
-              console.log("COUNTDOWN - setTimeout")
               setUpdate(true);
             }, game.start_time - Date.now());
           } else if (game.start_time + (game.secret_crash_point == 0 ? 0 : log(EXPONENTIAL_FACTOR, game.secret_crash_point)) * 1000 > Date.now()) {
-            console.log("IN_PROGRESS - page.tsx")
             setGameStatus({
               status: "IN_PROGRESS",
               roundId: game.game_id,
@@ -139,11 +132,9 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
               crashPoint: game.secret_crash_point,
             });
             setTimeout(() => {
-              console.log("IN_PROGRESS - setTimeout")
               setUpdate(true);
             }, game.start_time + (game.secret_crash_point == 0 ? 0 : log(EXPONENTIAL_FACTOR, game.secret_crash_point)) * 1000 - Date.now());
           } else {
-            console.log("END - page.tsx")
             setGameStatus({
               status: "END",
               roundId: game.game_id,

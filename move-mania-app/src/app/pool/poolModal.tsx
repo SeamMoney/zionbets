@@ -38,7 +38,7 @@ export default function PoolModal() {
         }).then((user) => {
           if (user) {
             setAccount(user);
-            getBalance(user.private_key, '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83::liquidity_pool::LPCoin').then((balance) => {
+            getBalance(user.private_key, `${process.env.MODULE_ADDRESS}::liquidity_pool::LPCoin`).then((balance) => {
               setBalance(balance);
               simulateWithdraw(user, balance).then((txn) => {
                 if (txn) {
@@ -46,7 +46,7 @@ export default function PoolModal() {
                 }
               });
             });
-            getBalance(user.private_key, '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83::z_apt::ZAPT').then((balance) => {
+            getBalance(user.private_key, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`).then((balance) => {
               setAptBalance(balance);
               simulateDeposit(user, balance).then((txn) => {
                 if (txn) {
@@ -72,10 +72,10 @@ export default function PoolModal() {
           if (user) {
             // console.log('balance: ', user.balance)
             setAccount(user);
-            getBalance(user.private_key, '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83::liquidity_pool::LPCoin').then((balance) => {
+            getBalance(user.private_key, `${process.env.MODULE_ADDRESS}::liquidity_pool::LPCoin`).then((balance) => {
               setBalance(balance);
             });
-            getBalance(user.private_key, '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83::z_apt::ZAPT').then((balance) => {
+            getBalance(user.private_key, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`).then((balance) => {
               setAptBalance(balance);
             });
           }

@@ -21,9 +21,11 @@ import { User } from "@/lib/schema";
 import { Ellipsis, EyeIcon, EyeOffIcon } from "lucide-react";
 import { getSession, signIn, signOut } from "next-auth/react";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function AccountButton() {
+
   const [account, setAccount] = useState<User | null>(null);
 
   const [privateKeyVisible, setPrivateKeyVisible] = useState(false);
@@ -69,7 +71,6 @@ export default function AccountButton() {
     };
 
     await updateUser(account?.email || "", user);
-    console.log("User updated")
     
     window.location.reload();
   };
@@ -91,7 +92,7 @@ export default function AccountButton() {
         ) : (
           <button
             className="bg-white px-6 py-1 text-neutral-950"
-            onClick={onSignIn}
+            onClick={() => {}}
           >
             Sign in
           </button>

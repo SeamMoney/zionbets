@@ -1,5 +1,5 @@
 import { PlayerState } from "@/app/playerList";
-import { createAptosKeyPair } from "./aptos";
+import { createAptosKeyPair, mintZAPT } from "./aptos";
 import { User } from "./schema";
 import { ChatMessage } from "./types";
 
@@ -36,8 +36,17 @@ export async function doesUserExist(username: string) {
 }
 
 export async function setUpUser(
-  userToSetup: Omit<User, "public_address" | "private_key" | "balance">
+  userToSetup: Omit<User, "public_address" | "private_key" | "balance">,
+  referrer?: string
 ) {
+
+  if (referrer) {
+
+    const referrerUser = await getUserFromReferralCode(referrer);
+
+    mintZAPT(referrerUser.private_key, 100);
+  }
+
   const keyPair = await createAptosKeyPair();
 
   try {
@@ -58,6 +67,22 @@ export async function setUpUser(
   }
 }
 
+export async function getUserFromReferralCode(referralCode: string) {
+  try {
+    const response = await fetch(`${API_URL}/users/referral/code/${referralCode}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "api-key": process.env.ZION_API_KEY || "",
+      },
+    });
+    return response.json();
+  }
+  catch (e) {
+    return null;
+  }
+}
+
 export async function getUser(email: string): Promise<User | null> {
   try {
     const response = await fetch(`${API_URL}/users/${email}`, {
@@ -74,11 +99,12 @@ export async function getUser(email: string): Promise<User | null> {
 }
 
 export async function setUpAndGetUser(
-  userToSetup: Omit<User, "public_address" | "private_key" | "balance">
+  userToSetup: Omit<User, "public_address" | "private_key" | "balance">, 
+  referrer?: string
 ): Promise<User | null> {
   const userExists = await doesUserExist(userToSetup.email);
   if (!userExists) {
-    const res = await setUpUser(userToSetup);
+    const res = await setUpUser(userToSetup, referrer);
     if (res) {
       return getUser(userToSetup.email);
     } else {

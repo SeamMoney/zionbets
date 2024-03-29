@@ -29,8 +29,8 @@ function CandlestickChart ({
     
     useEffect(() => {
 
-        console.log("data:", data)
-        console.log("linedata:", linedata)
+        // console.log("data:", data)
+        // console.log("linedata:", linedata)
 
         if (!chartContainerRef.current) return;
 

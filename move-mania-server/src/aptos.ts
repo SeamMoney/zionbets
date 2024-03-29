@@ -2,11 +2,13 @@ import { AptosAccount, AptosClient, HexString, Provider, Network } from "aptos";
 import crypto from 'crypto';
 import { calculateCrashPoint } from "./crashPoint";
 
-const MODULE_ADDRESS = '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83';
-const CRASH_RESOURCE_ACCOUNT_ADDRESS = '0x44d6cd854567d0bb4fc23ee3df1cb7eec15fea87c8cb844713c6166982826715';
-const LP_RESOURCE_ACCOUNT_ADDRESS = '0xbdd5fb2899ba75294df3b6735b11a9565160e0d0b2327e9ec84979224cf31aa1'
-const Z_APT_RESOURCE_ACCOUNT_ADDRESS = '0x6fc171eb36807e956b56a5c8c7157968f8aee43299e35e6e45f477719c8acd4d';
-const ADMIN_ACCOUNT_PRIVATE_KEY = '0xad136a5224a592705a0f7a18e63ee16653a871e209b3a0b12b1c34dbf2ad6c6a';
+require('dotenv').config();
+
+const MODULE_ADDRESS = process.env.MODULE_ADDRESS as string;
+const CRASH_RESOURCE_ACCOUNT_ADDRESS = process.env.CRASH_RESOURCE_ACCOUNT_ADDRESS as string;
+const LP_RESOURCE_ACCOUNT_ADDRESS = process.env.LP_RESOURCE_ACCOUNT_ADDRESS as string;
+const Z_APT_RESOURCE_ACCOUNT_ADDRESS = process.env.Z_APT_RESOURCE_ACCOUNT_ADDRESS as string;
+const ADMIN_ACCOUNT_PRIVATE_KEY = process.env.ADMIN_ACCOUNT_PRIVATE_KEY as string;
 
 const RPC_URL = 'https://fullnode.random.aptoslabs.com';
 const FAUCET_URL = 'https://faucet.random.aptoslabs.com'
