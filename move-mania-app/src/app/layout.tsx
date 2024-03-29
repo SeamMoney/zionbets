@@ -12,6 +12,7 @@ import { Analytics } from "@vercel/analytics/react"
 import Image from "next/image";
 import logo from "@/../public/zionbet_nobackground.png"
 import NavbarDropdown from "./navbarDropdown";
+import { Suspense } from "react";
 
 const baijamjuree = Bai_Jamjuree({
   weight: ['200', '300', '400', '500', '600'],
@@ -64,7 +65,9 @@ export default function RootLayout({
                 <div className="flex flex-row gap-4 items-center">
                   <BalanceButton />
                   {/* <AccountButton /> */}
-                  <NavbarDropdown />
+                  <Suspense>
+                    <NavbarDropdown />
+                  </Suspense>
                 </div>
               </div>
             </nav>

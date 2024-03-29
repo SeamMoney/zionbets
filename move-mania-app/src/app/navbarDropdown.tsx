@@ -14,7 +14,7 @@ import { Ellipsis } from "lucide-react";
 import { getSession, signIn } from "next-auth/react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 
 export default function NavbarDropdown() {
@@ -43,7 +43,6 @@ export default function NavbarDropdown() {
   }, []);
 
   return (
-    <Suspense>
     <div className="flex flex-row items-center gap-2">
       {
         !account && 
@@ -71,6 +70,5 @@ export default function NavbarDropdown() {
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
-    </Suspense>
   )
 }
