@@ -103,8 +103,10 @@ export async function setUpAndGetUser(
   referrer?: string
 ): Promise<User | null> {
   const userExists = await doesUserExist(userToSetup.email);
+  console.log(userExists);
   if (!userExists) {
     const res = await setUpUser(userToSetup, referrer);
+    console.log('res from setting up user', res)
     if (res) {
       return getUser(userToSetup.email);
     } else {

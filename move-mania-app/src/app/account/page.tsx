@@ -1,6 +1,6 @@
 'use client';
 
-import { setUpAndGetUser, updateUser } from "@/lib/api";
+import { getUser, setUpAndGetUser, updateUser } from "@/lib/api";
 import { User } from "@/lib/schema";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { getSession, signOut } from "next-auth/react";
@@ -18,13 +18,11 @@ export default function AccountPage() {
   useEffect(() => {
     getSession().then((session) => {
       if (session) {
-        if (!session.user) return;
+        if (!session.user || !session.user.email) return;
 
-        setUpAndGetUser({
-          username: session.user.name || "",
-          image: session.user.image || "",
-          email: session.user.email || "",
-        }).then((user) => {
+        getUser(
+          session.user.email
+        ).then((user) => {
           if (user) {
             setAccount(user);
           }

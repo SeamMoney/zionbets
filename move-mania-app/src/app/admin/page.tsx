@@ -1,6 +1,6 @@
 'use client';
 
-import { clearGames, setUpAndGetUser, updateUser } from "@/lib/api";
+import { clearGames, getUser, setUpAndGetUser, updateUser } from "@/lib/api";
 import { quickRemoveGame } from "@/lib/aptos";
 import { User } from "@/lib/schema";
 import { startRound } from "@/lib/socket";
@@ -17,13 +17,11 @@ export default function AdminPage() {
   useEffect(() => {
     getSession().then((session) => {
       if (session) {
-        if (!session.user) return;
+        if (!session.user || !session.user.email) return;
 
-        setUpAndGetUser({
-          username: session.user.name || "",
-          image: session.user.image || "",
-          email: session.user.email || "",
-        }).then((user) => {
+        getUser(
+          session.user.email
+        ).then((user) => {
           if (user) {
             setAccount(user);
           }
