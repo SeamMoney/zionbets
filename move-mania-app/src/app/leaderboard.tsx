@@ -39,7 +39,7 @@ export default function Leaderboard() {
   const getBalances = async (users: {username: string, public_address: string, private_key: string}[]) => {
     const balances = await Promise.all(
       users.map(async (user) => {
-        const balance = await getBalance(user.private_key, '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83::z_apt::ZAPT');
+        const balance = await getBalance(user.private_key, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`);
         return {
           ...user,
           balance,

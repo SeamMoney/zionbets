@@ -47,7 +47,7 @@ export default function BalanceButton() {
         }).then((user) => {
           if (user) {
             setAccount(user);
-            getBalance(user.private_key, '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83::z_apt::ZAPT').then((balance) => {
+            getBalance(user.private_key, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`).then((balance) => {
               setBalance(balance);
             });
           }
@@ -64,7 +64,7 @@ export default function BalanceButton() {
           if (user) {
             // console.log('balance: ', user.balance)
             setAccount(user);
-            getBalance(user.private_key, '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83::z_apt::ZAPT').then((balance) => {
+            getBalance(user.private_key, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`).then((balance) => {
               setBalance(balance);
             });
           }
@@ -98,7 +98,7 @@ export default function BalanceButton() {
 
     setLoading(true);
 
-    const tx = await transferApt(account.private_key, parseFloat(transferAmount), recipientAddress, '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83::z_apt::ZAPT');
+    const tx = await transferApt(account.private_key, parseFloat(transferAmount), recipientAddress, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`);
 
     if (!tx) {
       toast({

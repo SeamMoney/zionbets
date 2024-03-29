@@ -2,11 +2,11 @@ import { AptosAccount, AptosClient, FaucetClient, HexString, Provider } from "ap
 import { BetData, CashOutData } from "./types";
 import { User } from "./schema";
 
-const MODULE_ADDRESS = '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83';
+const MODULE_ADDRESS = process.env.MODULE_ADDRESS as string;
 const MODULE_NAME = 'crash';
-const CRASH_RESOURCE_ACCOUNT_ADDRESS = '0x44d6cd854567d0bb4fc23ee3df1cb7eec15fea87c8cb844713c6166982826715';
-const LP_RESOURCE_ACCOUNT_ADDRESS = '0xbdd5fb2899ba75294df3b6735b11a9565160e0d0b2327e9ec84979224cf31aa1'
-const Z_APT_RESOURCE_ACCOUNT_ADDRESS = '0x6fc171eb36807e956b56a5c8c7157968f8aee43299e35e6e45f477719c8acd4d';
+const CRASH_RESOURCE_ACCOUNT_ADDRESS = process.env.CRASH_RESOURCE_ACCOUNT_ADDRESS as string;
+const LP_RESOURCE_ACCOUNT_ADDRESS = process.env.LP_RESOURCE_ACCOUNT_ADDRESS as string;
+const Z_APT_RESOURCE_ACCOUNT_ADDRESS = process.env.Z_APT_RESOURCE_ACCOUNT_ADDRESS as string;
 
 const RPC_URL = 'https://fullnode.random.aptoslabs.com';
 const FAUCET_URL = 'https://faucet.random.aptoslabs.com';
@@ -484,14 +484,14 @@ export async function simulateDeposit(user: User, amount: number) {
 
     tx[0].changes.forEach((change) => {
       console.log(change);
-      if ((change as any).data && (change as any).data.type === "0x1::coin::CoinStore<0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83::liquidity_pool::LPCoin>") {
+      if ((change as any).data && (change as any).data.type === `0x1::coin::CoinStore<${MODULE_ADDRESS}::liquidity_pool::LPCoin>`) {
         // console.log((change as any).data);
         // console.log((change as any).data.data.coin.value);
         lp_coin_received = parseInt((change as any).data.data.coin.value.toString()) / APT;
       }
     });
 
-    return lp_coin_received - await getBalance(user.private_key, '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83::liquidity_pool::LPCoin');
+    return lp_coin_received - await getBalance(user.private_key, `0x1::coin::CoinStore<${MODULE_ADDRESS}::liquidity_pool::LPCoin>`);
   } catch (e) {
     console.error(e);
     return -1;
@@ -525,14 +525,14 @@ export async function simulateWithdraw(user: User, amount: number) {
 
     tx[0].changes.forEach((change) => {
       console.log(change);
-      if ((change as any).data && (change as any).data.type === "0x1::coin::CoinStore<0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83::z_apt::ZAPT>") {
+      if ((change as any).data && (change as any).data.type === `0x1::coin::CoinStore<${MODULE_ADDRESS}::z_apt::ZAPT>`) {
         // console.log((change as any).data);
         // console.log((change as any).data.data.coin.value);
         apt_received = parseInt((change as any).data.data.coin.value.toString()) / APT;
       }
     });
 
-    return apt_received - await getBalance(user.private_key, '0x718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83::z_apt::ZAPT');
+    return apt_received - await getBalance(user.private_key, `${MODULE_ADDRESS}::z_apt::ZAPT`);
   } catch (e) {
     console.error(e);
     return -1;
