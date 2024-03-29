@@ -14,7 +14,8 @@ import { Ellipsis } from "lucide-react";
 import { getSession, signIn } from "next-auth/react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { gameStatusContext } from "./CrashProvider";
 
 
 export default function NavbarDropdown() {
@@ -22,23 +23,24 @@ export default function NavbarDropdown() {
   const searchParams = useSearchParams();
   const referredBy = searchParams.get("ref");
 
-  const [account, setAccount] = useState<User | null>(null);
+  const { account } = useContext(gameStatusContext);
+  // const [account, setAccount] = useState<User | null>(null);
 
-  useEffect(() => {
-    getSession().then((session) => {
-      if (session) {
-        if (!session.user || !session.user.email) return;
+  // useEffect(() => {
+  //   getSession().then((session) => {
+  //     if (session) {
+  //       if (!session.user || !session.user.email) return;
 
-        getUser(
-          session.user.email
-        ).then((user) => {
-          if (user) {
-            setAccount(user);
-          }
-        });
-      }
-    });
-  }, []);
+  //       getUser(
+  //         session.user.email
+  //       ).then((user) => {
+  //         if (user) {
+  //           setAccount(user);
+  //         }
+  //       });
+  //     }
+  //   });
+  // }, []);
 
   return (
     <div className="flex flex-row items-center gap-2">

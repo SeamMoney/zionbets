@@ -5,7 +5,7 @@ import { User } from "@/lib/schema";
 import { sendMessage } from "@/lib/socket";
 import { ChatMessage, SOCKET_EVENTS } from "@/lib/types";
 import { getSession } from "next-auth/react";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Socket, io } from "socket.io-client";
 import {
   Drawer,
@@ -21,30 +21,32 @@ import {
 
 import { socket } from "@/lib/socket";
 import { cn } from "@/lib/utils";
+import { gameStatusContext } from "./CrashProvider";
 
 export default function ChatWindow() {
   const [newMessage, setNewMessage] = useState<ChatMessage | null>(null);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
 
-  const [account, setAccount] = useState<User | null>(null);
+  const { account } = useContext(gameStatusContext);
+  // const [account, setAccount] = useState<User | null>(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    getSession().then((session) => {
-      if (session) {
-        if (!session.user || !session.user.email) return;
+  // useEffect(() => {
+  //   getSession().then((session) => {
+  //     if (session) {
+  //       if (!session.user || !session.user.email) return;
 
-        getUser(
-          session.user.email
-        ).then((user) => {
-          if (user) {
-            setAccount(user);
-          }
-        });
-      }
-    });
-  }, []);
+  //       getUser(
+  //         session.user.email
+  //       ).then((user) => {
+  //         if (user) {
+  //           setAccount(user);
+  //         }
+  //       });
+  //     }
+  //   });
+  // }, []);
 
   useEffect(() => {
     if (newMessage) {

@@ -21,6 +21,7 @@ export type PlayerState = {
 
 export default function Leaderboard() {
   const {
+    account,
     gameStatus,
     latestAction
   } = useContext(gameStatusContext);
@@ -36,7 +37,7 @@ export default function Leaderboard() {
         console.log("Updated leaderboard")
       });
     });
-  }, [latestAction]);
+  }, [latestAction, account, gameStatus]);
 
   const getBalances = async (users: {username: string, public_address: string, private_key: string}[]) => {
     const balances = await Promise.all(

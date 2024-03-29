@@ -19,16 +19,18 @@ import {
 import { User } from "@/lib/schema";
 import { Clipboard, EyeIcon, EyeOffIcon, Loader2Icon } from "lucide-react";
 import { getSession, signIn, signOut } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast"
 import Link from "next/link";
 import { getBalance, transferApt } from "@/lib/aptos";
 import { cn } from "@/lib/utils";
+import { gameStatusContext } from "./CrashProvider";
 
 
 export default function BalanceButton() {
   const { toast } = useToast()
-  const [account, setAccount] = useState<User | null>(null);
+  const { account } = useContext(gameStatusContext);
+  // const [account, setAccount] = useState<User | null>(null);
   const [balance, setBalance] = useState<number | null>(null);
   const [recipientAddress, setRecipientAddress] = useState<string>("");
   const [transferAmount, setTransferAmount] = useState<string>("");
@@ -36,39 +38,39 @@ export default function BalanceButton() {
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    getSession().then((session) => {
-      if (session) {
-        if (!session.user) return;
+    // getSession().then((session) => {
+    //   if (session) {
+    //     if (!session.user) return;
 
-        if (!session.user || !session.user.email) return;
+    //     if (!session.user || !session.user.email) return;
 
-        getUser(
-          session.user.email
-        ).then((user) => {
-          if (user) {
-            setAccount(user);
-            getBalance(user.private_key, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`).then((balance) => {
+    //     getUser(
+    //       session.user.email
+    //     ).then((user) => {
+          if (account) {
+            // setAccount(user);
+            getBalance(account.private_key, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`).then((balance) => {
               setBalance(balance);
             });
           }
-        });
-      }
-    });
-  }, []);
+    //     });
+    //   }
+    // });
+  }, [account]);
 
   useEffect(() => {
     if (account) {
       const interval = setInterval(() => {
         // console.log('Checking for updates')
-        getUser(account.email).then((user) => {
-          if (user) {
+        // getUser(account.email).then((user) => {
+          if (account) {
             // console.log('balance: ', user.balance)
-            setAccount(user);
-            getBalance(user.private_key, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`).then((balance) => {
+            // setAccount(user);
+            getBalance(account.private_key, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`).then((balance) => {
               setBalance(balance);
             });
           }
-        });
+        // });
       }, 1000);
       return () => clearInterval(interval);
     }

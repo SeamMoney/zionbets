@@ -22,32 +22,35 @@ import { Ellipsis, EyeIcon, EyeOffIcon } from "lucide-react";
 import { getSession, signIn, signOut } from "next-auth/react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { gameStatusContext } from "./CrashProvider";
+
+
 
 export default function AccountButton() {
-
-  const [account, setAccount] = useState<User | null>(null);
+  const { account } = useContext(gameStatusContext);
+  // const [account, setAccount] = useState<User | null>(null);
 
   const [privateKeyVisible, setPrivateKeyVisible] = useState(false);
 
   const [username, setUsername] = useState("");
   const [image, setImage] = useState("");
 
-  useEffect(() => {
-    getSession().then((session) => {
-      if (session) {
-        if (!session.user || !session.user.email) return;
+  // useEffect(() => {
+  //   getSession().then((session) => {
+  //     if (session) {
+  //       if (!session.user || !session.user.email) return;
 
-        getUser(
-          session.user.email
-        ).then((user) => {
-          if (user) {
-            setAccount(user);
-          }
-        });
-      }
-    });
-  }, []);
+  //       getUser(
+  //         session.user.email
+  //       ).then((user) => {
+  //         if (user) {
+  //           setAccount(user);
+  //         }
+  //       });
+  //     }
+  //   });
+  // }, []);
 
   const onSignIn = () => {
     signIn("google");
