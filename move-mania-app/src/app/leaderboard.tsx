@@ -37,7 +37,7 @@ export default function Leaderboard() {
         console.log("Updated leaderboard")
       });
     });
-  }, [account, gameStatus]);
+  }, [account]);
 
   const getBalances = async (users: {username: string, public_address: string, private_key: string}[]) => {
     const balances = await Promise.all(
