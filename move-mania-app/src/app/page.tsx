@@ -22,9 +22,9 @@ export default function CrashPage() {
             <PlayerList />
           </div>
         </div>
-        <div className="w-full h-full pb-12">
+        {/* <div className="w-full h-full pb-12">
           <Leaderboard />
-        </div>
+        </div> */}
       </div>
     // </CrashProvider>
   );
