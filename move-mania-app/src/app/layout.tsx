@@ -56,7 +56,7 @@ export default function RootLayout({
                 <div className="flex flex-row items-center justify-between w-full h-full">
                   <div className="flex flex-row items-center gap-4">
                     <div className="flex flex-row items-center justify-start">
-                      <Link href='/'><Image src={logo} className="" alt="" width={150} height={150} /></Link>
+                      <Link href='/'><Image src={logo} className="" alt="" width={200} height={200} /></Link>
                       {/* <Link href='/' className="text-white text-2xl font-bold">ZION</Link> */}
                     </div>
                     {/* <Link href='/pool' className="bg-neutral-800 hover:bg-neutral-700 px-2 py-1 text-xs text-white font-semibold">
