@@ -21,12 +21,14 @@ interface MagicProviderProps {
   isLoggedIn: boolean | null;
   userInfo: User | null;
   setIsLoggedIn: (isLoggedIn: boolean) => void;
+  publicAddress: string | null
 }
 
 export const magicContext = createContext<MagicProviderProps>({
   isLoggedIn: null,
   userInfo: null,
   setIsLoggedIn: () => {},
+  publicAddress: null
 }); 
 
 
@@ -34,6 +36,7 @@ export default function MagicProvider({ children }: { children: React.ReactNode 
 
   const [ isLoggedIn, setIsLoggedIn ] = useState<boolean | null>(null);
   const [ userInfo, setUserInfo ] = useState<User | null>(null);
+  const [ publicAddress, setPublicAddress ] = useState<string | null>(null);
 
   useEffect(() => {
     if (!magic) {
@@ -44,6 +47,16 @@ export default function MagicProvider({ children }: { children: React.ReactNode 
     magic.user.isLoggedIn().then((isLoggedIn) => {
       console.log('isLoggedIn', isLoggedIn)
       setIsLoggedIn(isLoggedIn);
+      if (isLoggedIn) {
+        if (!magic) {
+          console.error('Magic not yet initialized');
+          return;
+        }
+        magic.aptos.getAccountInfo().then((userInfo) => {
+          console.log('userInfo', userInfo)
+          setPublicAddress(userInfo.address);
+        });
+      }
     });
   })
 
@@ -52,6 +65,7 @@ export default function MagicProvider({ children }: { children: React.ReactNode 
       isLoggedIn,
       userInfo,
       setIsLoggedIn,
+      publicAddress
     }}>
       {children}
     </magicContext.Provider>
