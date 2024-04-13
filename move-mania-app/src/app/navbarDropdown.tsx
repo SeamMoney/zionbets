@@ -16,7 +16,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import { gameStatusContext } from "./CrashProvider";
-import { magicLogin } from "@/lib/magic";
+import { magicLoginEmail, magicLoginPhone } from "@/lib/magic";
 import { magicContext } from "./MagicProvider";
 
 
@@ -55,7 +55,8 @@ export default function NavbarDropdown() {
           onClick={async () => {
             // signIn("google", {callbackUrl: `/${referredBy ? `?ref=${referredBy}` : ''}`});
             // console.log('sign in')
-            await magicLogin('+12062299029')
+            // await magicLoginPhone('+12062299029')
+            await magicLoginEmail('daniel.7039@hotmail.com')
             setIsLoggedIn(true);
           }}
         >

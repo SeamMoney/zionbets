@@ -16,7 +16,7 @@ const createMagic = () => {
 }
 export const magic = createMagic();
 
-export const magicLogin = async (phoneNumber: string) => {
+export const magicLoginPhone = async (phoneNumber: string) => {
 
   if (!magic) {
     console.error('Magic not yet initialized');
@@ -30,6 +30,30 @@ export const magicLogin = async (phoneNumber: string) => {
     console.log('logging in')
      const did = await magic.auth.loginWithSMS({
        phoneNumber: phoneNumber,
+     });
+     console.log(`DID Token: ${did}`);
+
+     return did;
+  } catch(e) {
+    console.log('Error logging in', e);
+    return null;
+  }
+}
+
+export const magicLoginEmail = async (email: string) => {
+
+  if (!magic) {
+    console.error('Magic not yet initialized');
+    return;
+  }
+
+  // await magic.wallet.connectWithUI();
+  console.log('magic', magic)
+  console.log('context login')
+  try {
+    console.log('logging in')
+     const did = await magic.auth.loginWithEmailOTP({
+       email: email
      });
      console.log(`DID Token: ${did}`);
 
