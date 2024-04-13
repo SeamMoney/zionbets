@@ -43,11 +43,11 @@ export const magicLogin = async (phoneNumber: string) => {
 export const magicLogout = async () => {
   const errorMessage  = "Error creating magic instance while trying to log out"
   if (magic === false) {
-      throw new Error(errorMessage)
+    throw new Error(errorMessage)
   }
   try {
-      await magic.user.logout()
+    await magic.user.logout()
   } catch (error) {
-      throw new Error(error as string)
+    throw new Error(error as string)
   }
 }
