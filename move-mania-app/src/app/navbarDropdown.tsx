@@ -16,6 +16,8 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import { gameStatusContext } from "./CrashProvider";
+import { magicLogin } from "@/lib/magic";
+import { magicContext } from "./MagicProvider";
 
 
 export default function NavbarDropdown() {
@@ -24,6 +26,8 @@ export default function NavbarDropdown() {
   const referredBy = searchParams.get("ref");
 
   const { account } = useContext(gameStatusContext);
+  const { isLoggedIn, setIsLoggedIn } = useContext(magicContext);
+
   // const [account, setAccount] = useState<User | null>(null);
 
   // useEffect(() => {
@@ -45,12 +49,14 @@ export default function NavbarDropdown() {
   return (
     <div className="flex flex-row items-center gap-2">
       {
-        !account && 
+        !isLoggedIn && 
         <button
           className="bg-white px-6 py-1 text-neutral-950 active:scale-95 active:opacity-50 transition-transform"
-          onClick={() => {
-            signIn("google", {callbackUrl: `/${referredBy ? `?ref=${referredBy}` : ''}`});
-            console.log('sign in')
+          onClick={async () => {
+            // signIn("google", {callbackUrl: `/${referredBy ? `?ref=${referredBy}` : ''}`});
+            // console.log('sign in')
+            await magicLogin('+12062299029')
+            setIsLoggedIn(true);
           }}
         >
           Sign in

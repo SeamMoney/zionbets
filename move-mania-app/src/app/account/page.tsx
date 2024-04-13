@@ -6,11 +6,14 @@ import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { getSession, signOut } from "next-auth/react";
 import { useContext, useEffect, useState } from "react";
 import { gameStatusContext } from "../CrashProvider";
+import { magicLogout } from "@/lib/magic";
+import { magicContext } from "../MagicProvider";
 
 
 export default function AccountPage() {
 
   const { account } = useContext(gameStatusContext);
+  const { isLoggedIn, setIsLoggedIn } = useContext(magicContext);
   // const [account, setAccount] = useState<User | null>(null);
 
   const [privateKeyVisible, setPrivateKeyVisible] = useState(false);
@@ -52,7 +55,7 @@ export default function AccountPage() {
     window.location.reload();
   };
 
-  if (!account) return <></>;
+  if (!isLoggedIn) return <></>;
 
   return (
     <div className="px-2 pt-4">
@@ -65,7 +68,7 @@ export default function AccountPage() {
         </p>
       </div>
       <div className="grid gap-4 py-4">
-        <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
+        {/* <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
           <label htmlFor="username" className="text-left ">
             Username
           </label>
@@ -80,7 +83,7 @@ export default function AccountPage() {
               className="bg-transparent border-none outline-none text-right text-ellipsis"
             />
           </span>
-        </div>
+        </div> */}
         {/* <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
           <label htmlFor="profile_pic" className="text-left ">
             Profile picture
@@ -97,7 +100,7 @@ export default function AccountPage() {
             />
           </span>
         </div> */}
-        <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
+        {/* <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
           <label htmlFor="email" className="text-left ">
             Email
           </label>
@@ -109,8 +112,8 @@ export default function AccountPage() {
               className="bg-transparent border-none outline-none text-right text-ellipsis cursor-not-allowed"
             />
           </span>
-        </div>
-        <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
+        </div> */}
+        {/* <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
           <label
             htmlFor="public_address"
             className="text-left "
@@ -125,8 +128,8 @@ export default function AccountPage() {
               className="bg-transparent border-none outline-none text-right text-ellipsis cursor-not-allowed"
             />
           </span>
-        </div>
-        <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
+        </div> */}
+        {/* <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
           <label
             htmlFor="private_key"
             className=" font-light w-[100px]"
@@ -153,13 +156,13 @@ export default function AccountPage() {
               />
             )}
           </span>
-        </div>
+        </div> */}
       </div>
       <div className="flex flex-col items-center gap-2 w-full">
         <button
           type="submit"
           className="border border-neutral-700 hover:bg-neutral-800/80 hover:bg-noise px-6 py-1 text-neutral-500 w-full active:scale-95 active:opacity-50 transition-transform"
-          onClick={() => signOut()}
+          onClick={async () => {await magicLogout(); setIsLoggedIn(false);}}
         >
           Sign out
         </button>
