@@ -13,7 +13,7 @@ import { magicContext } from "../MagicProvider";
 export default function AccountPage() {
 
   const { account } = useContext(gameStatusContext);
-  const { isLoggedIn, setIsLoggedIn } = useContext(magicContext);
+  const { isLoggedIn, setIsLoggedIn, publicAddress } = useContext(magicContext);
   // const [account, setAccount] = useState<User | null>(null);
 
   const [privateKeyVisible, setPrivateKeyVisible] = useState(false);
@@ -113,7 +113,7 @@ export default function AccountPage() {
             />
           </span>
         </div> */}
-        {/* <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
+        <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
           <label
             htmlFor="public_address"
             className="text-left "
@@ -124,11 +124,11 @@ export default function AccountPage() {
             <input
               id="public_address"
               disabled
-              value={account.public_address}
+              value={publicAddress || ''}
               className="bg-transparent border-none outline-none text-right text-ellipsis cursor-not-allowed"
             />
           </span>
-        </div> */}
+        </div>
         {/* <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
           <label
             htmlFor="private_key"
