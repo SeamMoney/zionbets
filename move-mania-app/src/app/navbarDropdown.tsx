@@ -17,6 +17,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { magicLoginEmail, magicLoginPhone } from "@/lib/magic";
 import { magicContext } from "./MagicProvider";
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { COUNTRY_CODES } from "@/lib/countryCodes";
 
 
 export default function NavbarDropdown() {
@@ -71,9 +72,15 @@ export default function NavbarDropdown() {
                 >
                   <Phone strokeWidth={1.25} />
                 </label>
-                <select className="bg-transparent " ref={countryCodeRef} defaultValue='+1'>
+                <select className="bg-transparent max-w-24 outline-none" ref={countryCodeRef} defaultValue='+1'>
                   <option value="+1">US +1</option>
-                  <option value="+44">UK +44</option>
+                  {
+                    COUNTRY_CODES.map((country) => {
+                      return (
+                        <option value={`+${country.code}`} key={country.code}>{country.iso} +{country.code}</option>
+                      )
+                    })
+                  }
                 </select>
                 <span className="flex flex-row justify-center items-center gap-1 w-full">
                   <input
