@@ -10,12 +10,12 @@ import { getSession } from "next-auth/react";
 import Link from "next/link";
 import { useContext, useEffect, useState } from "react";
 import { gameStatusContext } from "../CrashProvider";
+import { magicContext } from "../MagicProvider";
 
 
 export default function PoolModal() {
 
-  const { account } = useContext(gameStatusContext);
-  // const [account, setAccount] = useState<User | null>(null);
+  const { isLoggedIn, userInfo } = useContext(magicContext);
   const [balance, setBalance] = useState<number>(0)
   const [lpCoinSupply, setLpCoinSupply] = useState<number>(0)
   const [aptBalance, setAptBalance] = useState<number>(0)
@@ -28,27 +28,27 @@ export default function PoolModal() {
   const { toast } = useToast()
   
   useEffect(() => {
-    if (account) {
+    if (isLoggedIn && userInfo) {
       try {
-        getBalance(account.private_key, `${process.env.MODULE_ADDRESS}::liquidity_pool::LPCoin`).then((balance) => {
+        getBalance(userInfo.address, `${process.env.MODULE_ADDRESS}::liquidity_pool::LPCoin`).then((balance) => {
           setBalance(balance);
-          simulateWithdraw(account, balance).then((txn) => {
-            if (txn) {
-              setExpectedReturnFromWithdraw(txn);
-            }
-          });
+          // simulateWithdraw(userInfo, balance).then((txn) => {
+          //   if (txn) {
+          //     setExpectedReturnFromWithdraw(txn);
+          //   }
+          // });
         });
       } catch (e) {
         console.log(e)
       }
       try {
-        getBalance(account.private_key, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`).then((balance) => {
+        getBalance(userInfo.address, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`).then((balance) => {
           setAptBalance(balance);
-          simulateDeposit(account, balance).then((txn) => {
-            if (txn) {
-              setExpectedReturnFromDeposit(txn);
-            }
-          });
+          // simulateDeposit(userInfo, balance).then((txn) => {
+          //   if (txn) {
+          //     setExpectedReturnFromDeposit(txn);
+          //   }
+          // });
         });
       } catch (e) {
         console.log(e)
@@ -58,33 +58,33 @@ export default function PoolModal() {
     getLPCoinSupply().then((supply) => {
       setLpCoinSupply(supply)
     });
-  }, [account]);
+  }, [isLoggedIn, userInfo]);
 
 
   useEffect(() => {
-    if (account) {
+    if (isLoggedIn && userInfo) {
       const interval = setInterval(() => {
         // console.log('Checking for updates')
         try {
-          getBalance(account.private_key, `${process.env.MODULE_ADDRESS}::liquidity_pool::LPCoin`).then((balance) => {
+          getBalance(userInfo.address, `${process.env.MODULE_ADDRESS}::liquidity_pool::LPCoin`).then((balance) => {
             setBalance(balance);
-            simulateWithdraw(account, balance).then((txn) => {
-              if (txn) {
-                setExpectedReturnFromWithdraw(txn);
-              }
-            });
+            // simulateWithdraw(userInfo, balance).then((txn) => {
+            //   if (txn) {
+            //     setExpectedReturnFromWithdraw(txn);
+            //   }
+            // });
           });
         } catch (e) {
           console.log(e)
         }
         try {
-          getBalance(account.private_key, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`).then((balance) => {
+          getBalance(userInfo.address, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`).then((balance) => {
             setAptBalance(balance);
-            simulateDeposit(account, balance).then((txn) => {
-              if (txn) {
-                setExpectedReturnFromDeposit(txn);
-              }
-            });
+            // simulateDeposit(userInfo, balance).then((txn) => {
+            //   if (txn) {
+            //     setExpectedReturnFromDeposit(txn);
+            //   }
+            // });
           });
         } catch (e) {
           console.log(e)
@@ -121,25 +121,25 @@ export default function PoolModal() {
                   placeholder={`${aptBalance?.toFixed(2) || parseInt('0').toFixed(2)}`}
                   value={depositAmount}
                   onChange={async (e) => {
-                    setDepositAmount(e.target.value)
+                    // setDepositAmount(e.target.value)
 
-                    if (!account) return;
+                    // if (!isLoggedIn || !userInfo) return;
 
-                    if (e.target.value === '') {
-                      await simulateDeposit(account, aptBalance).then((txn) => {
-                        if (txn) {
-                          setExpectedReturnFromDeposit(txn);
-                        }
-                      });
-                      return;
-                    }
+                    // if (e.target.value === '') {
+                    //   await simulateDeposit(userInfo, aptBalance).then((txn) => {
+                    //     if (txn) {
+                    //       setExpectedReturnFromDeposit(txn);
+                    //     }
+                    //   });
+                    //   return;
+                    // }
 
 
-                    await simulateDeposit(account, parseFloat(e.target.value)).then((txn) => {
-                      if (txn) {
-                        setExpectedReturnFromDeposit(txn);
-                      }
-                    });
+                    // await simulateDeposit(userInfo, parseFloat(e.target.value)).then((txn) => {
+                    //   if (txn) {
+                    //     setExpectedReturnFromDeposit(txn);
+                    //   }
+                    // });
                   }}
                   className="bg-transparent border-none outline-none text-right text-ellipsis"
                 />
@@ -169,26 +169,26 @@ export default function PoolModal() {
                 parseFloat(depositAmount) > 0 && aptBalance && parseFloat(depositAmount) <= aptBalance && 'bg-[#404226]/40 active:scale-95 active:opacity-50 transition-transform'
               )}
               onClick={async () => {
-                if (!account) return;
+                // if (!isLoggedIn || !userInfo) return;
 
-                if (depositAmount === '') {
-                  toast({
-                    title: "Please enter a valid amount to deposit",
-                  });
-                  return;
-                }
+                // if (depositAmount === '') {
+                //   toast({
+                //     title: "Please enter a valid amount to deposit",
+                //   });
+                //   return;
+                // }
 
-                const tx = await supplyPool(account, parseFloat(depositAmount));
-                if (!tx) {
-                  toast({
-                    title: "Failed to deposit funds",
-                  });
-                  return;
-                }
-                toast({
-                  title: "Funds deposited",
-                  description: <Link href={`https://explorer.aptoslabs.com/txn/${tx.version}/?network=randomnet`} target="_blank" className="underline">View transaction</Link>
-                })
+                // const tx = await supplyPool(userInfo, parseFloat(depositAmount));
+                // if (!tx) {
+                //   toast({
+                //     title: "Failed to deposit funds",
+                //   });
+                //   return;
+                // }
+                // toast({
+                //   title: "Funds deposited",
+                //   description: <Link href={`https://explorer.aptoslabs.com/txn/${tx.version}/?network=randomnet`} target="_blank" className="underline">View transaction</Link>
+                // })
               }}  
             >
               Deposit
@@ -212,24 +212,24 @@ export default function PoolModal() {
                   placeholder={`${balance?.toFixed(2) || parseInt('0').toFixed(2)}`}
                   value={withdrawAmount}
                   onChange={async (e) => {
-                    setWithdrawAmount(e.target.value)
+                    // setWithdrawAmount(e.target.value)
 
-                    if (!account) return;
+                    // if (!userInfo || !isLoggedIn) return;
 
-                    if (e.target.value === '') {
-                      await simulateWithdraw(account, balance).then((txn) => {
-                        if (txn) {
-                          setExpectedReturnFromWithdraw(txn);
-                        }
-                      });
-                      return;
-                    }
+                    // if (e.target.value === '') {
+                    //   await simulateWithdraw(userInfo, balance).then((txn) => {
+                    //     if (txn) {
+                    //       setExpectedReturnFromWithdraw(txn);
+                    //     }
+                    //   });
+                    //   return;
+                    // }
 
-                    simulateWithdraw(account, parseFloat(e.target.value)).then((txn) => {
-                      if (txn) {
-                        setExpectedReturnFromWithdraw(txn);
-                      }
-                    });
+                    // simulateWithdraw(userInfo, parseFloat(e.target.value)).then((txn) => {
+                    //   if (txn) {
+                    //     setExpectedReturnFromWithdraw(txn);
+                    //   }
+                    // });
                   }}
                   className="bg-transparent border-none outline-none text-right text-ellipsis"
                 />
@@ -259,26 +259,26 @@ export default function PoolModal() {
                 parseFloat(withdrawAmount) > 0 && balance && parseFloat(withdrawAmount) <= balance && 'bg-[#404226]/40 active:scale-95 active:opacity-50 transition-transform'
               )}
               onClick={async () => {
-                if (!account) return;
+                // if (!userInfo || !isLoggedIn) return;
 
-                if (withdrawAmount === '') {
-                  toast({
-                    title: "Please enter a valid amount to withdraw",
-                  });
-                  return;
-                }
+                // if (withdrawAmount === '') {
+                //   toast({
+                //     title: "Please enter a valid amount to withdraw",
+                //   });
+                //   return;
+                // }
 
-                const tx = await withdrawPool(account, parseFloat(withdrawAmount));
-                if (!tx) {
-                  toast({
-                    title: "Failed to withdraw funds",
-                  });
-                  return;
-                }
-                toast({
-                  title: "Funds withdrawn",
-                  description: <Link href={`https://explorer.aptoslabs.com/txn/${tx.version}/?network=randomnet`} target="_blank" className="underline">View transaction</Link>
-                })
+                // const tx = await withdrawPool(userInfo, parseFloat(withdrawAmount));
+                // if (!tx) {
+                //   toast({
+                //     title: "Failed to withdraw funds",
+                //   });
+                //   return;
+                // }
+                // toast({
+                //   title: "Funds withdrawn",
+                //   description: <Link href={`https://explorer.aptoslabs.com/txn/${tx.version}/?network=randomnet`} target="_blank" className="underline">View transaction</Link>
+                // })
               }}
             >
               Withdraw

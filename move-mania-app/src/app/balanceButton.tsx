@@ -17,15 +17,12 @@ import { useToast } from "@/components/ui/use-toast"
 import Link from "next/link";
 import { getBalance, transferApt } from "@/lib/aptos";
 import { cn } from "@/lib/utils";
-import { gameStatusContext } from "./CrashProvider";
 import { magicContext } from "./MagicProvider";
 
 
 export default function BalanceButton() {
   const { toast } = useToast()
-  const { account } = useContext(gameStatusContext);
-  const { isLoggedIn, userInfo, setIsLoggedIn, publicAddress } = useContext(magicContext);
-  // const [account, setAccount] = useState<User | null>(null);
+  const { isLoggedIn, userInfo } = useContext(magicContext);
   const [balance, setBalance] = useState<number | null>(null);
   const [recipientAddress, setRecipientAddress] = useState<string>("");
   const [transferAmount, setTransferAmount] = useState<string>("");
@@ -51,10 +48,9 @@ export default function BalanceButton() {
     //     });
     //   }
     // });
-  }, [account]);
+  }, [isLoggedIn, userInfo]);
 
   useEffect(() => {
-    if (account) {
       const interval = setInterval(() => {
         // console.log('Checking for updates')
         // getUser(account.email).then((user) => {
@@ -68,53 +64,52 @@ export default function BalanceButton() {
         // });
       }, 1000);
       return () => clearInterval(interval);
-    }
   });
 
   const onWithdraw = async () => {
 
-    if (!account || !balance || transferAmount == '') return;
-    if (parseFloat(transferAmount) <= 0) {
-      toast({
-        title: "Please enter a valid amount",
-      });
-      return;
-    }
-    if (parseFloat(transferAmount) > balance) {
-      toast({
-        title: "Insufficient funds",
-      });
-      return;
-    }
-    if (recipientAddress == '') {
-      toast({
-        title: "Please enter a recipient address",
-      });
-      return;
-    }
+    // if (!isLoggedIn || !userInfo || !balance || transferAmount == '') return;
+    // if (parseFloat(transferAmount) <= 0) {
+    //   toast({
+    //     title: "Please enter a valid amount",
+    //   });
+    //   return;
+    // }
+    // if (parseFloat(transferAmount) > balance) {
+    //   toast({
+    //     title: "Insufficient funds",
+    //   });
+    //   return;
+    // }
+    // if (recipientAddress == '') {
+    //   toast({
+    //     title: "Please enter a recipient address",
+    //   });
+    //   return;
+    // }
 
-    setLoading(true);
+    // setLoading(true);
 
-    const tx = await transferApt(account.private_key, parseFloat(transferAmount), recipientAddress, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`);
+    // const tx = await transferApt(accountprivate_key, parseFloat(transferAmount), recipientAddress, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`);
 
-    if (!tx) {
-      toast({
-        title: "Failed to withdraw funds",
-      });
-      setLoading(false);
-      return;
-    }
+    // if (!tx) {
+    //   toast({
+    //     title: "Failed to withdraw funds",
+    //   });
+    //   setLoading(false);
+    //   return;
+    // }
 
-    // withdraw funds
-    toast({
-      title: "Funds withdrawn",
-      description: <Link href={`https://explorer.aptoslabs.com/txn/${tx.version}/?network=randomnet`} target="_blank" className="underline">View transaction</Link>
-    })
-    setLoading(false);
+    // // withdraw funds
+    // toast({
+    //   title: "Funds withdrawn",
+    //   description: <Link href={`https://explorer.aptoslabs.com/txn/${tx.version}/?network=randomnet`} target="_blank" className="underline">View transaction</Link>
+    // })
+    // setLoading(false);
 
-    // clear input fields
-    setRecipientAddress('');
-    setTransferAmount('');
+    // // clear input fields
+    // setRecipientAddress('');
+    // setTransferAmount('');
 
 
   }

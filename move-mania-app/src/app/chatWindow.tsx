@@ -21,32 +21,15 @@ import {
 
 import { socket } from "@/lib/socket";
 import { cn } from "@/lib/utils";
-import { gameStatusContext } from "./CrashProvider";
+import { magicContext } from "./MagicProvider";
 
 export default function ChatWindow() {
   const [newMessage, setNewMessage] = useState<ChatMessage | null>(null);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
 
-  const { account } = useContext(gameStatusContext);
-  // const [account, setAccount] = useState<User | null>(null);
+  const { isLoggedIn, userInfo } = useContext(magicContext);
 
   const inputRef = useRef<HTMLInputElement>(null);
-
-  // useEffect(() => {
-  //   getSession().then((session) => {
-  //     if (session) {
-  //       if (!session.user || !session.user.email) return;
-
-  //       getUser(
-  //         session.user.email
-  //       ).then((user) => {
-  //         if (user) {
-  //           setAccount(user);
-  //         }
-  //       });
-  //     }
-  //   });
-  // }, []);
 
   useEffect(() => {
     if (newMessage) {
@@ -73,16 +56,16 @@ export default function ChatWindow() {
       return;
     }
 
-    if (!account) {
+    if (!isLoggedIn || !userInfo) {
       console.error("User not signed in");
       return;
     }
 
     // Send message to server
     sendMessage({
-      authorEmail: account?.email,
+      authorEmail: userInfo.address,
       message,
-      authorUsername: account?.username,
+      authorUsername: userInfo.username,
     });
   };
 
@@ -107,7 +90,7 @@ export default function ChatWindow() {
             <ChatBubble key={index} message={message} />
           ))}
         </div>
-        {account ? (
+        {(isLoggedIn && userInfo) ? (
           <div className="w-full min-h-[30px] flex flex-row gap-1">
             <div className="grow bg-noise">
               <input
