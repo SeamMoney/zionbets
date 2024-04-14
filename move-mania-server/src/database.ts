@@ -8,9 +8,108 @@ import {
   PlayerListSchema,
   User,
   UserSchema,
+  UserV2,
+  UserV2Schema,
 } from "./schema";
 import crypto from "crypto";
 import { BetData, CashOutData, ChatMessage } from "./types";
+
+/* =================================================================================================
+  DATABASE v2
+================================================================================================= */
+
+export async function initializeUsersV2Table() {
+  const db = await open({
+    filename: "./db/v2/users_v2.db",
+    driver: require("sqlite3").Database,
+  });
+
+  await db.exec(UserV2Schema);
+
+  await db.close();
+}
+
+export async function getUsersV2() {
+  await initializeUsersV2Table(); // initialize tables if not yet initialized
+
+  // Open the database
+  const db = await open({
+    filename: "./db/v2/users_v2.db",
+    driver: require("sqlite3").Database,
+  });
+
+  // Get all the users
+  const users = (await db.all("SELECT * FROM users_v2")) as UserV2[];
+
+  await db.close();
+
+  return users;
+}
+
+export async function createUserV2(user: UserV2) {
+  await initializeUsersV2Table(); // initialize tables if not yet initialized
+
+  // Open the database
+  const db = await open({
+    filename: "./db/v2/users_v2.db",
+    driver: require("sqlite3").Database,
+  });
+
+  await db.run(
+    "INSERT INTO users_v2 (address, username, referral_code, referred_by) VALUES (?, ?, ?, ?)",
+    user.address,
+    user.username,
+    user.referral_code,
+    user.referred_by 
+  );
+
+  await db.close();
+}
+
+export async function getUserV2(address: string) {
+  await initializeUsersV2Table(); // initialize tables if not yet initialized
+
+  // Open the database
+  const db = await open({
+    filename: "./db/v2/users_v2.db",
+    driver: require("sqlite3").Database,
+  });
+
+  // Get the user with the given email
+  const user = (await db.get("SELECT * FROM users_v2 WHERE address = ?", address)) as
+    | UserV2
+    | undefined;
+
+  await db.close();
+
+  return user;
+}
+
+export async function updateUserV2(address: string, user: UserV2) {
+  await initializeUsersV2Table(); // initialize tables if not yet initialized
+
+  // Open the database
+  const db = await open({
+    filename: "./db/v2/users_v2.db",
+    driver: require("sqlite3").Database,
+  });
+
+  await db.run(
+    "UPDATE users_v2 SET username = ?, referral_code = ?, referred_by = ? WHERE address = ?",
+    user.username,
+    user.referral_code,
+    user.referred_by,
+    address
+  );
+
+  await db.close();
+}
+
+
+/* =================================================================================================
+  DATABASE v1
+================================================================================================= */
+
 
 const STARTING_BALANCE = 100;
 
