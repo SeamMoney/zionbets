@@ -14,7 +14,6 @@ import { getSession, signIn } from "next-auth/react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
-import { gameStatusContext } from "./CrashProvider";
 import { magicLoginEmail, magicLoginPhone } from "@/lib/magic";
 import { magicContext } from "./MagicProvider";
 
@@ -24,7 +23,6 @@ export default function NavbarDropdown() {
   const searchParams = useSearchParams();
   const referredBy = searchParams.get("ref");
 
-  const { account } = useContext(gameStatusContext);
   const { isLoggedIn, setIsLoggedIn } = useContext(magicContext);
 
   // const [account, setAccount] = useState<User | null>(null);

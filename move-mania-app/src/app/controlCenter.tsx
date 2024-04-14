@@ -26,6 +26,7 @@ import { gameStatusContext } from "./CrashProvider";
 import { cashOut, placeBet } from "@/lib/aptos";
 import { useToast } from "@/components/ui/use-toast";
 import Link from "next/link";
+import { magicContext } from "./MagicProvider";
 
 export type GameStatus = {
   status: "COUNTDOWN" | "IN_PROGRESS" | "END";
@@ -37,9 +38,9 @@ export type GameStatus = {
 export default function ControlCenter() {
   const {
     gameStatus,
-    account,
     latestAction
   } = useContext(gameStatusContext);
+  const { isLoggedIn, userInfo } = useContext(magicContext);
 
   const { toast } = useToast()
 
@@ -52,17 +53,17 @@ export default function ControlCenter() {
   const [hasCashOut, setHasCashOut] = useState(false);
 
   useEffect(() => {
-    if (account) {
-      hasUserBet(account?.email || "").then((bet) => {
+    if (isLoggedIn && userInfo) {
+      hasUserBet(userInfo.address || "").then((bet) => {
         setHasBet(bet);
       });
 
-      hasUserCashOut(account?.email || "").then((cashout) => {
+      hasUserCashOut(userInfo.address || "").then((cashout) => {
         setHasCashOut(cashout);
       });
 
     }
-  }, [gameStatus, account, latestAction]);
+  }, [gameStatus, isLoggedIn, userInfo, latestAction]);
 
   useEffect(() => {
     if (gameStatus?.status === "IN_PROGRESS") {
@@ -82,84 +83,84 @@ export default function ControlCenter() {
 
   const onSetBet = async () => {
 
-    if (!socket) return;
+    // if (!socket) return;
 
-    if (!account) return;
+    // if (!isLoggedIn || !userInfo) return;
 
-    toast({
-      title: "Placing bet at " + betAmount + " zAPT...",
-    })
+    // toast({
+    //   title: "Placing bet at " + betAmount + " zAPT...",
+    // })
 
-    const blockchainRes = await placeBet(account, {
-      roundId: 1,
-      playerEmail: account.email || "",
-      betAmount: parseFloat(betAmount),
-      coinType: "APT",
-    })
+    // const blockchainRes = await placeBet(userInfo, {
+    //   roundId: 1,
+    //   playerEmail: userInfo.address,
+    //   betAmount: parseFloat(betAmount),
+    //   coinType: "APT",
+    // })
 
-    if (!blockchainRes) {
-      console.error('Error placing bet');
-      toast({
-        title: "Error placing bet",
-        description: "Please try again"
-      })
-      return;
-    }
+    // if (!blockchainRes) {
+    //   console.error('Error placing bet');
+    //   toast({
+    //     title: "Error placing bet",
+    //     description: "Please try again"
+    //   })
+    //   return;
+    // }
 
-    const data = {
-      roundId: 1,
-      playerEmail: account.email || "",
-      betAmount: parseFloat(betAmount),
-      coinType: "APT",
-    };
-    const success = setNewBet(data);
+    // const data = {
+    //   roundId: 1,
+    //   playerEmail: userInfo.address,
+    //   betAmount: parseFloat(betAmount),
+    //   coinType: "APT",
+    // };
+    // const success = setNewBet(data);
 
-    toast({
-      title: "Bet placed at " + betAmount + " zAPT",
-      description: <Link href={`https://explorer.aptoslabs.com/txn/${blockchainRes.version}/?network=randomnet`} target="_blank" className="underline">View transaction</Link>
-    })
+    // toast({
+    //   title: "Bet placed at " + betAmount + " zAPT",
+    //   description: <Link href={`https://explorer.aptoslabs.com/txn/${blockchainRes.version}/?network=randomnet`} target="_blank" className="underline">View transaction</Link>
+    // })
   };
 
   const onCashOut = async () => {
-    if (!socket) return;
+    // if (!socket) return;
 
-    if (!account) return;
+    // if (!userInfo || !isLoggedIn) return;
 
-    if (!gameStatus?.startTime) return;
+    // if (!gameStatus?.startTime) return;
 
-    const cashoutMultipler = Number(calculateCurrentCrashPoint((Date.now() - gameStatus.startTime) / 1000).toFixed(2));
+    // const cashoutMultipler = Number(calculateCurrentCrashPoint((Date.now() - gameStatus.startTime) / 1000).toFixed(2));
 
-    toast({
-      title: "Cashing out at " + cashoutMultipler + "x...",
-    })
+    // toast({
+    //   title: "Cashing out at " + cashoutMultipler + "x...",
+    // })
 
 
-    const blockchainRes = await cashOut(account, {
-      roundId: 1,
-      playerEmail: account.email,
-      cashOutMultiplier: cashoutMultipler,
-    });
+    // const blockchainRes = await cashOut(userInfo, {
+    //   roundId: 1,
+    //   playerEmail: userInfo.address,
+    //   cashOutMultiplier: cashoutMultipler,
+    // });
 
-    if (!blockchainRes) {
-      console.error('Error cashing out');
-      toast({
-        title: "Error cashing out",
-        description: "Please try again"
-      })
-      return;
-    }
+    // if (!blockchainRes) {
+    //   console.error('Error cashing out');
+    //   toast({
+    //     title: "Error cashing out",
+    //     description: "Please try again"
+    //   })
+    //   return;
+    // }
 
-    const data = {
-      roundId: 1,
-      playerEmail: account.email || "",
-      cashOutMultiplier: cashoutMultipler,
-    };
-    const succes = cashOutBet(data);
+    // const data = {
+    //   roundId: 1,
+    //   playerEmail: userInfo.address,
+    //   cashOutMultiplier: cashoutMultipler,
+    // };
+    // const succes = cashOutBet(data);
 
-    toast({
-      title: "Cashed out at " + cashoutMultipler + "x",
-      description: <Link href={`https://explorer.aptoslabs.com/txn/${blockchainRes.version}/?network=randomnet`} target="_blank" className="underline">View transaction</Link>
-    })
+    // toast({
+    //   title: "Cashed out at " + cashoutMultipler + "x",
+    //   description: <Link href={`https://explorer.aptoslabs.com/txn/${blockchainRes.version}/?network=randomnet`} target="_blank" className="underline">View transaction</Link>
+    // })
 
   };
 
@@ -227,7 +228,7 @@ export default function ControlCenter() {
         </div>
         <div className="flex flex-row items-baseline gap-2 w-full text-lg">
           {
-            !account && (
+            !(isLoggedIn && userInfo) && (
               <button
                 className="border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 cursor-not-allowed w-full"
                 disabled
@@ -237,7 +238,7 @@ export default function ControlCenter() {
             )
           }
           {
-            account && gameStatus?.status === "COUNTDOWN" && (
+            isLoggedIn && userInfo && gameStatus?.status === "COUNTDOWN" && (
               <button
                 className={cn(
                   "border border-green-700 px-6 py-1 border-yellow-700 text-yellow-500 bg-neutral-950 w-full",
@@ -256,7 +257,7 @@ export default function ControlCenter() {
             )
           }
           {
-            account && gameStatus?.status === "IN_PROGRESS" && hasBet &&  (
+            isLoggedIn && userInfo && gameStatus?.status === "IN_PROGRESS" && hasBet &&  (
               <button
                 className={cn(
                   "border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 w-full",
@@ -275,7 +276,7 @@ export default function ControlCenter() {
             )
           }
           {
-            account && gameStatus?.status === "IN_PROGRESS" && !hasBet &&  (
+            isLoggedIn && userInfo && gameStatus?.status === "IN_PROGRESS" && !hasBet &&  (
               <button
                 className="border px-6 py-1 border-yellow-700 text-yellow-500 bg-neutral-950 cursor-not-allowed w-full"
                 disabled
@@ -285,7 +286,7 @@ export default function ControlCenter() {
             )
           }
           {
-            account && gameStatus?.status === "END" && (
+            isLoggedIn && userInfo && gameStatus?.status === "END" && (
               <button
                 className="border border-yellow-700 px-6 py-1 text-yellow-500 bg-neutral-950 cursor-not-allowed w-full"
                 disabled
@@ -375,7 +376,7 @@ export default function ControlCenter() {
               </div>
               <div className="flex flex-row items-baseline gap-2 w-full text-lg">
                 {
-                  !account && (
+                  (!isLoggedIn || !userInfo) && (
                     <button
                       className="border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 cursor-not-allowed w-full"
                       disabled
@@ -385,7 +386,7 @@ export default function ControlCenter() {
                   )
                 }
                 {
-                  account && (
+                  isLoggedIn && userInfo && (
                     <button
                       className={cn(
                         "border bg-[#404226]/40 border-yellow-700 text-yellow-500 px-6 py-1 w-full",
