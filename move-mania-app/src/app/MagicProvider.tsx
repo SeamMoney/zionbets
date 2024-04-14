@@ -2,7 +2,7 @@
 
 import { setUpAndGetUser, updateUser } from "@/lib/api";
 import { magic } from "@/lib/magic";
-import { User } from "@/lib/schema";
+import { User, UserV2 } from "@/lib/schema";
 import { createContext, useEffect, useState } from "react";
 import {
   AlertDialog,
@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
 
 interface MagicProviderProps {
   isLoggedIn: boolean | null;
-  userInfo: User | null;
+  userInfo: UserV2 | null;
   setIsLoggedIn: (isLoggedIn: boolean) => void;
   publicAddress: string | null
 }
@@ -35,7 +35,7 @@ export const magicContext = createContext<MagicProviderProps>({
 export default function MagicProvider({ children }: { children: React.ReactNode }) {
 
   const [ isLoggedIn, setIsLoggedIn ] = useState<boolean | null>(null);
-  const [ userInfo, setUserInfo ] = useState<User | null>(null);
+  const [ userInfo, setUserInfo ] = useState<UserV2 | null>(null);
   const [ publicAddress, setPublicAddress ] = useState<string | null>(null);
 
   useEffect(() => {
@@ -55,6 +55,14 @@ export default function MagicProvider({ children }: { children: React.ReactNode 
         magic.aptos.getAccountInfo().then((userInfo) => {
           console.log('userInfo', userInfo)
           setPublicAddress(userInfo.address);
+          
+          setUpAndGetUser({
+            address: userInfo.address,
+          }).then((user) => {
+            if (user) {
+              setUserInfo(user);
+            }
+          });
         });
       }
     });

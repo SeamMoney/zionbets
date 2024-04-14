@@ -44,21 +44,21 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
 
-    getSession().then((session) => {
-      if (session) {
-        if (!session.user) return;
+    // getSession().then((session) => {
+    //   if (session) {
+    //     if (!session.user) return;
 
-        setUpAndGetUser({
-          username: session.user.name || "",
-          image: session.user.image || "",
-          email: session.user.email || "",
-        }).then((user) => {
-          if (user) {
-            setAccount(user);
-          }
-        });
-      }
-    });
+    //     setUpAndGetUser({
+    //       username: session.user.name || "",
+    //       image: session.user.image || "",
+    //       email: session.user.email || "",
+    //     }).then((user) => {
+    //       if (user) {
+    //         setAccount(user);
+    //       }
+    //     });
+    //   }
+    // });
 
     function onConnect() {
       setIsConnected(true);

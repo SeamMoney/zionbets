@@ -13,7 +13,8 @@ import { magicContext } from "../MagicProvider";
 export default function AccountPage() {
 
   const { account } = useContext(gameStatusContext);
-  const { isLoggedIn, setIsLoggedIn, publicAddress } = useContext(magicContext);
+  const { isLoggedIn, setIsLoggedIn, publicAddress, userInfo } = useContext(magicContext);
+  console.log('userInfo', userInfo)
   // const [account, setAccount] = useState<User | null>(null);
 
   const [privateKeyVisible, setPrivateKeyVisible] = useState(false);
@@ -55,7 +56,7 @@ export default function AccountPage() {
     window.location.reload();
   };
 
-  if (!isLoggedIn) return <></>;
+  if (!isLoggedIn || !userInfo) return <></>;
 
   return (
     <div className="px-2 pt-4">
@@ -68,7 +69,7 @@ export default function AccountPage() {
         </p>
       </div>
       <div className="grid gap-4 py-4">
-        {/* <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
+        <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
           <label htmlFor="username" className="text-left ">
             Username
           </label>
@@ -79,11 +80,11 @@ export default function AccountPage() {
               onChange={(e) => {
                 setUsername(e.target.value);
               }}
-              placeholder={account.username}
+              placeholder={userInfo.username}
               className="bg-transparent border-none outline-none text-right text-ellipsis"
             />
           </span>
-        </div> */}
+        </div>
         {/* <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
           <label htmlFor="profile_pic" className="text-left ">
             Profile picture
