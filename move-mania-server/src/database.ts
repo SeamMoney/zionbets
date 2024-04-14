@@ -105,6 +105,20 @@ export async function updateUserV2(address: string, user: UserV2) {
   await db.close();
 }
 
+export async function deleteUserV2(address: string) {
+  await initializeUsersV2Table(); // initialize tables if not yet initialized
+
+  // Open the database
+  const db = await open({
+    filename: "./db/v2/users_v2.db",
+    driver: require("sqlite3").Database,
+  });
+
+  await db.run("DELETE FROM users_v2 WHERE address = ?", address);
+
+  await db.close();
+}
+
 
 /* =================================================================================================
   DATABASE v1
