@@ -6,6 +6,7 @@ import {
   createUser,
   createUserV2,
   deleteUser,
+  deleteUserV2,
   getChatMessages,
   getCurrentGame,
   getGames,
@@ -75,6 +76,15 @@ app.post("/v2/users", async (req, res) => {
     return;
   }
   res.send("User created");
+});
+/**
+ * Delete a user
+ */
+app.delete("/v2/users/:address", async (req, res) => {
+
+  const address = req.params.address;
+  await deleteUserV2(address);
+  res.send("User deleted");
 });
 
 /* =================================================================================================
