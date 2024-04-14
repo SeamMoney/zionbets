@@ -7,6 +7,13 @@ export type User = {
   balance: number;
 };
 
+export type UserV2 = {
+  address: string;
+  username: string;
+  referral_code: string;
+  referred_by: string | null;
+}
+
 export const UserSchema = `CREATE TABLE IF NOT EXISTS users (
   username TEXT PRIMARY KEY,
   image TEXT,

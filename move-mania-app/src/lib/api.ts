@@ -1,10 +1,9 @@
 import { PlayerState } from "@/app/playerList";
 import { createAptosKeyPair, mintZAPT } from "./aptos";
-import { User } from "./schema";
+import { User, UserV2 } from "./schema";
 import { ChatMessage } from "./types";
 
-const API_URL = process.env.ZION_API_URL || "http://localhost:3008";
-
+const API_URL = `${process.env.ZION_API_URL || 'http://localhost:3008'}/v2`;
 export async function getUsers() {
   try {
     const response = await fetch(`${API_URL}/users`, {
@@ -20,9 +19,9 @@ export async function getUsers() {
   }
 }
 
-export async function doesUserExist(username: string) {
+export async function doesUserExist(address: string) {
   try {
-    const response = await fetch(`${API_URL}/users/${username}`, {
+    const response = await fetch(`${API_URL}/users/${address}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -36,33 +35,36 @@ export async function doesUserExist(username: string) {
 }
 
 export async function setUpUser(
-  userToSetup: Omit<User, "public_address" | "private_key" | "balance">,
+  userToSetup: Omit<UserV2, "referred_by" | "referral_code" | "username">,
   referrer?: string
 ) {
 
-  if (referrer) {
+  // if (referrer) {
 
-    const referrerUser = await getUserFromReferralCode(referrer);
+  //   const referrerUser = await getUserFromReferralCode(referrer);
 
-    mintZAPT(referrerUser.private_key, 100);
-  }
+  //   mintZAPT(referrerUser.private_key, 100);
+  // }
 
-  const keyPair = await createAptosKeyPair();
+  // const keyPair = await createAptosKeyPair();
 
   try {
     const response = await fetch(`${API_URL}/users`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "api-key": process.env.ZION_API_KEY || "",
+        // "api-key": process.env.ZION_API_KEY || "",
       },
       body: JSON.stringify({
-        ...userToSetup,
-        ...keyPair,
+        address: userToSetup.address,
+        username: userToSetup.address.slice(0, 8),
+        referral_code: userToSetup.address.slice(2, 8),
+        referred_by: referrer || null,
       }),
     });
     return response.ok;
   } catch (e) {
+    console.log('error setting up user', e)
     return false;
   }
 }
@@ -83,9 +85,9 @@ export async function getUserFromReferralCode(referralCode: string) {
   }
 }
 
-export async function getUser(email: string): Promise<User | null> {
+export async function getUser(address: string): Promise<UserV2 | null> {
   try {
-    const response = await fetch(`${API_URL}/users/${email}`, {
+    const response = await fetch(`${API_URL}/users/${address}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -99,21 +101,21 @@ export async function getUser(email: string): Promise<User | null> {
 }
 
 export async function setUpAndGetUser(
-  userToSetup: Omit<User, "public_address" | "private_key" | "balance">, 
+  userToSetup: Omit<UserV2, "referred_by" | "referral_code" | "username">, 
   referrer?: string
-): Promise<User | null> {
-  const userExists = await doesUserExist(userToSetup.email);
-  console.log(userExists);
+): Promise<UserV2 | null> {
+  const userExists = await doesUserExist(userToSetup.address);
+  console.log('userExists', userExists);
   if (!userExists) {
     const res = await setUpUser(userToSetup, referrer);
     console.log('res from setting up user', res)
     if (res) {
-      return getUser(userToSetup.email);
+      return getUser(userToSetup.address);
     } else {
       return null;
     }
   } else {
-    return getUser(userToSetup.email);
+    return getUser(userToSetup.address);
   }
 }
 
