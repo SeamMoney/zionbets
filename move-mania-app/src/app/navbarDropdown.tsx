@@ -46,42 +46,42 @@ export default function NavbarDropdown() {
         </DialogTrigger>
         <DialogContent className="bg-neutral-950">
           <input type="text" autoFocus className="hidden" />
-          <DialogTitle>Sign in</DialogTitle>
+          <DialogTitle>Sign in to start winning big!</DialogTitle>
           <DialogDescription>
-            Enter your phone number or email to sign in.
+            Use your phone number or email address to get logged in to your Zion Bets account.
           </DialogDescription>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col items-center gap-2 ">
             {
               emailPhoneToggle ?
               <button
-                className="bg-white h-10 text-neutral-950 active:scale-95 active:opacity-50 transition-transform"
+                className="bg-white h-10 text-neutral-950 active:scale-95 active:opacity-50 transition-transform w-full"
                 // onClick={async () => {
                 //   await magicLoginPhone('+447741234567')
                 //   setIsLoggedIn(true);
                 // }}
-                onClick={() => setEmailPhoneToggle(false)}
+                onClick={() => {setEmailPhoneToggle(false); setPhoneInput("");}}
               >
                 Continue with Phone
               </button>
               :
-              <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row items-center justify-between px-4 h-10 w-full">
+              <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row items-center justify-between px-4 h-10 w-full gap-4">
                 <label
                   htmlFor="public_address"
                   className="text-left "
                 >
-                  <Phone />
+                  <Phone strokeWidth={1.25} />
                 </label>
                 <select className="bg-transparent " ref={countryCodeRef} defaultValue='+1'>
                   <option value="+1">US +1</option>
                   <option value="+44">UK +44</option>
                 </select>
-                <span className="flex flex-row justify-center items-center gap-1">
+                <span className="flex flex-row justify-center items-center gap-1 w-full">
                   <input
                     id="public_address"
                     placeholder={'201 555 0123'}
                     value={phoneInput}
                     onChange={(e) => {setPhoneInput(e.target.value)}}
-                    className="bg-transparent border-none outline-none text-ellipsis"
+                    className="bg-transparent border-none outline-none text-ellipsis w-full"
                   />
                 </span>
                 <button
@@ -89,45 +89,48 @@ export default function NavbarDropdown() {
                     const countryCode = countryCodeRef.current?.value;
                     await magicLoginPhone(countryCode + phoneInput)
                     setIsLoggedIn(true);
+                    setPhoneInput("");
                   }}
                 >
                   Submit
                 </button>
               </div>
             }
+            <span>or</span>
             {
               !emailPhoneToggle ?
               <button
-                className="bg-white h-10 text-neutral-950 active:opacity-50 transition-transform"
+                className="bg-white h-10 text-neutral-950 active:opacity-50 transition-transform w-full"
                 // onClick={async () => {
                 //   await magicLoginPhone('+447741234567')
                 //   setIsLoggedIn(true);
                 // }}
-                onClick={() => {setEmailPhoneToggle(true)}}
+                onClick={() => {setEmailPhoneToggle(true); setEmailInput("")}}
               >
                 Continue with Email
               </button>
               :
-              <div className="border border-neutral-700 bg-neutral-800/20 bg-noise items-center flex flex-row justify-between px-4 h-10 w-full">
+              <div className="border border-neutral-700 bg-neutral-800/20 bg-noise items-center flex flex-row justify-between px-4 h-10 w-full gap-4">
                 <label
                   htmlFor="public_address"
                   className="text-left "
                 >
-                  <Mail />
+                  <Mail strokeWidth={1.25} />
                 </label>
-                <span className=" flex flex-row justify-center items-center gap-1">
+                <span className=" flex flex-row justify-center items-center gap-1 w-full">
                   <input
                     id="public_address"
                     placeholder={'your@email.com'}
                     value={emailInput}
                     onChange={(e) => {setEmailInput(e.target.value)}}
-                    className="bg-transparent border-none outline-none text-ellipsis"
+                    className="bg-transparent border-none outline-none text-ellipsis w-full"
                   />
                 </span>
                 <button
                   onClick={async () => {
                     await magicLoginEmail(emailInput)
                     setIsLoggedIn(true);
+                    setEmailInput("");
                   }}
                 >
                   Submit
