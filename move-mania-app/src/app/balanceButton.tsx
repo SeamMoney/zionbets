@@ -9,13 +9,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 
-import {
-  doesUserExist,
-  getUser,
-  setUpAndGetUser,
-  setUpUser,
-  updateUser,
-} from "@/lib/api";
 import { User } from "@/lib/schema";
 import { Clipboard, EyeIcon, EyeOffIcon, Loader2Icon } from "lucide-react";
 import { getSession, signIn, signOut } from "next-auth/react";
@@ -25,11 +18,13 @@ import Link from "next/link";
 import { getBalance, transferApt } from "@/lib/aptos";
 import { cn } from "@/lib/utils";
 import { gameStatusContext } from "./CrashProvider";
+import { magicContext } from "./MagicProvider";
 
 
 export default function BalanceButton() {
   const { toast } = useToast()
   const { account } = useContext(gameStatusContext);
+  const { isLoggedIn, userInfo, setIsLoggedIn, publicAddress } = useContext(magicContext);
   // const [account, setAccount] = useState<User | null>(null);
   const [balance, setBalance] = useState<number | null>(null);
   const [recipientAddress, setRecipientAddress] = useState<string>("");
@@ -47,9 +42,9 @@ export default function BalanceButton() {
     //     getUser(
     //       session.user.email
     //     ).then((user) => {
-          if (account) {
+          if (isLoggedIn && userInfo) {
             // setAccount(user);
-            getBalance(account.private_key, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`).then((balance) => {
+            getBalance(userInfo.address, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`).then((balance) => {
               setBalance(balance);
             });
           }
@@ -63,10 +58,10 @@ export default function BalanceButton() {
       const interval = setInterval(() => {
         // console.log('Checking for updates')
         // getUser(account.email).then((user) => {
-          if (account) {
+          if (isLoggedIn && userInfo) {
             // console.log('balance: ', user.balance)
             // setAccount(user);
-            getBalance(account.private_key, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`).then((balance) => {
+            getBalance(userInfo.address, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`).then((balance) => {
               setBalance(balance);
             });
           }
@@ -124,7 +119,7 @@ export default function BalanceButton() {
 
   }
   
-  if (account) {
+  if (isLoggedIn && userInfo) {
     return (
       <Dialog>
       <DialogTrigger asChild>
@@ -150,12 +145,12 @@ export default function BalanceButton() {
             <input
               id="public_address"
               disabled
-              value={account.public_address}
+              value={userInfo.address}
               className="bg-transparent border-none outline-none text-right text-ellipsis cursor-not-allowed"
             />
             <Clipboard className="w-4 h-4 cursor-pointer opacity-80 hover:opacity-100" onClick={() => {
               // copy public address to clipboard
-              navigator.clipboard.writeText(account.public_address);
+              navigator.clipboard.writeText(userInfo.address);
               toast({
                 title: "Address copied to clipboard",
               });
@@ -195,7 +190,7 @@ export default function BalanceButton() {
             <span className=" opacity-50 flex flex-row justify-center items-center gap-1">
               <input
                 id="public_address"
-                placeholder={account.public_address}
+                placeholder={userInfo.address}
                 value={recipientAddress}
                 onChange={(e) => setRecipientAddress(e.target.value)}
                 className="bg-transparent border-none outline-none text-right text-ellipsis"

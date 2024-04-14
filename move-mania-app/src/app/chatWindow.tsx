@@ -1,6 +1,6 @@
 "use client";
 
-import { getChatMessages, getUser, setUpAndGetUser } from "@/lib/api";
+import { getChatMessages } from "@/lib/api";
 import { User } from "@/lib/schema";
 import { sendMessage } from "@/lib/socket";
 import { ChatMessage, SOCKET_EVENTS } from "@/lib/types";

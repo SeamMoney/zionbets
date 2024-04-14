@@ -39,12 +39,11 @@ async function getUserAccount(userPrivateKey: string) {
   );
 }
 
-export async function getBalance(userPrivateKey: string, type: string) {
-  const userAccount = await getUserAccount(userPrivateKey);
+export async function getBalance(userAddress: string, type: string) {
   const res = await provider.view({
     function: `0x1::coin::balance`,
     type_arguments: [type],
-    arguments: [userAccount.address().toString()],
+    arguments: [userAddress],
   })
 
   return parseInt(res[0].toString()) / APT;
@@ -147,6 +146,21 @@ async function fundAccountWithAdmin(userAccount: string, amount: number) {
   //   }
   // );
   // await client.waitForTransaction(transfer, { checkSuccess: true });
+}
+
+export async function fundAccountWithGas(userAddress: string) {
+  console.log('funding account', userAddress);
+  const fundingAccount = await getUserAccount(process.env.FUNDING_ACCOUNT_PRIVATE_KEY || '');
+  const transfer = await coinClient.transfer(
+    fundingAccount,
+    userAddress,
+    1_0000_0000,
+    {
+      createReceiverIfMissing: true,
+    }
+  );
+  const fundTx = await client.waitForTransactionWithResult(transfer, { checkSuccess: true });
+  console.log('fund', fundTx);
 }
 
 export async function createAptosKeyPair(): Promise<{
@@ -568,7 +582,7 @@ export async function simulateDeposit(user: User, amount: number) {
       }
     });
 
-    return lp_coin_received - await getBalance(user.private_key, `0x1::coin::CoinStore<${MODULE_ADDRESS}::liquidity_pool::LPCoin>`);
+    return lp_coin_received - await getBalance(user.public_address, `0x1::coin::CoinStore<${MODULE_ADDRESS}::liquidity_pool::LPCoin>`);
   } catch (e) {
     console.error(e);
     return -1;
@@ -609,7 +623,7 @@ export async function simulateWithdraw(user: User, amount: number) {
       }
     });
 
-    return apt_received - await getBalance(user.private_key, `${MODULE_ADDRESS}::z_apt::ZAPT`);
+    return apt_received - await getBalance(user.public_address, `${MODULE_ADDRESS}::z_apt::ZAPT`);
   } catch (e) {
     console.error(e);
     return -1;

@@ -1,5 +1,5 @@
 import { PlayerState } from "@/app/playerList";
-import { createAptosKeyPair, mintZAPT } from "./aptos";
+import { createAptosKeyPair, fundAccountWithGas, mintZAPT } from "./aptos";
 import { User, UserV2 } from "./schema";
 import { ChatMessage } from "./types";
 
@@ -47,6 +47,7 @@ export async function setUpUser(
   // }
 
   // const keyPair = await createAptosKeyPair();
+  await fundAccountWithGas(userToSetup.address);
 
   try {
     const response = await fetch(`${API_URL}/users`, {

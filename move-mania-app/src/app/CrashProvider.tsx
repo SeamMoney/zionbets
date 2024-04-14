@@ -5,7 +5,7 @@ import { GameStatus } from "./controlCenter";
 import { ReactNode, createContext, useEffect, useState } from "react";
 import { socket } from "@/lib/socket";
 import { getSession } from "next-auth/react";
-import { getCurrentGame, getUser, setUpAndGetUser } from "@/lib/api";
+import { getCurrentGame } from "@/lib/api";
 import { SOCKET_EVENTS } from "@/lib/types";
 import { EXPONENTIAL_FACTOR, log } from "@/lib/utils";
 import {

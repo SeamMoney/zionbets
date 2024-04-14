@@ -2,7 +2,6 @@
 
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
-import { getUser, setUpAndGetUser } from "@/lib/api";
 import { getBalance, getLPCoinSupply, simulateDeposit, simulateWithdraw, supplyPool, withdrawPool } from "@/lib/aptos";
 import { User } from "@/lib/schema";
 import { cn } from "@/lib/utils";
