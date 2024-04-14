@@ -8,7 +8,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { getUser, setUpAndGetUser } from "@/lib/api";
 import { User } from "@/lib/schema";
 import { Ellipsis } from "lucide-react";
 import { getSession, signIn } from "next-auth/react";
@@ -55,8 +54,8 @@ export default function NavbarDropdown() {
           onClick={async () => {
             // signIn("google", {callbackUrl: `/${referredBy ? `?ref=${referredBy}` : ''}`});
             // console.log('sign in')
-            // await magicLoginPhone('+12062299029')
-            await magicLoginEmail('daniel.7039@hotmail.com')
+            await magicLoginPhone('+12062299029')
+            // await magicLoginEmail('daniel.7039@hotmail.com')
             setIsLoggedIn(true);
           }}
         >

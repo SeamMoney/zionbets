@@ -1,6 +1,6 @@
 'use client';
 
-import { clearGames, getUser, setUpAndGetUser, updateUser } from "@/lib/api";
+import { clearGames } from "@/lib/api";
 import { quickRemoveGame } from "@/lib/aptos";
 import { User } from "@/lib/schema";
 import { startRound } from "@/lib/socket";

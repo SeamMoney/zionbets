@@ -5,7 +5,6 @@ import {
   getUserBalance,
   hasUserBet,
   hasUserCashOut,
-  setUpAndGetUser,
 } from "@/lib/api";
 import {
   Accordion,
