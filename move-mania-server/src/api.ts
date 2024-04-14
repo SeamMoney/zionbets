@@ -4,6 +4,7 @@ import {
   clearGames,
   clearPlayerList,
   createUser,
+  createUserV2,
   deleteUser,
   getChatMessages,
   getCurrentGame,
@@ -12,11 +13,14 @@ import {
   getUser,
   getUserBalance,
   getUserByReferralCode,
+  getUserV2,
   getUsers,
+  getUsersV2,
   hasUserBet,
   hasUserCashOut,
   updateUser,
 } from "./database";
+import { UserV2 } from "./schema";
 require('dotenv').config();
 var cors = require("cors");
 const app = express();
@@ -26,6 +30,56 @@ app.use(cors({
 }));
 
 const PORT = 3008;
+
+/* =================================================================================================
+  API v2
+================================================================================================= */
+
+/* 
+  This is the entry point for the server. 
+*/
+app.get("/v2", (req, res) => {
+  res.send("Hello from the Zion Bets server! (v2)");
+});
+/**
+ * This is the endpoint to get all users
+ */
+app.get("/v2/users", async (req, res) => {
+
+  const users = await getUsersV2();
+  res.send(users);
+});
+/**'
+ * Get user by address
+ */
+app.get("/v2/users/:address", async (req, res) => {
+
+  const address = req.params.address;
+  const user = await getUserV2(address);
+  if (user) {
+    res.send(user);
+  } else {
+    res.status(404).send("User not found");
+  }
+});
+/**
+ * Create a new user
+ */
+app.post("/v2/users", async (req, res) => {
+
+  const user = req.body as UserV2;
+  try {
+    await createUserV2(user);
+  } catch (e) {
+    res.status(400).send("User already exists");
+    return;
+  }
+  res.send("User created");
+});
+
+/* =================================================================================================
+  API v1
+================================================================================================= */
 
 /* 
   This is the entry point for the server. 

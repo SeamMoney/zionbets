@@ -7,6 +7,13 @@ export type User = {
   balance: number;
 };
 
+export type UserV2 = {
+  address: string;
+  username: string;
+  referral_code: string;
+  referred_by: string | null;
+}
+
 export type Game = {
   game_id: string;
   start_time: number;
@@ -37,6 +44,13 @@ export const UserSchema = `CREATE TABLE IF NOT EXISTS users (
   private_key TEXT,
   balance FLOAT
 )`;
+
+export const UserV2Schema = `CREATE TABLE IF NOT EXISTS users_v2 (
+  address TEXT PRIMARY KEY NOT NULL UNIQUE,
+  username TEXT NOT NULL UNIQUE,
+  referral_code TEXT NOT NULL UNIQUE,
+  referred_by TEXT DEFAULT NULL
+);`;
 
 export const GameSchema = `CREATE TABLE IF NOT EXISTS games (
   game_id TEXT PRIMARY KEY,
