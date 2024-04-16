@@ -92,6 +92,7 @@ export default function NavbarDropdown() {
                   />
                 </span>
                 <button
+                  className="active:scale-95 active:opacity-50 transition-transform"
                   onClick={async () => {
                     const countryCode = countryCodeRef.current?.value;
                     await magicLoginPhone(countryCode + phoneInput)
@@ -134,6 +135,7 @@ export default function NavbarDropdown() {
                   />
                 </span>
                 <button
+                  className="active:scale-95 active:opacity-50 transition-transform"
                   onClick={async () => {
                     await magicLoginEmail(emailInput)
                     setIsLoggedIn(true);
