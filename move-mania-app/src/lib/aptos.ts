@@ -8,8 +8,8 @@ const CRASH_RESOURCE_ACCOUNT_ADDRESS = process.env.CRASH_RESOURCE_ACCOUNT_ADDRES
 const LP_RESOURCE_ACCOUNT_ADDRESS = process.env.LP_RESOURCE_ACCOUNT_ADDRESS as string;
 const Z_APT_RESOURCE_ACCOUNT_ADDRESS = process.env.Z_APT_RESOURCE_ACCOUNT_ADDRESS as string;
 
-export const RPC_URL = 'https://fullnode.random.aptoslabs.com';
-const FAUCET_URL = 'https://faucet.random.aptoslabs.com';
+export const RPC_URL = 'https://fullnode.devnet.aptoslabs.com';
+const FAUCET_URL = 'https://faucet.devnet.aptoslabs.com';
 
 const client = new AptosClient(RPC_URL);
 const coinClient = new CoinClient(client);

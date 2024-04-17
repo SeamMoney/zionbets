@@ -14,7 +14,6 @@ import { getSession, signIn } from "next-auth/react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useContext, useEffect, useRef, useState } from "react";
-import { magicLoginEmail, magicLoginPhone } from "@/lib/magic";
 import { magicContext } from "./MagicProvider";
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { COUNTRY_CODES } from "@/lib/countryCodes";
@@ -25,7 +24,7 @@ export default function NavbarDropdown() {
   const searchParams = useSearchParams();
   const referredBy = searchParams.get("ref");
 
-  const { isLoggedIn, setIsLoggedIn } = useContext(magicContext);
+  const { isLoggedIn, logInEmail, logInPhone } = useContext(magicContext);
 
   const [ emailPhoneToggle, setEmailPhoneToggle ] = useState<boolean>(false);
   const [ phoneInput, setPhoneInput ] = useState<string>("");
@@ -95,8 +94,7 @@ export default function NavbarDropdown() {
                   className="active:scale-95 active:opacity-50 transition-transform"
                   onClick={async () => {
                     const countryCode = countryCodeRef.current?.value;
-                    await magicLoginPhone(countryCode + phoneInput)
-                    setIsLoggedIn(true);
+                    await logInPhone(`${countryCode}${phoneInput}`);
                     setPhoneInput("");
                   }}
                 >
@@ -137,8 +135,7 @@ export default function NavbarDropdown() {
                 <button
                   className="active:scale-95 active:opacity-50 transition-transform"
                   onClick={async () => {
-                    await magicLoginEmail(emailInput)
-                    setIsLoggedIn(true);
+                    await logInEmail(emailInput);
                     setEmailInput("");
                   }}
                 >
