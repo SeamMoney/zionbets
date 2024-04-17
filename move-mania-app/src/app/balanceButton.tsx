@@ -8,6 +8,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import {
+  AptosClient,
+  BCS,
+  CoinClient,
+  FaucetClient,
+  TxnBuilderTypes,
+} from "aptos";
 
 import { User } from "@/lib/schema";
 import { Clipboard, EyeIcon, EyeOffIcon, Loader2Icon } from "lucide-react";
@@ -15,14 +22,23 @@ import { getSession, signIn, signOut } from "next-auth/react";
 import { useContext, useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast"
 import Link from "next/link";
-import { getBalance, transferApt } from "@/lib/aptos";
+import { RPC_URL, getBalance, transferApt } from "@/lib/aptos";
 import { cn } from "@/lib/utils";
 import { magicContext } from "./MagicProvider";
+
+const MAGIC_WALLET_ADDRESS =
+  "0xa8256b208efd4be625e0de7d473d89bc5b8e09ef578c84642b09f89492e96054";
+const SAMPLE_RAW_TRANSACTION = {
+  type: "entry_function_payload",
+  function: "0x1::coin::transfer",
+  type_arguments: ["0x1::aptos_coin::AptosCoin"],
+  arguments: [MAGIC_WALLET_ADDRESS, 1000],
+};
 
 
 export default function BalanceButton() {
   const { toast } = useToast()
-  const { isLoggedIn, userInfo } = useContext(magicContext);
+  const { isLoggedIn, userInfo, aptosWallet } = useContext(magicContext);
   const [balance, setBalance] = useState<number | null>(null);
   const [recipientAddress, setRecipientAddress] = useState<string>("");
   const [transferAmount, setTransferAmount] = useState<string>("");
@@ -67,6 +83,40 @@ export default function BalanceButton() {
   });
 
   const onWithdraw = async () => {
+
+    // setResultB(null);
+
+    if (!userInfo || !aptosWallet) {
+      console.warn("No account");
+      return;
+    }
+
+    const token = new TxnBuilderTypes.TypeTagStruct(
+      TxnBuilderTypes.StructTag.fromString("0x1::aptos_coin::AptosCoin")
+    );
+
+    const payload = new TxnBuilderTypes.TransactionPayloadEntryFunction(
+      TxnBuilderTypes.EntryFunction.natural(
+        "0x1::coin",
+        "transfer",
+        [token],
+        [
+          BCS.bcsToBytes(
+            TxnBuilderTypes.AccountAddress.fromHex(MAGIC_WALLET_ADDRESS)
+          ),
+          BCS.bcsSerializeUint64(1000),
+        ]
+      )
+    );
+
+    const { hash } = await aptosWallet.signAndSubmitBCSTransaction(payload);
+
+    const client = new AptosClient(RPC_URL);
+    await client.waitForTransaction(hash, {
+      checkSuccess: true,
+    });
+    console.log("Transaction succeeded with hash: ", hash);
+    // setResultB(hash);
 
     // if (!isLoggedIn || !userInfo || !balance || transferAmount == '') return;
     // if (parseFloat(transferAmount) <= 0) {
