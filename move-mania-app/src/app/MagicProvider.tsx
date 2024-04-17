@@ -80,9 +80,15 @@ export default function MagicProvider({ children }: { children: React.ReactNode 
         const accountInfo = await magicAptosWallet.account();
         setPublicAddress(accountInfo.address);
         console.log('accountInfo', accountInfo)
-        setUpAndGetUser({
-          address: accountInfo.address,
-        }).then((user) => {
+        if (!magicAptosWallet) {
+          return
+        }
+        setUpAndGetUser(
+          {
+            address: accountInfo.address,
+          },
+          magicAptosWallet
+        ).then((user) => {
           if (user) {
             setUserInfo(user);
           }
@@ -120,9 +126,15 @@ export default function MagicProvider({ children }: { children: React.ReactNode 
       const accountInfo = await magicAptosWallet.account();
       setPublicAddress(accountInfo.address);
       console.log('accountInfo', accountInfo)
-      setUpAndGetUser({
-        address: accountInfo.address,
-      }).then((user) => {
+      if (!magicAptosWallet) {
+        return
+      }
+      setUpAndGetUser(
+        {
+          address: accountInfo.address,
+        },
+        magicAptosWallet
+      ).then((user) => {
         if (user) {
           setUserInfo(user);
         }
@@ -164,9 +176,15 @@ export default function MagicProvider({ children }: { children: React.ReactNode 
       const accountInfo = await magicAptosWallet.account();
       setPublicAddress(accountInfo.address);
       console.log('accountInfo', accountInfo)
-      setUpAndGetUser({
-        address: accountInfo.address,
-      }).then((user) => {
+      if (!magicAptosWallet) {
+        return
+      }
+      setUpAndGetUser(
+        {
+          address: accountInfo.address,
+        },
+        magicAptosWallet
+      ).then((user) => {
         if (user) {
           setUserInfo(user);
         }

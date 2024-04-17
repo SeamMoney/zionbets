@@ -1,7 +1,8 @@
 import { PlayerState } from "@/app/playerList";
-import { createAptosKeyPair, fundAccountWithGas, mintZAPT } from "./aptos";
+import { fundAccountWithGas, mintZAPT, registerForZAPT } from "./aptos";
 import { User, UserV2 } from "./schema";
 import { ChatMessage } from "./types";
+import { MagicAptosWallet } from "@magic-ext/aptos";
 
 const API_URL = `${process.env.ZION_API_URL || 'http://localhost:3008'}/v2`;
 export async function getUsers() {
@@ -35,6 +36,7 @@ export async function doesUserExist(address: string) {
 }
 
 export async function setUpUser(
+  userWallet: MagicAptosWallet,
   userToSetup: Omit<UserV2, "referred_by" | "referral_code" | "username">,
   referrer?: string
 ) {
@@ -48,6 +50,7 @@ export async function setUpUser(
 
   // const keyPair = await createAptosKeyPair();
   await fundAccountWithGas(userToSetup.address);
+  await registerForZAPT(userWallet);
 
   try {
     const response = await fetch(`${API_URL}/users`, {
@@ -103,12 +106,14 @@ export async function getUser(address: string): Promise<UserV2 | null> {
 
 export async function setUpAndGetUser(
   userToSetup: Omit<UserV2, "referred_by" | "referral_code" | "username">, 
+  userWallet: MagicAptosWallet,
   referrer?: string
 ): Promise<UserV2 | null> {
+  console.log('userToSetup', userToSetup)
   const userExists = await doesUserExist(userToSetup.address);
   console.log('userExists', userExists);
   if (!userExists) {
-    const res = await setUpUser(userToSetup, referrer);
+    const res = await setUpUser(userWallet, userToSetup, referrer);
     console.log('res from setting up user', res)
     if (res) {
       return getUser(userToSetup.address);

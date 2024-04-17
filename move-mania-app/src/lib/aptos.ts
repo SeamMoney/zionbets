@@ -51,21 +51,6 @@ export async function getBalance(userAddress: string, type: string) {
 }
 
 export async function transferApt(userWallet: MagicAptosWallet, amount: number, toAddress: string, type: string) {
-
-  // const userInfo = await userWallet.account();
-
-  // const txn = await provider.generateTransaction(
-  //   userInfo.address,
-  //   {
-  //     function: `0x1::coin::transfer`,
-  //     type_arguments: [type],
-  //     arguments: [
-  //       toAddress,
-  //       Math.floor(amount * APT),
-  //     ],
-  //   },
-  //   TRANSACTION_OPTIONS
-  // );
   const token = new TxnBuilderTypes.TypeTagStruct(
     TxnBuilderTypes.StructTag.fromString(type)
   );
@@ -95,7 +80,6 @@ export async function transferApt(userWallet: MagicAptosWallet, amount: number, 
     txnHash: txResult.hash,
     version: (txResult as any).version,
   };
-
 }
 
 export async function registerForAPT(userAccount: AptosAccount) {
@@ -124,22 +108,30 @@ export async function registerForAPT(userAccount: AptosAccount) {
   };
 }
 
-export async function registerForZAPT(userPrivateKey: string) {
-  const userAccount = await getUserAccount(userPrivateKey);
+export async function registerForZAPT(userWallet: MagicAptosWallet) {
 
-  const txn = await provider.generateTransaction(
-    userAccount.address(),
-    {
-      function: `${MODULE_ADDRESS}::z_apt::register`,
-      type_arguments: [],
-      arguments: [],
-    },
-    TRANSACTION_OPTIONS
+  const payload = new TxnBuilderTypes.TransactionPayloadEntryFunction(
+    TxnBuilderTypes.EntryFunction.natural(
+      `${MODULE_ADDRESS}::z_apt`,
+      "register",
+      [],
+      []
+    )
   );
 
-  const tx = await provider.signAndSubmitTransaction(userAccount, txn);
+  // const txn = await provider.generateTransaction(
+  //   userAccount.address(),
+  //   {
+  //     function: `${MODULE_ADDRESS}::z_apt::register`,
+  //     type_arguments: [],
+  //     arguments: [],
+  //   },
+  //   TRANSACTION_OPTIONS
+  // );
 
-  const txResult = await client.waitForTransactionWithResult(tx);
+  const { hash } = await userWallet.signAndSubmitBCSTransaction(payload);
+
+  const txResult = await client.waitForTransactionWithResult(hash);
 
   if (!(txResult as any).success) {
     return null;
@@ -180,60 +172,60 @@ export async function fundAccountWithGas(userAddress: string) {
   console.log('fund', fundTx);
 }
 
-export async function createAptosKeyPair(): Promise<{
-  public_address: string;
-  private_key: string;
-} | null> {
-  const wallet = new AptosAccount();
-  const privateKey = wallet.toPrivateKeyObject().privateKeyHex;
-  const publicKey = wallet.address();
+// export async function createAptosKeyPair(): Promise<{
+//   public_address: string;
+//   private_key: string;
+// } | null> {
+//   const wallet = new AptosAccount();
+//   const privateKey = wallet.toPrivateKeyObject().privateKeyHex;
+//   const publicKey = wallet.address();
 
-  const adminAccount = await getUserAccount(process.env.ADMIN_ACCOUNT_PRIVATE_KEY || '');
-  const fundingAccount = await getUserAccount(process.env.FUNDING_ACCOUNT_PRIVATE_KEY || '');
+//   const adminAccount = await getUserAccount(process.env.ADMIN_ACCOUNT_PRIVATE_KEY || '');
+//   const fundingAccount = await getUserAccount(process.env.FUNDING_ACCOUNT_PRIVATE_KEY || '');
 
-  // await faucetClient.fundAccount(publicKey, 1_0000, 5)
-  // await registerForAPT(wallet);
-  console.log('funding account', publicKey.toString());
-  const transfer = await coinClient.transfer(
-    fundingAccount,
-    wallet,
-    1_0000_0000,
-    {
-      createReceiverIfMissing: true,
-    }
-  );
-  const fundTx = await client.waitForTransactionWithResult(transfer, { checkSuccess: true });
-  console.log('fund', fundTx);
-  // await sleep(5000);
+//   // await faucetClient.fundAccount(publicKey, 1_0000, 5)
+//   // await registerForAPT(wallet);
+//   console.log('funding account', publicKey.toString());
+//   const transfer = await coinClient.transfer(
+//     fundingAccount,
+//     wallet,
+//     1_0000_0000,
+//     {
+//       createReceiverIfMissing: true,
+//     }
+//   );
+//   const fundTx = await client.waitForTransactionWithResult(transfer, { checkSuccess: true });
+//   console.log('fund', fundTx);
+//   // await sleep(5000);
   
-  await registerForZAPT(privateKey);
+//   await registerForZAPT(privateKey);
 
-  const txn = await provider.generateTransaction(
-    adminAccount.address(),
-    {
-      function: `${MODULE_ADDRESS}::z_apt::mint`,
-      type_arguments: [],
-      arguments: [
-        '100000000000',
-        wallet.address()
-      ],
-    },
-    TRANSACTION_OPTIONS
-  );
+//   const txn = await provider.generateTransaction(
+//     adminAccount.address(),
+//     {
+//       function: `${MODULE_ADDRESS}::z_apt::mint`,
+//       type_arguments: [],
+//       arguments: [
+//         '100000000000',
+//         wallet.address()
+//       ],
+//     },
+//     TRANSACTION_OPTIONS
+//   );
 
-  const tx = await provider.signAndSubmitTransaction(adminAccount, txn);
+//   const tx = await provider.signAndSubmitTransaction(adminAccount, txn);
 
-  const txResult = await client.waitForTransactionWithResult(tx);
+//   const txResult = await client.waitForTransactionWithResult(tx);
 
-  if (!(txResult as any).success) {
-    return null;
-  }
+//   if (!(txResult as any).success) {
+//     return null;
+//   }
 
-  return {
-    public_address: publicKey.toString(),
-    private_key: privateKey,
-  };
-}
+//   return {
+//     public_address: publicKey.toString(),
+//     private_key: privateKey,
+//   };
+// }
 
 export async function mintZAPT(userPrivateKey: string, amount: number) {
   const userAccount = await getUserAccount(userPrivateKey);
