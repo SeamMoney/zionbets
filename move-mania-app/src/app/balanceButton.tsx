@@ -91,75 +91,75 @@ export default function BalanceButton() {
       return;
     }
 
-    const token = new TxnBuilderTypes.TypeTagStruct(
-      TxnBuilderTypes.StructTag.fromString("0x1::aptos_coin::AptosCoin")
-    );
+    // const token = new TxnBuilderTypes.TypeTagStruct(
+    //   TxnBuilderTypes.StructTag.fromString("0x1::aptos_coin::AptosCoin")
+    // );
 
-    const payload = new TxnBuilderTypes.TransactionPayloadEntryFunction(
-      TxnBuilderTypes.EntryFunction.natural(
-        "0x1::coin",
-        "transfer",
-        [token],
-        [
-          BCS.bcsToBytes(
-            TxnBuilderTypes.AccountAddress.fromHex(MAGIC_WALLET_ADDRESS)
-          ),
-          BCS.bcsSerializeUint64(1000),
-        ]
-      )
-    );
+    // const payload = new TxnBuilderTypes.TransactionPayloadEntryFunction(
+    //   TxnBuilderTypes.EntryFunction.natural(
+    //     "0x1::coin",
+    //     "transfer",
+    //     [token],
+    //     [
+    //       BCS.bcsToBytes(
+    //         TxnBuilderTypes.AccountAddress.fromHex(MAGIC_WALLET_ADDRESS)
+    //       ),
+    //       BCS.bcsSerializeUint64(1000),
+    //     ]
+    //   )
+    // );
 
-    const { hash } = await aptosWallet.signAndSubmitBCSTransaction(payload);
+    // const { hash } = await aptosWallet.signAndSubmitBCSTransaction(payload);
 
-    const client = new AptosClient(RPC_URL);
-    await client.waitForTransaction(hash, {
-      checkSuccess: true,
-    });
-    console.log("Transaction succeeded with hash: ", hash);
+    // const client = new AptosClient(RPC_URL);
+    // await client.waitForTransaction(hash, {
+    //   checkSuccess: true,
+    // });
+    // console.log("Transaction succeeded with hash: ", hash);
     // setResultB(hash);
 
-    // if (!isLoggedIn || !userInfo || !balance || transferAmount == '') return;
-    // if (parseFloat(transferAmount) <= 0) {
-    //   toast({
-    //     title: "Please enter a valid amount",
-    //   });
-    //   return;
-    // }
-    // if (parseFloat(transferAmount) > balance) {
-    //   toast({
-    //     title: "Insufficient funds",
-    //   });
-    //   return;
-    // }
-    // if (recipientAddress == '') {
-    //   toast({
-    //     title: "Please enter a recipient address",
-    //   });
-    //   return;
-    // }
+    if (!isLoggedIn || !userInfo || !balance || transferAmount == '') return;
+    if (parseFloat(transferAmount) <= 0) {
+      toast({
+        title: "Please enter a valid amount",
+      });
+      return;
+    }
+    if (parseFloat(transferAmount) > balance) {
+      toast({
+        title: "Insufficient funds",
+      });
+      return;
+    }
+    if (recipientAddress == '') {
+      toast({
+        title: "Please enter a recipient address",
+      });
+      return;
+    }
 
-    // setLoading(true);
+    setLoading(true);
 
-    // const tx = await transferApt(accountprivate_key, parseFloat(transferAmount), recipientAddress,  `0x1::aptos_coin::AptosCoin`);
+    const tx = await transferApt(aptosWallet, parseFloat(transferAmount), recipientAddress,  `0x1::aptos_coin::AptosCoin`);
 
-    // if (!tx) {
-    //   toast({
-    //     title: "Failed to withdraw funds",
-    //   });
-    //   setLoading(false);
-    //   return;
-    // }
+    if (!tx) {
+      toast({
+        title: "Failed to withdraw funds",
+      });
+      setLoading(false);
+      return;
+    }
 
-    // // withdraw funds
-    // toast({
-    //   title: "Funds withdrawn",
-    //   description: <Link href={`https://explorer.aptoslabs.com/txn/${tx.version}/?network=randomnet`} target="_blank" className="underline">View transaction</Link>
-    // })
-    // setLoading(false);
+    // withdraw funds
+    toast({
+      title: "Funds withdrawn",
+      description: <Link href={`https://explorer.aptoslabs.com/txn/${tx.version}/?network=devnet`} target="_blank" className="underline">View transaction</Link>
+    })
+    setLoading(false);
 
-    // // clear input fields
-    // setRecipientAddress('');
-    // setTransferAmount('');
+    // clear input fields
+    setRecipientAddress('');
+    setTransferAmount('');
 
 
   }

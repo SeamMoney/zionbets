@@ -1,6 +1,7 @@
-import { AptosAccount, AptosClient, CoinClient, FaucetClient, HexString, Provider } from "aptos";
+import { AptosAccount, AptosClient, BCS, CoinClient, FaucetClient, HexString, Provider, TxnBuilderTypes } from "aptos";
 import { BetData, CashOutData } from "./types";
 import { User } from "./schema";
+import { MagicAptosWallet } from "@magic-ext/aptos";
 
 const MODULE_ADDRESS = process.env.MODULE_ADDRESS as string;
 const MODULE_NAME = 'crash';
@@ -49,25 +50,42 @@ export async function getBalance(userAddress: string, type: string) {
 
 }
 
-export async function transferApt(userPrivateKey: string, amount: number, toAddress: string, type: string) {
-  const userAccount = await getUserAccount(userPrivateKey);
+export async function transferApt(userWallet: MagicAptosWallet, amount: number, toAddress: string, type: string) {
 
-  const txn = await provider.generateTransaction(
-    userAccount.address(),
-    {
-      function: `0x1::coin::transfer`,
-      type_arguments: [type],
-      arguments: [
-        toAddress,
-        Math.floor(amount * APT),
-      ],
-    },
-    TRANSACTION_OPTIONS
+  // const userInfo = await userWallet.account();
+
+  // const txn = await provider.generateTransaction(
+  //   userInfo.address,
+  //   {
+  //     function: `0x1::coin::transfer`,
+  //     type_arguments: [type],
+  //     arguments: [
+  //       toAddress,
+  //       Math.floor(amount * APT),
+  //     ],
+  //   },
+  //   TRANSACTION_OPTIONS
+  // );
+  const token = new TxnBuilderTypes.TypeTagStruct(
+    TxnBuilderTypes.StructTag.fromString(type)
+  );
+  const payload = new TxnBuilderTypes.TransactionPayloadEntryFunction(
+    TxnBuilderTypes.EntryFunction.natural(
+      "0x1::coin",
+      "transfer",
+      [token],
+      [
+        BCS.bcsToBytes(
+          TxnBuilderTypes.AccountAddress.fromHex(toAddress)
+        ),
+        BCS.bcsSerializeUint64(Math.floor(amount * APT)),
+      ]
+    )
   );
 
-  const tx = await provider.signAndSubmitTransaction(userAccount, txn);
+  const { hash } = await userWallet.signAndSubmitBCSTransaction(payload);
 
-  const txResult = await client.waitForTransactionWithResult(tx);
+  const txResult = await client.waitForTransactionWithResult(hash);
 
   if (!(txResult as any).success) {
     return null;
