@@ -4,10 +4,10 @@ import { User, UserV2 } from "./schema";
 import { ChatMessage } from "./types";
 import { MagicAptosWallet } from "@magic-ext/aptos";
 
-const API_URL = `${process.env.ZION_API_URL || 'http://localhost:3008'}/v2`;
+const API_URL = `${process.env.ZION_API_URL || 'http://localhost:3008'}`;
 export async function getUsers() {
   try {
-    const response = await fetch(`${API_URL}/users`, {
+    const response = await fetch(`${API_URL}/v2/users`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -22,7 +22,7 @@ export async function getUsers() {
 
 export async function doesUserExist(address: string) {
   try {
-    const response = await fetch(`${API_URL}/users/${address}`, {
+    const response = await fetch(`${API_URL}/v2/users/${address}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -54,7 +54,7 @@ export async function setUpUser(
   await mintZAPT(userToSetup.address, 1000);
 
   try {
-    const response = await fetch(`${API_URL}/users`, {
+    const response = await fetch(`${API_URL}/v2/users`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -92,7 +92,7 @@ export async function getUserFromReferralCode(referralCode: string) {
 
 export async function getUser(address: string): Promise<UserV2 | null> {
   try {
-    const response = await fetch(`${API_URL}/users/${address}`, {
+    const response = await fetch(`${API_URL}/v2/users/${address}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -128,7 +128,7 @@ export async function setUpAndGetUser(
 
 export async function updateUser(email: string, user: User): Promise<boolean> {
   try {
-    const response = await fetch(`${API_URL}/users/${email}`, {
+    const response = await fetch(`${API_URL}/v2/users/${email}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -185,16 +185,19 @@ export async function getPlayerList(): Promise<PlayerState[]> {
 
 export async function getCurrentGame() {
   try {
+    console.log('getting game from api')
     const response = await fetch(`${API_URL}/games/current`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "api-key": process.env.ZION_API_KEY || "",
       },
     });
+    console.log('response', response)
     const res = await response.json();
+    console.log('res', res)
     return res;
   } catch (e) {
+    console.log('error getting game', e)
     return null;
   }
 }
