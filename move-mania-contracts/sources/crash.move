@@ -110,6 +110,7 @@ module zion::crash {
   * @param house_secret_hash - the hash of the house secret
   * @param salt_hash - the hash of the salt
   */
+  #[randomness]
   entry fun start_game(
     admin: &signer, 
     house_secret_hash: vector<u8>, 
