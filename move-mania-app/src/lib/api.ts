@@ -51,6 +51,7 @@ export async function setUpUser(
   // const keyPair = await createAptosKeyPair();
   await fundAccountWithGas(userToSetup.address);
   await registerForZAPT(userWallet);
+  await mintZAPT(userToSetup.address, 1000);
 
   try {
     const response = await fetch(`${API_URL}/users`, {

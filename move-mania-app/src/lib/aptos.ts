@@ -227,9 +227,7 @@ export async function fundAccountWithGas(userAddress: string) {
 //   };
 // }
 
-export async function mintZAPT(userPrivateKey: string, amount: number) {
-  const userAccount = await getUserAccount(userPrivateKey);
-
+export async function mintZAPT(userAddress: string, amount: number) {
   const adminAccount = await getUserAccount(process.env.ADMIN_ACCOUNT_PRIVATE_KEY || '');
 
   const txn = await provider.generateTransaction(
@@ -239,7 +237,7 @@ export async function mintZAPT(userPrivateKey: string, amount: number) {
       type_arguments: [],
       arguments: [
         Math.floor(amount * APT),
-        userAccount.address()
+        userAddress
       ],
     },
     TRANSACTION_OPTIONS
