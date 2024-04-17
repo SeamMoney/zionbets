@@ -122,45 +122,45 @@ export default function ControlCenter() {
   };
 
   const onCashOut = async () => {
-    // if (!socket) return;
+    if (!socket) return;
 
-    // if (!userInfo || !isLoggedIn) return;
+    if (!userInfo || !isLoggedIn || !aptosWallet) return;
 
-    // if (!gameStatus?.startTime) return;
+    if (!gameStatus?.startTime) return;
 
-    // const cashoutMultipler = Number(calculateCurrentCrashPoint((Date.now() - gameStatus.startTime) / 1000).toFixed(2));
+    const cashoutMultipler = Number(calculateCurrentCrashPoint((Date.now() - gameStatus.startTime) / 1000).toFixed(2));
 
-    // toast({
-    //   title: "Cashing out at " + cashoutMultipler + "x...",
-    // })
+    toast({
+      title: "Cashing out at " + cashoutMultipler + "x...",
+    })
 
 
-    // const blockchainRes = await cashOut(userInfo, {
-    //   roundId: 1,
-    //   playerEmail: userInfo.address,
-    //   cashOutMultiplier: cashoutMultipler,
-    // });
+    const blockchainRes = await cashOut(aptosWallet, {
+      roundId: 1,
+      playerEmail: userInfo.address,
+      cashOutMultiplier: cashoutMultipler,
+    });
 
-    // if (!blockchainRes) {
-    //   console.error('Error cashing out');
-    //   toast({
-    //     title: "Error cashing out",
-    //     description: "Please try again"
-    //   })
-    //   return;
-    // }
+    if (!blockchainRes) {
+      console.error('Error cashing out');
+      toast({
+        title: "Error cashing out",
+        description: "Please try again"
+      })
+      return;
+    }
 
-    // const data = {
-    //   roundId: 1,
-    //   playerEmail: userInfo.address,
-    //   cashOutMultiplier: cashoutMultipler,
-    // };
-    // const succes = cashOutBet(data);
+    const data = {
+      roundId: 1,
+      playerEmail: userInfo.address,
+      cashOutMultiplier: cashoutMultipler,
+    };
+    const succes = cashOutBet(data);
 
-    // toast({
-    //   title: "Cashed out at " + cashoutMultipler + "x",
-    //   description: <Link href={`https://explorer.aptoslabs.com/txn/${blockchainRes.version}/?network=devnet`} target="_blank" className="underline">View transaction</Link>
-    // })
+    toast({
+      title: "Cashed out at " + cashoutMultipler + "x",
+      description: <Link href={`https://explorer.aptoslabs.com/txn/${blockchainRes.version}/?network=devnet`} target="_blank" className="underline">View transaction</Link>
+    })
 
   };
 

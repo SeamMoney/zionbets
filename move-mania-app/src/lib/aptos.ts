@@ -313,24 +313,22 @@ export async function placeBet(userWallet: MagicAptosWallet, betData: BetData) {
   };
 }
 
-export async function cashOut(user: User, cashOutData: CashOutData) {
-  const userAccount = await getUserAccount(user.private_key);
+export async function cashOut(userWallet: MagicAptosWallet, cashOutData: CashOutData) {
 
-  const cashOutTxn = await provider.generateTransaction(
-    userAccount.address(),
-    {
-      function: `${MODULE_ADDRESS}::${MODULE_NAME}::cash_out`,
-      type_arguments: [],
-      arguments: [
-        Math.floor(cashOutData.cashOutMultiplier * 100)
+  const payload = new TxnBuilderTypes.TransactionPayloadEntryFunction(
+    TxnBuilderTypes.EntryFunction.natural(
+      `${MODULE_ADDRESS}::${MODULE_NAME}`,
+      "cash_out",
+      [],
+      [
+        BCS.bcsSerializeUint64(Math.floor(cashOutData.cashOutMultiplier * 100)),
       ]
-    },
-    TRANSACTION_OPTIONS
+    )
   );
 
-  const tx = await provider.signAndSubmitTransaction(userAccount, cashOutTxn);
+  const { hash } = await userWallet.signAndSubmitBCSTransaction(payload);
 
-  const txResult = await client.waitForTransactionWithResult(tx)
+  const txResult = await client.waitForTransactionWithResult(hash);
 
   if (!(txResult as any).success) {
     return null;
