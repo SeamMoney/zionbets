@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { User } from "@/lib/schema";
-import { Ellipsis, Mail, Phone } from "lucide-react";
+import { Ellipsis, Loader2Icon, Mail, Phone } from "lucide-react";
 import { getSession, signIn } from "next-auth/react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -31,6 +31,14 @@ export default function NavbarDropdown() {
   const [ emailInput, setEmailInput ] = useState<string>("");
 
   const countryCodeRef = useRef<HTMLSelectElement>(null);
+
+  if (isLoggedIn === null) {
+    return (
+      <button className="bg-white px-6 py-1 text-neutral-950 active:scale-95 active:opacity-50 transition-transform">
+        <Loader2Icon className="animate-spin" />
+      </button>
+    )
+  }
 
   return (
     <div className="flex flex-row items-center gap-2">
