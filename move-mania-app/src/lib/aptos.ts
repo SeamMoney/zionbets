@@ -284,26 +284,24 @@ export async function quickRemoveGame() {
   };
 }
 
-export async function placeBet(user: User, betData: BetData) {
-  const userAccount = await getUserAccount(user.private_key);
+export async function placeBet(userWallet: MagicAptosWallet, betData: BetData) {
 
   // await faucetClient.fundAccount(userAccount.address(), 10_0000_0000, 5)
 
-  const placeBetTxn = await provider.generateTransaction(
-    userAccount.address(),
-    {
-      function: `${MODULE_ADDRESS}::${MODULE_NAME}::place_bet`,
-      type_arguments: [],
-      arguments: [
-        betData.betAmount * APT,
+  const payload = new TxnBuilderTypes.TransactionPayloadEntryFunction(
+    TxnBuilderTypes.EntryFunction.natural(
+      `${MODULE_ADDRESS}::${MODULE_NAME}`,
+      "place_bet",
+      [],
+      [
+        BCS.bcsSerializeUint64(Math.floor(betData.betAmount * APT)),
       ]
-    },
-    TRANSACTION_OPTIONS
+    )
   );
 
-  const tx = await provider.signAndSubmitTransaction(userAccount, placeBetTxn);
+  const { hash } = await userWallet.signAndSubmitBCSTransaction(payload);
 
-  const txResult = await client.waitForTransactionWithResult(tx)
+  const txResult = await client.waitForTransactionWithResult(hash);
 
   if (!(txResult as any).success) {
     return null;
