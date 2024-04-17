@@ -41,7 +41,7 @@ export default function BalanceButton() {
     //     ).then((user) => {
           if (isLoggedIn && userInfo) {
             // setAccount(user);
-            getBalance(userInfo.address, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`).then((balance) => {
+            getBalance(userInfo.address, `0x1::aptos_coin::AptosCoin`).then((balance) => {
               setBalance(balance);
             });
           }
@@ -57,7 +57,7 @@ export default function BalanceButton() {
           if (isLoggedIn && userInfo) {
             // console.log('balance: ', user.balance)
             // setAccount(user);
-            getBalance(userInfo.address, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`).then((balance) => {
+            getBalance(userInfo.address, `0x1::aptos_coin::AptosCoin`).then((balance) => {
               setBalance(balance);
             });
           }
@@ -90,7 +90,7 @@ export default function BalanceButton() {
 
     // setLoading(true);
 
-    // const tx = await transferApt(accountprivate_key, parseFloat(transferAmount), recipientAddress, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`);
+    // const tx = await transferApt(accountprivate_key, parseFloat(transferAmount), recipientAddress,  `0x1::aptos_coin::AptosCoin`);
 
     // if (!tx) {
     //   toast({

@@ -15,7 +15,6 @@ const client = new AptosClient(RPC_URL);
 const coinClient = new CoinClient(client);
 const provider = new Provider({
   fullnodeUrl: RPC_URL,
-  // indexerUrl: 'https://indexer.random.aptoslabs.com',
 })
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
