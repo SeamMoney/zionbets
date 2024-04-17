@@ -1,13 +1,12 @@
 'use client';
 
 import { useContext, useEffect, useState } from "react";
-import { magicLogout } from "@/lib/magic";
 import { magicContext } from "../MagicProvider";
 
 
 export default function AccountPage() {
 
-  const { isLoggedIn, setIsLoggedIn, publicAddress, userInfo } = useContext(magicContext);
+  const { isLoggedIn, setIsLoggedIn, publicAddress, userInfo, logOut } = useContext(magicContext);
 
   const [username, setUsername] = useState("");
 
@@ -137,7 +136,7 @@ export default function AccountPage() {
         <button
           type="submit"
           className="border border-neutral-700 hover:bg-neutral-800/80 hover:bg-noise px-6 py-1 text-neutral-500 w-full active:scale-95 active:opacity-50 transition-transform"
-          onClick={async () => {await magicLogout(); setIsLoggedIn(false);}}
+          onClick={logOut}
         >
           Sign out
         </button>
