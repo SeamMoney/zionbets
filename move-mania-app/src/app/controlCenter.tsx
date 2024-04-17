@@ -40,7 +40,7 @@ export default function ControlCenter() {
     gameStatus,
     latestAction
   } = useContext(gameStatusContext);
-  const { isLoggedIn, userInfo } = useContext(magicContext);
+  const { isLoggedIn, userInfo, aptosWallet } = useContext(magicContext);
 
   const { toast } = useToast()
 
@@ -83,42 +83,42 @@ export default function ControlCenter() {
 
   const onSetBet = async () => {
 
-    // if (!socket) return;
+    if (!socket) return;
 
-    // if (!isLoggedIn || !userInfo) return;
+    if (!isLoggedIn || !userInfo || !aptosWallet) return;
 
-    // toast({
-    //   title: "Placing bet at " + betAmount + " zAPT...",
-    // })
+    toast({
+      title: "Placing bet at " + betAmount + " zAPT...",
+    })
 
-    // const blockchainRes = await placeBet(userInfo, {
-    //   roundId: 1,
-    //   playerEmail: userInfo.address,
-    //   betAmount: parseFloat(betAmount),
-    //   coinType: "APT",
-    // })
+    const blockchainRes = await placeBet(aptosWallet, {
+      roundId: 1,
+      playerEmail: userInfo.address,
+      betAmount: parseFloat(betAmount),
+      coinType: "APT",
+    })
 
-    // if (!blockchainRes) {
-    //   console.error('Error placing bet');
-    //   toast({
-    //     title: "Error placing bet",
-    //     description: "Please try again"
-    //   })
-    //   return;
-    // }
+    if (!blockchainRes) {
+      console.error('Error placing bet');
+      toast({
+        title: "Error placing bet",
+        description: "Please try again"
+      })
+      return;
+    }
 
-    // const data = {
-    //   roundId: 1,
-    //   playerEmail: userInfo.address,
-    //   betAmount: parseFloat(betAmount),
-    //   coinType: "APT",
-    // };
-    // const success = setNewBet(data);
+    const data = {
+      roundId: 1,
+      playerEmail: userInfo.address,
+      betAmount: parseFloat(betAmount),
+      coinType: "APT",
+    };
+    const success = setNewBet(data);
 
-    // toast({
-    //   title: "Bet placed at " + betAmount + " zAPT",
-    //   description: <Link href={`https://explorer.aptoslabs.com/txn/${blockchainRes.version}/?network=randomnet`} target="_blank" className="underline">View transaction</Link>
-    // })
+    toast({
+      title: "Bet placed at " + betAmount + " zAPT",
+      description: <Link href={`https://explorer.aptoslabs.com/txn/${blockchainRes.version}/?network=devnet`} target="_blank" className="underline">View transaction</Link>
+    })
   };
 
   const onCashOut = async () => {
@@ -159,7 +159,7 @@ export default function ControlCenter() {
 
     // toast({
     //   title: "Cashed out at " + cashoutMultipler + "x",
-    //   description: <Link href={`https://explorer.aptoslabs.com/txn/${blockchainRes.version}/?network=randomnet`} target="_blank" className="underline">View transaction</Link>
+    //   description: <Link href={`https://explorer.aptoslabs.com/txn/${blockchainRes.version}/?network=devnet`} target="_blank" className="underline">View transaction</Link>
     // })
 
   };

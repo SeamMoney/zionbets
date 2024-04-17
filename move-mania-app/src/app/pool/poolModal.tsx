@@ -187,7 +187,7 @@ export default function PoolModal() {
                 // }
                 // toast({
                 //   title: "Funds deposited",
-                //   description: <Link href={`https://explorer.aptoslabs.com/txn/${tx.version}/?network=randomnet`} target="_blank" className="underline">View transaction</Link>
+                //   description: <Link href={`https://explorer.aptoslabs.com/txn/${tx.version}/?network=devnet`} target="_blank" className="underline">View transaction</Link>
                 // })
               }}  
             >
@@ -277,7 +277,7 @@ export default function PoolModal() {
                 // }
                 // toast({
                 //   title: "Funds withdrawn",
-                //   description: <Link href={`https://explorer.aptoslabs.com/txn/${tx.version}/?network=randomnet`} target="_blank" className="underline">View transaction</Link>
+                //   description: <Link href={`https://explorer.aptoslabs.com/txn/${tx.version}/?network=devnet`} target="_blank" className="underline">View transaction</Link>
                 // })
               }}
             >
