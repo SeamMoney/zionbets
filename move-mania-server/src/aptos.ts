@@ -10,13 +10,13 @@ const LP_RESOURCE_ACCOUNT_ADDRESS = process.env.LP_RESOURCE_ACCOUNT_ADDRESS as s
 const Z_APT_RESOURCE_ACCOUNT_ADDRESS = process.env.Z_APT_RESOURCE_ACCOUNT_ADDRESS as string;
 const ADMIN_ACCOUNT_PRIVATE_KEY = process.env.ADMIN_ACCOUNT_PRIVATE_KEY as string;
 
-const RPC_URL = 'https://fullnode.random.aptoslabs.com';
-const FAUCET_URL = 'https://faucet.random.aptoslabs.com'
+const RPC_URL = 'https://fullnode.devnet.aptoslabs.com';
+const FAUCET_URL = 'https://faucet.devnet.aptoslabs.com'
 
 const client = new AptosClient(RPC_URL);
 const provider = new Provider({
   fullnodeUrl: RPC_URL,
-  indexerUrl: 'https://indexer.random.aptoslabs.com',
+  indexerUrl: 'https://indexer.devnet.aptoslabs.com',
 })
 
 const TRANSACTION_OPTIONS = {
