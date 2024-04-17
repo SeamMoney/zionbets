@@ -47,7 +47,7 @@ export async function setUpUser(
   // }
 
   // const keyPair = await createAptosKeyPair();
-  await fundAccountWithGas(userToSetup.address);
+  // await fundAccountWithGas(userToSetup.address);
 
   try {
     const response = await fetch(`${API_URL}/users`, {
