@@ -163,6 +163,14 @@ export default function BalanceButton() {
 
 
   }
+
+  if ((isLoggedIn && !userInfo)) {
+    return (
+      <button className="bg-neutral-800 hover:bg-neutral-700 px-2 py-1 text-xs text-white font-semibold">
+        <Loader2Icon className="animate-spin" />
+      </button>
+    )
+  }
   
   if (isLoggedIn && userInfo) {
     return (
