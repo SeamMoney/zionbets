@@ -72,7 +72,7 @@ export default function NavbarDropdown() {
                 Continue with Phone
               </button>
               :
-              <form className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row items-center justify-between px-4 h-10 w-full gap-4">
+              <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row items-center justify-between px-4 h-10 w-full gap-4">
                 <label
                   htmlFor="public_address"
                   className="text-left "
@@ -106,11 +106,10 @@ export default function NavbarDropdown() {
                     await logInPhone(`${countryCode}${phoneInput}`);
                     setPhoneInput("");
                   }}
-                  type="submit"
                 >
                   Submit
                 </button>
-              </form>
+              </div>
             }
             <span>or</span>
             {
@@ -126,7 +125,7 @@ export default function NavbarDropdown() {
                 Continue with Email
               </button>
               :
-              <form className="border border-neutral-700 bg-neutral-800/20 bg-noise items-center flex flex-row justify-between px-4 h-10 w-full gap-4">
+              <div className="border border-neutral-700 bg-neutral-800/20 bg-noise items-center flex flex-row justify-between px-4 h-10 w-full gap-4">
                 <label
                   htmlFor="public_address"
                   className="text-left "
@@ -144,7 +143,6 @@ export default function NavbarDropdown() {
                   />
                 </span>
                 <button
-                  type="submit"
                   className="active:scale-95 active:opacity-50 transition-transform"
                   onClick={async () => {
                     await logInEmail(emailInput);
@@ -153,7 +151,7 @@ export default function NavbarDropdown() {
                 >
                   Submit
                 </button>
-              </form>
+              </div>
             }
           </div>
         </DialogContent>
