@@ -160,7 +160,7 @@ export default function NavbarDropdown() {
         <DropdownMenuContent>
           <DropdownMenuLabel>Navigation</DropdownMenuLabel>
           <Link href='/'><DropdownMenuItem>Crash</DropdownMenuItem></Link>
-          <Link href='/pool'><DropdownMenuItem>Pool</DropdownMenuItem></Link>
+          {/* <Link href='/pool'><DropdownMenuItem>Pool</DropdownMenuItem></Link> */}
           <Link href='/account'><DropdownMenuItem>My account</DropdownMenuItem></Link>
           <DropdownMenuSeparator />
           <DropdownMenuLabel>Socials</DropdownMenuLabel>
