@@ -1,58 +1,35 @@
 'use client';
 
-import { getUser, setUpAndGetUser, updateUser } from "@/lib/api";
-import { User } from "@/lib/schema";
-import { EyeIcon, EyeOffIcon } from "lucide-react";
-import { getSession, signOut } from "next-auth/react";
 import { useContext, useEffect, useState } from "react";
-import { gameStatusContext } from "../CrashProvider";
+import { magicContext } from "../MagicProvider";
 
 
 export default function AccountPage() {
 
-  const { account } = useContext(gameStatusContext);
-  // const [account, setAccount] = useState<User | null>(null);
-
-  const [privateKeyVisible, setPrivateKeyVisible] = useState(false);
+  const { isLoggedIn, setIsLoggedIn, publicAddress, userInfo, logOut } = useContext(magicContext);
 
   const [username, setUsername] = useState("");
 
-  // useEffect(() => {
-  //   getSession().then((session) => {
-  //     if (session) {
-  //       if (!session.user || !session.user.email) return;
-
-  //       getUser(
-  //         session.user.email
-  //       ).then((user) => {
-  //         if (user) {
-  //           setAccount(user);
-  //         }
-  //       });
-  //     }
-  //   });
-  // }, []);
-
   const onSubmit = async () => {
-    if (!account) return;
+    // if (!account) return;
 
-    const newUsername = username == "" ? account?.username : username;
+    // const newUsername = username == "" ? account?.username : username;
 
-    const user: User = {
-      username: newUsername,
-      email: account.email,
-      image: account.image,
-      public_address: account.public_address,
-      private_key: account.private_key,
-      balance: account.balance,
-    };
+    // const user: User = {
+    //   username: newUsername,
+    //   email: account.email,
+    //   image: account.image,
+    //   public_address: account.public_address,
+    //   private_key: account.private_key,
+    //   balance: account.balance,
+    // };
 
-    await updateUser(account.email, user);
+    // await updateUser(account.email, user);
     
-    window.location.reload();
+    // window.location.reload();
   };
 
-  if (!account) return <></>;
+  if (!isLoggedIn || !userInfo) return <></>;
 
   return (
     <div className="px-2 pt-4">
@@ -76,7 +53,7 @@ export default function AccountPage() {
               onChange={(e) => {
                 setUsername(e.target.value);
               }}
-              placeholder={account.username}
+              placeholder={userInfo.username}
               className="bg-transparent border-none outline-none text-right text-ellipsis"
             />
           </span>
@@ -97,7 +74,7 @@ export default function AccountPage() {
             />
           </span>
         </div> */}
-        <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
+        {/* <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
           <label htmlFor="email" className="text-left ">
             Email
           </label>
@@ -109,7 +86,7 @@ export default function AccountPage() {
               className="bg-transparent border-none outline-none text-right text-ellipsis cursor-not-allowed"
             />
           </span>
-        </div>
+        </div> */}
         <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
           <label
             htmlFor="public_address"
@@ -121,12 +98,12 @@ export default function AccountPage() {
             <input
               id="public_address"
               disabled
-              value={account.public_address}
+              value={publicAddress || ''}
               className="bg-transparent border-none outline-none text-right text-ellipsis cursor-not-allowed"
             />
           </span>
         </div>
-        <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
+        {/* <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
           <label
             htmlFor="private_key"
             className=" font-light w-[100px]"
@@ -153,13 +130,13 @@ export default function AccountPage() {
               />
             )}
           </span>
-        </div>
+        </div> */}
       </div>
       <div className="flex flex-col items-center gap-2 w-full">
         <button
           type="submit"
           className="border border-neutral-700 hover:bg-neutral-800/80 hover:bg-noise px-6 py-1 text-neutral-500 w-full active:scale-95 active:opacity-50 transition-transform"
-          onClick={() => signOut()}
+          onClick={logOut}
         >
           Sign out
         </button>

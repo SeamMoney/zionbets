@@ -1,13 +1,10 @@
 import ControlCenter from "./controlCenter";
 import GameScreen from "./gameScreen";
 import PlayerList from "./playerList";
-import CrashProvider from "./CrashProvider";
-import Leaderboard from "./leaderboard";
 
 export default function CrashPage() {
 
   return (
-    // <CrashProvider>
       <div className="bg-[#020202] text-white flex flex-col items-center px-2 gap-2 py-4 bg-noise w-full">
         <div className="flex flex-col items-center w-full gap-2">
           <div className="w-full flex flex-col items-center justify-between border border-neutral-700 overflow-hidden">
@@ -22,10 +19,6 @@ export default function CrashPage() {
             <PlayerList />
           </div>
         </div>
-        {/* <div className="w-full h-full pb-12">
-          <Leaderboard />
-        </div> */}
       </div>
-    // </CrashProvider>
   );
 }

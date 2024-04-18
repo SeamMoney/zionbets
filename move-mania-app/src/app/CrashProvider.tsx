@@ -5,7 +5,7 @@ import { GameStatus } from "./controlCenter";
 import { ReactNode, createContext, useEffect, useState } from "react";
 import { socket } from "@/lib/socket";
 import { getSession } from "next-auth/react";
-import { getCurrentGame, getUser, setUpAndGetUser } from "@/lib/api";
+import { getCurrentGame } from "@/lib/api";
 import { SOCKET_EVENTS } from "@/lib/types";
 import { EXPONENTIAL_FACTOR, log } from "@/lib/utils";
 import {
@@ -44,21 +44,21 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
 
-    getSession().then((session) => {
-      if (session) {
-        if (!session.user) return;
+    // getSession().then((session) => {
+    //   if (session) {
+    //     if (!session.user) return;
 
-        setUpAndGetUser({
-          username: session.user.name || "",
-          image: session.user.image || "",
-          email: session.user.email || "",
-        }).then((user) => {
-          if (user) {
-            setAccount(user);
-          }
-        });
-      }
-    });
+    //     setUpAndGetUser({
+    //       username: session.user.name || "",
+    //       image: session.user.image || "",
+    //       email: session.user.email || "",
+    //     }).then((user) => {
+    //       if (user) {
+    //         setAccount(user);
+    //       }
+    //     });
+    //   }
+    // });
 
     function onConnect() {
       setIsConnected(true);
