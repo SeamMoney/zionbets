@@ -96,6 +96,7 @@ export default function NavbarDropdown() {
                     value={phoneInput}
                     onChange={(e) => {setPhoneInput(e.target.value)}}
                     className="bg-transparent border-none outline-none text-ellipsis w-full"
+                    type="tel" pattern="[0-9]*" inputMode="numeric"
                   />
                 </span>
                 <button
@@ -138,6 +139,7 @@ export default function NavbarDropdown() {
                     value={emailInput}
                     onChange={(e) => {setEmailInput(e.target.value)}}
                     className="bg-transparent border-none outline-none text-ellipsis w-full"
+                    type="email" inputMode="email"
                   />
                 </span>
                 <button
