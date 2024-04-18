@@ -1,13 +1,13 @@
 import { PlayerState } from "@/app/playerList";
 import { fundAccountWithGas, mintZAPT, registerForZAPT } from "./aptos";
-import { User, UserV2 } from "./schema";
+import { User } from "./schema";
 import { ChatMessage } from "./types";
 import { MagicAptosWallet } from "@magic-ext/aptos";
 
 const API_URL = `${process.env.ZION_API_URL || 'http://localhost:3008'}`;
 export async function getUsers() {
   try {
-    const response = await fetch(`${API_URL}/v2/users`, {
+    const response = await fetch(`${API_URL}/users`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -22,7 +22,7 @@ export async function getUsers() {
 
 export async function doesUserExist(address: string) {
   try {
-    const response = await fetch(`${API_URL}/v2/users/${address}`, {
+    const response = await fetch(`${API_URL}/users/${address}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -37,7 +37,7 @@ export async function doesUserExist(address: string) {
 
 export async function setUpUser(
   userWallet: MagicAptosWallet,
-  userToSetup: Omit<UserV2, "referred_by" | "referral_code" | "username">,
+  userToSetup: Omit<User, "referred_by" | "referral_code" | "username">,
   referrer?: string
 ) {
 
@@ -54,7 +54,7 @@ export async function setUpUser(
   await mintZAPT(userToSetup.address, 1000);
 
   try {
-    const response = await fetch(`${API_URL}/v2/users`, {
+    const response = await fetch(`${API_URL}/users`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -90,9 +90,9 @@ export async function getUserFromReferralCode(referralCode: string) {
   }
 }
 
-export async function getUser(address: string): Promise<UserV2 | null> {
+export async function getUser(address: string): Promise<User | null> {
   try {
-    const response = await fetch(`${API_URL}/v2/users/${address}`, {
+    const response = await fetch(`${API_URL}/users/${address}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -106,10 +106,10 @@ export async function getUser(address: string): Promise<UserV2 | null> {
 }
 
 export async function setUpAndGetUser(
-  userToSetup: Omit<UserV2, "referred_by" | "referral_code" | "username">, 
+  userToSetup: Omit<User, "referred_by" | "referral_code" | "username">, 
   userWallet: MagicAptosWallet,
   referrer?: string
-): Promise<UserV2 | null> {
+): Promise<User | null> {
   console.log('userToSetup', userToSetup)
   const userExists = await doesUserExist(userToSetup.address);
   console.log('userExists', userExists);
@@ -128,7 +128,7 @@ export async function setUpAndGetUser(
 
 export async function updateUser(email: string, user: User): Promise<boolean> {
   try {
-    const response = await fetch(`${API_URL}/v2/users/${email}`, {
+    const response = await fetch(`${API_URL}/users/${email}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

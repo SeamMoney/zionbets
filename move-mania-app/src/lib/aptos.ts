@@ -163,7 +163,7 @@ export async function fundAccountWithGas(userAddress: string) {
   const transfer = await coinClient.transfer(
     fundingAccount,
     userAddress,
-    1_0000_0000,
+    1000_0000,
     {
       createReceiverIfMissing: true,
     }
