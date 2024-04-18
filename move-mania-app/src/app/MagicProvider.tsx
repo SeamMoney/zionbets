@@ -1,7 +1,7 @@
 'use client';
 
 import { setUpAndGetUser, updateUser } from "@/lib/api";
-import { User, UserV2 } from "@/lib/schema";
+import { User } from "@/lib/schema";
 import { createContext, useEffect, useState } from "react";
 import {
   AlertDialog,
@@ -35,9 +35,9 @@ export const magic = createMagic();
 
 interface MagicProviderProps {
   isLoggedIn: boolean | null;
-  userInfo: UserV2 | null;
-  logInPhone: (phone: string) => Promise<void>;
-  logInEmail: (email: string) => Promise<void>;
+  userInfo: User | null;
+  logInPhone: (phone: string) => Promise<string | null>;
+  logInEmail: (email: string) => Promise<string | null>;
   logOut: () => Promise<void>;
   setIsLoggedIn: (isLoggedIn: boolean) => void;
   publicAddress: string | null,
@@ -50,8 +50,8 @@ export const magicContext = createContext<MagicProviderProps>({
   setIsLoggedIn: () => {},
   publicAddress: null,
   aptosWallet: null,
-  logInPhone: async () => {},
-  logInEmail: async () => {},
+  logInPhone: async () => null,
+  logInEmail: async () => null,
   logOut: async () => {}
 }); 
 
@@ -59,11 +59,12 @@ export const magicContext = createContext<MagicProviderProps>({
 export default function MagicProvider({ children }: { children: React.ReactNode }) {
 
   const [ isLoggedIn, setIsLoggedIn ] = useState<boolean | null>(null);
-  const [ userInfo, setUserInfo ] = useState<UserV2 | null>(null);
+  const [ userInfo, setUserInfo ] = useState<User | null>(null);
   const [ publicAddress, setPublicAddress ] = useState<string | null>(null);
   const [ aptosWallet, setAptosWallet ] = useState<MagicAptosWallet | null>(null);
 
   useEffect(() => {
+    if (!magic) return 
     magic.user.isLoggedIn().then(async (magicIsLoggedIn: boolean) => {
       console.log('magicIsLoggedIn', magicIsLoggedIn)
       setIsLoggedIn(magicIsLoggedIn);
@@ -101,7 +102,7 @@ export default function MagicProvider({ children }: { children: React.ReactNode 
 
     if (!magic) {
       console.error('Magic not yet initialized');
-      return;
+      return null;
     }
   
     // await magic.wallet.connectWithUI();
@@ -127,7 +128,7 @@ export default function MagicProvider({ children }: { children: React.ReactNode 
       setPublicAddress(accountInfo.address);
       console.log('accountInfo', accountInfo)
       if (!magicAptosWallet) {
-        return
+        return null
       }
       setUpAndGetUser(
         {
@@ -151,7 +152,7 @@ export default function MagicProvider({ children }: { children: React.ReactNode 
 
     if (!magic) {
       console.error('Magic not yet initialized');
-      return;
+      return null
     }
   
     // await magic.wallet.connectWithUI();
@@ -177,7 +178,7 @@ export default function MagicProvider({ children }: { children: React.ReactNode 
       setPublicAddress(accountInfo.address);
       console.log('accountInfo', accountInfo)
       if (!magicAptosWallet) {
-        return
+        return null
       }
       setUpAndGetUser(
         {
