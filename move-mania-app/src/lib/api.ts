@@ -185,16 +185,16 @@ export async function getPlayerList(): Promise<PlayerState[]> {
 
 export async function getCurrentGame() {
   try {
-    console.log('getting game from api')
+    // console.log('getting game from api')
     const response = await fetch(`${API_URL}/games/current`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
     });
-    console.log('response', response)
+    // console.log('response', response)
     const res = await response.json();
-    console.log('res', res)
+    // console.log('res', res)
     return res;
   } catch (e) {
     console.log('error getting game', e)
