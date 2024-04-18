@@ -8,29 +8,37 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-
 import {
-  doesUserExist,
-  getUser,
-  setUpAndGetUser,
-  setUpUser,
-  updateUser,
-} from "@/lib/api";
+  AptosClient,
+  BCS,
+  CoinClient,
+  FaucetClient,
+  TxnBuilderTypes,
+} from "aptos";
+
 import { User } from "@/lib/schema";
 import { Clipboard, EyeIcon, EyeOffIcon, Loader2Icon } from "lucide-react";
 import { getSession, signIn, signOut } from "next-auth/react";
 import { useContext, useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast"
 import Link from "next/link";
-import { getBalance, transferApt } from "@/lib/aptos";
+import { RPC_URL, getBalance, transferApt } from "@/lib/aptos";
 import { cn } from "@/lib/utils";
-import { gameStatusContext } from "./CrashProvider";
+import { magicContext } from "./MagicProvider";
+
+const MAGIC_WALLET_ADDRESS =
+  "0xa8256b208efd4be625e0de7d473d89bc5b8e09ef578c84642b09f89492e96054";
+const SAMPLE_RAW_TRANSACTION = {
+  type: "entry_function_payload",
+  function: "0x1::coin::transfer",
+  type_arguments: ["0x1::aptos_coin::AptosCoin"],
+  arguments: [MAGIC_WALLET_ADDRESS, 1000],
+};
 
 
 export default function BalanceButton() {
   const { toast } = useToast()
-  const { account } = useContext(gameStatusContext);
-  // const [account, setAccount] = useState<User | null>(null);
+  const { isLoggedIn, userInfo, aptosWallet } = useContext(magicContext);
   const [balance, setBalance] = useState<number | null>(null);
   const [recipientAddress, setRecipientAddress] = useState<string>("");
   const [transferAmount, setTransferAmount] = useState<string>("");
@@ -47,38 +55,70 @@ export default function BalanceButton() {
     //     getUser(
     //       session.user.email
     //     ).then((user) => {
-          if (account) {
+          if (isLoggedIn && userInfo) {
             // setAccount(user);
-            getBalance(account.private_key, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`).then((balance) => {
+            getBalance(userInfo.address, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`).then((balance) => {
               setBalance(balance);
             });
           }
     //     });
     //   }
     // });
-  }, [account]);
+  }, [isLoggedIn, userInfo]);
 
   useEffect(() => {
-    if (account) {
       const interval = setInterval(() => {
         // console.log('Checking for updates')
         // getUser(account.email).then((user) => {
-          if (account) {
+          if (isLoggedIn && userInfo) {
             // console.log('balance: ', user.balance)
             // setAccount(user);
-            getBalance(account.private_key, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`).then((balance) => {
+            getBalance(userInfo.address, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`).then((balance) => {
               setBalance(balance);
             });
           }
         // });
       }, 1000);
       return () => clearInterval(interval);
-    }
   });
 
   const onWithdraw = async () => {
 
-    if (!account || !balance || transferAmount == '') return;
+    // setResultB(null);
+
+    if (!userInfo || !aptosWallet) {
+      console.warn("No account");
+      return;
+    }
+
+    // const token = new TxnBuilderTypes.TypeTagStruct(
+    //   TxnBuilderTypes.StructTag.fromString("0x1::aptos_coin::AptosCoin")
+    // );
+
+    // const payload = new TxnBuilderTypes.TransactionPayloadEntryFunction(
+    //   TxnBuilderTypes.EntryFunction.natural(
+    //     "0x1::coin",
+    //     "transfer",
+    //     [token],
+    //     [
+    //       BCS.bcsToBytes(
+    //         TxnBuilderTypes.AccountAddress.fromHex(MAGIC_WALLET_ADDRESS)
+    //       ),
+    //       BCS.bcsSerializeUint64(1000),
+    //     ]
+    //   )
+    // );
+
+    // const { hash } = await aptosWallet.signAndSubmitBCSTransaction(payload);
+
+    // const client = new AptosClient(RPC_URL);
+    // await client.waitForTransaction(hash, {
+    //   checkSuccess: true,
+    // });
+    // console.log("Transaction succeeded with hash: ", hash);
+    // setResultB(hash);
+
+    if (!isLoggedIn || !userInfo || !balance || transferAmount == '') return;
     if (parseFloat(transferAmount) <= 0) {
       toast({
         title: "Please enter a valid amount",
@@ -100,7 +140,7 @@ export default function BalanceButton() {
 
     setLoading(true);
 
-    const tx = await transferApt(account.private_key, parseFloat(transferAmount), recipientAddress, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`);
+    const tx = await transferApt(aptosWallet, parseFloat(transferAmount), recipientAddress,  `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`);
 
     if (!tx) {
       toast({
@@ -113,7 +153,7 @@ export default function BalanceButton() {
     // withdraw funds
     toast({
       title: "Funds withdrawn",
-      description: <Link href={`https://explorer.aptoslabs.com/txn/${tx.version}/?network=randomnet`} target="_blank" className="underline">View transaction</Link>
+      description: <Link href={`https://explorer.aptoslabs.com/txn/${tx.version}/?network=devnet`} target="_blank" className="underline">View transaction</Link>
     })
     setLoading(false);
 
@@ -123,8 +163,16 @@ export default function BalanceButton() {
 
 
   }
+
+  if ((isLoggedIn && !userInfo)) {
+    return (
+      <button className="bg-neutral-800 hover:bg-neutral-700 px-2 py-1 text-xs text-white font-semibold">
+        <Loader2Icon className="animate-spin" />
+      </button>
+    )
+  }
   
-  if (account) {
+  if (isLoggedIn && userInfo) {
     return (
       <Dialog>
       <DialogTrigger asChild>
@@ -150,12 +198,12 @@ export default function BalanceButton() {
             <input
               id="public_address"
               disabled
-              value={account.public_address}
+              value={userInfo.address}
               className="bg-transparent border-none outline-none text-right text-ellipsis cursor-not-allowed"
             />
             <Clipboard className="w-4 h-4 cursor-pointer opacity-80 hover:opacity-100" onClick={() => {
               // copy public address to clipboard
-              navigator.clipboard.writeText(account.public_address);
+              navigator.clipboard.writeText(userInfo.address);
               toast({
                 title: "Address copied to clipboard",
               });
@@ -195,7 +243,7 @@ export default function BalanceButton() {
             <span className=" opacity-50 flex flex-row justify-center items-center gap-1">
               <input
                 id="public_address"
-                placeholder={account.public_address}
+                placeholder={userInfo.address}
                 value={recipientAddress}
                 onChange={(e) => setRecipientAddress(e.target.value)}
                 className="bg-transparent border-none outline-none text-right text-ellipsis"

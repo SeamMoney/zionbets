@@ -1,10 +1,8 @@
 export type User = {
+  address: string;
   username: string;
-  image: string;
-  email: string;
-  public_address: string;
-  private_key: string;
-  balance: number;
+  referral_code: string;
+  referred_by: string | null;
 };
 
 export const UserSchema = `CREATE TABLE IF NOT EXISTS users (

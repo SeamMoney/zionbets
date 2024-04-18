@@ -5,7 +5,6 @@ import {
   getUserBalance,
   hasUserBet,
   hasUserCashOut,
-  setUpAndGetUser,
 } from "@/lib/api";
 import {
   Accordion,
@@ -27,6 +26,7 @@ import { gameStatusContext } from "./CrashProvider";
 import { cashOut, placeBet } from "@/lib/aptos";
 import { useToast } from "@/components/ui/use-toast";
 import Link from "next/link";
+import { magicContext } from "./MagicProvider";
 
 export type GameStatus = {
   status: "COUNTDOWN" | "IN_PROGRESS" | "END";
@@ -38,9 +38,9 @@ export type GameStatus = {
 export default function ControlCenter() {
   const {
     gameStatus,
-    account,
     latestAction
   } = useContext(gameStatusContext);
+  const { isLoggedIn, userInfo, aptosWallet } = useContext(magicContext);
 
   const { toast } = useToast()
 
@@ -53,17 +53,17 @@ export default function ControlCenter() {
   const [hasCashOut, setHasCashOut] = useState(false);
 
   useEffect(() => {
-    if (account) {
-      hasUserBet(account?.email || "").then((bet) => {
+    if (isLoggedIn && userInfo) {
+      hasUserBet(userInfo.address || "").then((bet) => {
         setHasBet(bet);
       });
 
-      hasUserCashOut(account?.email || "").then((cashout) => {
+      hasUserCashOut(userInfo.address || "").then((cashout) => {
         setHasCashOut(cashout);
       });
 
     }
-  }, [gameStatus, account, latestAction]);
+  }, [gameStatus, isLoggedIn, userInfo, latestAction]);
 
   useEffect(() => {
     if (gameStatus?.status === "IN_PROGRESS") {
@@ -85,15 +85,15 @@ export default function ControlCenter() {
 
     if (!socket) return;
 
-    if (!account) return;
+    if (!isLoggedIn || !userInfo || !aptosWallet) return;
 
     toast({
       title: "Placing bet at " + betAmount + " zAPT...",
     })
 
-    const blockchainRes = await placeBet(account, {
+    const blockchainRes = await placeBet(aptosWallet, {
       roundId: 1,
-      playerEmail: account.email || "",
+      playerEmail: userInfo.address,
       betAmount: parseFloat(betAmount),
       coinType: "APT",
     })
@@ -109,7 +109,7 @@ export default function ControlCenter() {
 
     const data = {
       roundId: 1,
-      playerEmail: account.email || "",
+      playerEmail: userInfo.address,
       betAmount: parseFloat(betAmount),
       coinType: "APT",
     };
@@ -117,14 +117,14 @@ export default function ControlCenter() {
 
     toast({
       title: "Bet placed at " + betAmount + " zAPT",
-      description: <Link href={`https://explorer.aptoslabs.com/txn/${blockchainRes.version}/?network=randomnet`} target="_blank" className="underline">View transaction</Link>
+      description: <Link href={`https://explorer.aptoslabs.com/txn/${blockchainRes.version}/?network=devnet`} target="_blank" className="underline">View transaction</Link>
     })
   };
 
   const onCashOut = async () => {
     if (!socket) return;
 
-    if (!account) return;
+    if (!userInfo || !isLoggedIn || !aptosWallet) return;
 
     if (!gameStatus?.startTime) return;
 
@@ -135,9 +135,9 @@ export default function ControlCenter() {
     })
 
 
-    const blockchainRes = await cashOut(account, {
+    const blockchainRes = await cashOut(aptosWallet, {
       roundId: 1,
-      playerEmail: account.email,
+      playerEmail: userInfo.address,
       cashOutMultiplier: cashoutMultipler,
     });
 
@@ -152,14 +152,14 @@ export default function ControlCenter() {
 
     const data = {
       roundId: 1,
-      playerEmail: account.email || "",
+      playerEmail: userInfo.address,
       cashOutMultiplier: cashoutMultipler,
     };
     const succes = cashOutBet(data);
 
     toast({
       title: "Cashed out at " + cashoutMultipler + "x",
-      description: <Link href={`https://explorer.aptoslabs.com/txn/${blockchainRes.version}/?network=randomnet`} target="_blank" className="underline">View transaction</Link>
+      description: <Link href={`https://explorer.aptoslabs.com/txn/${blockchainRes.version}/?network=devnet`} target="_blank" className="underline">View transaction</Link>
     })
 
   };
@@ -228,7 +228,7 @@ export default function ControlCenter() {
         </div>
         <div className="flex flex-row items-baseline gap-2 w-full text-lg">
           {
-            !account && (
+            !(isLoggedIn && userInfo) && (
               <button
                 className="border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 cursor-not-allowed w-full"
                 disabled
@@ -238,7 +238,7 @@ export default function ControlCenter() {
             )
           }
           {
-            account && gameStatus?.status === "COUNTDOWN" && (
+            isLoggedIn && userInfo && gameStatus?.status === "COUNTDOWN" && (
               <button
                 className={cn(
                   "border border-green-700 px-6 py-1 border-yellow-700 text-yellow-500 bg-neutral-950 w-full",
@@ -257,7 +257,7 @@ export default function ControlCenter() {
             )
           }
           {
-            account && gameStatus?.status === "IN_PROGRESS" && hasBet &&  (
+            isLoggedIn && userInfo && gameStatus?.status === "IN_PROGRESS" && hasBet &&  (
               <button
                 className={cn(
                   "border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 w-full",
@@ -276,7 +276,7 @@ export default function ControlCenter() {
             )
           }
           {
-            account && gameStatus?.status === "IN_PROGRESS" && !hasBet &&  (
+            isLoggedIn && userInfo && gameStatus?.status === "IN_PROGRESS" && !hasBet &&  (
               <button
                 className="border px-6 py-1 border-yellow-700 text-yellow-500 bg-neutral-950 cursor-not-allowed w-full"
                 disabled
@@ -286,7 +286,7 @@ export default function ControlCenter() {
             )
           }
           {
-            account && gameStatus?.status === "END" && (
+            isLoggedIn && userInfo && gameStatus?.status === "END" && (
               <button
                 className="border border-yellow-700 px-6 py-1 text-yellow-500 bg-neutral-950 cursor-not-allowed w-full"
                 disabled
@@ -376,7 +376,7 @@ export default function ControlCenter() {
               </div>
               <div className="flex flex-row items-baseline gap-2 w-full text-lg">
                 {
-                  !account && (
+                  (!isLoggedIn || !userInfo) && (
                     <button
                       className="border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 cursor-not-allowed w-full"
                       disabled
@@ -386,7 +386,7 @@ export default function ControlCenter() {
                   )
                 }
                 {
-                  account && (
+                  isLoggedIn && userInfo && (
                     <button
                       className={cn(
                         "border bg-[#404226]/40 border-yellow-700 text-yellow-500 px-6 py-1 w-full",
