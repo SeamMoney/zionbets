@@ -480,24 +480,22 @@ export async function getLockedLPCoinSupply(version?: string) {
   return parseInt(response[0].toString()) / APT
 }
 
-export async function supplyPool(user: User, amount: number) {
-  const userAccount = await getUserAccount(user.private_key);
+export async function supplyPool(userWallet: MagicAptosWallet, amount: number) {
 
-  const txn = await provider.generateTransaction(
-    userAccount.address(),
-    {
-      function: `${MODULE_ADDRESS}::liquidity_pool::supply_liquidity`,
-      type_arguments: [],
-      arguments: [
-        Math.floor(amount * APT),
-      ],
-    },
-    TRANSACTION_OPTIONS
+  const payload = new TxnBuilderTypes.TransactionPayloadEntryFunction(
+    TxnBuilderTypes.EntryFunction.natural(
+      `${MODULE_ADDRESS}::liquidity_pool`,
+      "supply_liquidity",
+      [],
+      [
+        BCS.bcsSerializeUint64(Math.floor(amount * APT)),
+      ]
+    )
   );
 
-  const tx = await provider.signAndSubmitTransaction(userAccount, txn);
+  const { hash } = await userWallet.signAndSubmitBCSTransaction(payload);
 
-  const txResult = await client.waitForTransactionWithResult(tx);
+  const txResult = await client.waitForTransactionWithResult(hash);
 
   if (!(txResult as any).success) {
     return null;
@@ -509,24 +507,21 @@ export async function supplyPool(user: User, amount: number) {
   };
 }
 
-export async function withdrawPool(user: User, amount: number) {
-  const userAccount = await getUserAccount(user.private_key);
-
-  const txn = await provider.generateTransaction(
-    userAccount.address(),
-    {
-      function: `${MODULE_ADDRESS}::liquidity_pool::remove_liquidity`,
-      type_arguments: [],
-      arguments: [
-        Math.floor(amount * APT),
-      ],
-    },
-    TRANSACTION_OPTIONS
+export async function withdrawPool(userWallet: MagicAptosWallet, amount: number) {
+  const payload = new TxnBuilderTypes.TransactionPayloadEntryFunction(
+    TxnBuilderTypes.EntryFunction.natural(
+      `${MODULE_ADDRESS}::liquidity_pool`,
+      "withdraw_liquidity",
+      [],
+      [
+        BCS.bcsSerializeUint64(Math.floor(amount * APT)),
+      ]
+    )
   );
 
-  const tx = await provider.signAndSubmitTransaction(userAccount, txn);
+  const { hash } = await userWallet.signAndSubmitBCSTransaction(payload);
 
-  const txResult = await client.waitForTransactionWithResult(tx);
+  const txResult = await client.waitForTransactionWithResult(hash);
 
   if (!(txResult as any).success) {
     return null;
@@ -551,84 +546,97 @@ export async function getCrashCalculationEvents() {
   return res;
 }
 
-export async function simulateDeposit(user: User, amount: number) {
-  try {
-    const userAccount = await getUserAccount(user.private_key);
+export async function simulateDeposit(userWallet: MagicAptosWallet, amount: number) {
 
-    const txn = await provider.generateTransaction(
-      userAccount.address(),
-      {
-        function: `${MODULE_ADDRESS}::liquidity_pool::supply_liquidity`,
-        type_arguments: [],
-        arguments: [
-          Math.floor(amount * APT),
-        ],
-      },
-      TRANSACTION_OPTIONS
-    );
+  return 0;
 
-    const tx = await provider.simulateTransaction(
-      userAccount,
-      txn
-    );
+  // try {
+  //   const payload = new TxnBuilderTypes.TransactionPayloadEntryFunction( 
+  //     TxnBuilderTypes.EntryFunction.natural(
+  //       `${MODULE_ADDRESS}::liquidity_pool`,
+  //       "deposit",
+  //       [],
+  //       [
+  //         BCS.bcsSerializeUint64(Math.floor(amount * APT)),
+  //       ]
+  //     )
+  //   );
 
-    // console.log(tx);
+  //   const txn = await provider.generateTransaction(
+  //     userAccount.address(),
+  //     {
+  //       function: `${MODULE_ADDRESS}::liquidity_pool::supply_liquidity`,
+  //       type_arguments: [],
+  //       arguments: [
+  //         Math.floor(amount * APT),
+  //       ],
+  //     },
+  //     TRANSACTION_OPTIONS
+  //   );
 
-    let lp_coin_received = 0;
+  //   const tx = await provider.simulateTransaction(
+  //     userAccount,
+  //     txn
+  //   );
 
-    tx[0].changes.forEach((change) => {
+  //   // console.log(tx);
+
+  //   let lp_coin_received = 0;
+
+  //   tx[0].changes.forEach((change) => {
       
-      if ((change as any).data && (change as any).data.type === `0x1::coin::CoinStore<${MODULE_ADDRESS}::liquidity_pool::LPCoin>`) {
-        // console.log((change as any).data);
-        // console.log((change as any).data.data.coin.value);
-        lp_coin_received = parseInt((change as any).data.data.coin.value.toString()) / APT;
-      }
-    });
+  //     if ((change as any).data && (change as any).data.type === `0x1::coin::CoinStore<${MODULE_ADDRESS}::liquidity_pool::LPCoin>`) {
+  //       // console.log((change as any).data);
+  //       // console.log((change as any).data.data.coin.value);
+  //       lp_coin_received = parseInt((change as any).data.data.coin.value.toString()) / APT;
+  //     }
+  //   });
 
-    return lp_coin_received - await getBalance(user.public_address, `0x1::coin::CoinStore<${MODULE_ADDRESS}::liquidity_pool::LPCoin>`);
-  } catch (e) {
-    console.error(e);
-    return -1;
-  }
+  //   return lp_coin_received - await getBalance(user.public_address, `0x1::coin::CoinStore<${MODULE_ADDRESS}::liquidity_pool::LPCoin>`);
+  // } catch (e) {
+  //   console.error(e);
+  //   return -1;
+  // }
 }
 
-export async function simulateWithdraw(user: User, amount: number) {
-  try {
-    const userAccount = await getUserAccount(user.private_key);
+export async function simulateWithdraw(userWallet: MagicAptosWallet, amount: number) {
+  return 0;
+  // try {
+  //   const userAccount = await getUserAccount(user.private_key);
 
-    const txn = await provider.generateTransaction(
-      userAccount.address(),
-      {
-        function: `${MODULE_ADDRESS}::liquidity_pool::remove_liquidity`,
-        type_arguments: [],
-        arguments: [
-          Math.floor(amount * APT),
-        ],
-      },
-      TRANSACTION_OPTIONS
-    );
+  //   const txn = await provider.generateTransaction(
+  //     userAccount.address(),
+  //     {
+  //       function: `${MODULE_ADDRESS}::liquidity_pool::remove_liquidity`,
+  //       type_arguments: [],
+  //       arguments: [
+  //         Math.floor(amount * APT),
+  //       ],
+  //     },
+  //     TRANSACTION_OPTIONS
+  //   );
 
-    const tx = await provider.simulateTransaction(
-      userAccount,
-      txn
-    );
+  //   const tx = await provider.simulateTransaction(
+  //     userAccount,
+  //     txn
+  //   );
 
-    // console.log(tx);
+  //   // console.log(tx);
 
-    let apt_received = 0;
+  //   let apt_received = 0;
 
-    tx[0].changes.forEach((change) => {
+  //   tx[0].changes.forEach((change) => {
       
-      if ((change as any).data && (change as any).data.type === `0x1::coin::CoinStore<${MODULE_ADDRESS}::z_apt::ZAPT>`) {
-        // console.log((change as any).data);
-        // console.log((change as any).data.data.coin.value);
-        apt_received = parseInt((change as any).data.data.coin.value.toString()) / APT;
-      }
-    });
+  //     if ((change as any).data && (change as any).data.type === `0x1::coin::CoinStore<${MODULE_ADDRESS}::z_apt::ZAPT>`) {
+  //       // console.log((change as any).data);
+  //       // console.log((change as any).data.data.coin.value);
+  //       apt_received = parseInt((change as any).data.data.coin.value.toString()) / APT;
+  //     }
+  //   });
 
-    return apt_received - await getBalance(user.public_address, `${MODULE_ADDRESS}::z_apt::ZAPT`);
-  } catch (e) {
-    console.error(e);
-    return -1;
-  }
+  //   return apt_received - await getBalance(user.public_address, `${MODULE_ADDRESS}::z_apt::ZAPT`);
+  // } catch (e) {
+  //   console.error(e);
+  //   return -1;
+  // }
 }
