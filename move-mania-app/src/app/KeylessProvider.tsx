@@ -1,7 +1,7 @@
 'use client';
 
-import { Aptos, AptosConfig, Ed25519PrivateKey, EphemeralKeyPair, Network } from "@aptos-labs/ts-sdk";
-import { createContext, useEffect } from "react";
+import { Aptos, AptosConfig, Ed25519PrivateKey, EphemeralKeyPair, MultiKeyAccount, Network } from "@aptos-labs/ts-sdk";
+import { createContext, useEffect, useState } from "react";
 import { jwtDecode } from 'jwt-decode';
 
   /**
@@ -9,24 +9,22 @@ import { jwtDecode } from 'jwt-decode';
  */
   export type StoredEphemeralKeyPairs = { [nonce: string]: EphemeralKeyPair };
 
-
-type OpenIdProvider = 'Google' | 'Twitch' | 'Facebook';
-type SetupData = {
-  provider: OpenIdProvider;
-  maxEpoch: number;
-  randomness: string;
-  ephemeralPrivateKey: string;
-}
-
 interface KeylessProviderProps {
+  keylessAccount: MultiKeyAccount | null;
+  isLoggedIn: boolean;
   logIn: () => Promise<void>;
 }
 
 export const keylessContext = createContext<KeylessProviderProps>({
+  keylessAccount: null,
+  isLoggedIn: false,
   logIn: async () => {}
 });
 
 export default function KeylessProvider({ children }: { children: React.ReactNode }) {
+
+  const [keylessAccount, setKeylessAccount] = useState<MultiKeyAccount | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
 
   useEffect(() => {
@@ -75,6 +73,8 @@ export default function KeylessProvider({ children }: { children: React.ReactNod
     });
 
     console.log("keylessAccount", keylessAccount);
+    setKeylessAccount(keylessAccount);
+    setIsLoggedIn(true);
 
   }
 
@@ -217,6 +217,8 @@ export default function KeylessProvider({ children }: { children: React.ReactNod
 
   return (
     <keylessContext.Provider value={{
+      keylessAccount,
+      isLoggedIn,
       logIn: beginKeylessAuth
     }}>
       {children}
