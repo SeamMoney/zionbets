@@ -16,13 +16,15 @@ interface KeylessProviderProps {
   userInfo: User | null;
   isLoggedIn: boolean;
   logIn: () => Promise<void>;
+  logOut: () => Promise<void>;
 }
 
 export const keylessContext = createContext<KeylessProviderProps>({
   keylessAccount: null,
   userInfo: null,
   isLoggedIn: false,
-  logIn: async () => {}
+  logIn: async () => {},
+  logOut: async () => {}
 });
 
 export default function KeylessProvider({ children }: { children: React.ReactNode }) {
@@ -94,6 +96,18 @@ export default function KeylessProvider({ children }: { children: React.ReactNod
       }
     });
 
+  }
+
+  const logOut = async () => {
+    setKeylessAccount(null);
+    setIsLoggedIn(false);
+    setUserInfo(null);
+
+    // Clear the ephemeral key pair from localStorage
+    const keyPairs = getLocalEphemeralKeyPairs();
+    for (const nonce in keyPairs) {
+      removeEphemeralKeyPair(nonce);
+    }
   }
 
   const parseJWTFromURL = (url: string): string | null => {
@@ -238,7 +252,8 @@ export default function KeylessProvider({ children }: { children: React.ReactNod
       keylessAccount,
       userInfo,
       isLoggedIn,
-      logIn: beginKeylessAuth
+      logIn: beginKeylessAuth,
+      logOut
     }}>
       {children}
     </keylessContext.Provider>

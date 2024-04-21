@@ -2,7 +2,7 @@ import { AptosAccount, AptosClient, BCS, CoinClient, FaucetClient, HexString, Ne
 import { BetData, CashOutData } from "./types";
 import { User } from "./schema";
 import { MagicAptosWallet } from "@magic-ext/aptos";
-import { Aptos, AptosConfig, MultiKeyAccount } from "@aptos-labs/ts-sdk";
+import { Account, Aptos, AptosConfig, Ed25519PrivateKey, MultiKeyAccount } from "@aptos-labs/ts-sdk";
 
 const MODULE_ADDRESS = process.env.MODULE_ADDRESS as string;
 const MODULE_NAME = 'crash';
@@ -136,8 +136,13 @@ export async function registerForZAPT(userWallet: MultiKeyAccount) {
 
   // const txResult = await client.waitForTransactionWithResult(hash);
 
+  const fundingAccount = Account.fromPrivateKey({
+    privateKey: new Ed25519PrivateKey(process.env.FUNDING_ACCOUNT_PRIVATE_KEY || '')
+  });
+
   const transaction = await aptos.transaction.build.simple({
     sender: userWallet.accountAddress,
+    withFeePayer: true,
     data: {
       function: `${MODULE_ADDRESS}::z_apt::register`,
       typeArguments: [],
@@ -145,15 +150,20 @@ export async function registerForZAPT(userWallet: MultiKeyAccount) {
     },
   })
 
+  // sign transaction
   const senderAuthenticator = aptos.transaction.sign({
     signer: userWallet,
     transaction,
   });
-  // const sponsorSignature = aptos.transaction.signAsFeePayer({ signer: sponsor, transaction });
-
+  const feePayerSignerAuthenticator = aptos.transaction.signAsFeePayer({
+    signer: fundingAccount,
+    transaction,
+  });
+  // submit transaction
   const committedTransaction = await aptos.transaction.submit.simple({
     transaction,
     senderAuthenticator,
+    feePayerAuthenticator: feePayerSignerAuthenticator,
   });
 
   const txResult = await aptos.transaction.waitForTransaction({
