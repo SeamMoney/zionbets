@@ -1,7 +1,8 @@
-import { AptosAccount, AptosClient, BCS, CoinClient, FaucetClient, HexString, Provider, TxnBuilderTypes } from "aptos";
+import { AptosAccount, AptosClient, BCS, CoinClient, FaucetClient, HexString, Network, Provider, TxnBuilderTypes } from "aptos";
 import { BetData, CashOutData } from "./types";
 import { User } from "./schema";
 import { MagicAptosWallet } from "@magic-ext/aptos";
+import { Aptos, AptosConfig, MultiKeyAccount } from "@aptos-labs/ts-sdk";
 
 const MODULE_ADDRESS = process.env.MODULE_ADDRESS as string;
 const MODULE_NAME = 'crash';
@@ -17,6 +18,8 @@ const coinClient = new CoinClient(client);
 const provider = new Provider({
   fullnodeUrl: RPC_URL,
 })
+const aptosConfig = new AptosConfig({ network: Network.DEVNET }); // default to devnet
+const aptos = new Aptos(aptosConfig);
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -108,38 +111,62 @@ export async function registerForAPT(userAccount: AptosAccount) {
   };
 }
 
-export async function registerForZAPT(userWallet: MagicAptosWallet) {
+export async function registerForZAPT(userWallet: MultiKeyAccount) {
 
-  const payload = new TxnBuilderTypes.TransactionPayloadEntryFunction(
-    TxnBuilderTypes.EntryFunction.natural(
-      `${MODULE_ADDRESS}::z_apt`,
-      "register",
-      [],
-      []
-    )
-  );
-
-  // const txn = await provider.generateTransaction(
-  //   userAccount.address(),
-  //   {
-  //     function: `${MODULE_ADDRESS}::z_apt::register`,
-  //     type_arguments: [],
-  //     arguments: [],
-  //   },
-  //   TRANSACTION_OPTIONS
+  // const payload = new TxnBuilderTypes.TransactionPayloadEntryFunction(
+  //   TxnBuilderTypes.EntryFunction.natural(
+  //     `${MODULE_ADDRESS}::z_apt`,
+  //     "register",
+  //     [],
+  //     []
+  //   )
   // );
 
-  const { hash } = await userWallet.signAndSubmitBCSTransaction(payload);
+  // // const txn = await provider.generateTransaction(
+  // //   userAccount.address(),
+  // //   {
+  // //     function: `${MODULE_ADDRESS}::z_apt::register`,
+  // //     type_arguments: [],
+  // //     arguments: [],
+  // //   },
+  // //   TRANSACTION_OPTIONS
+  // // );
 
-  const txResult = await client.waitForTransactionWithResult(hash);
+  // const { hash } = await userWallet.
 
-  if (!(txResult as any).success) {
+  // const txResult = await client.waitForTransactionWithResult(hash);
+
+  const transaction = await aptos.transaction.build.simple({
+    sender: userWallet.accountAddress,
+    data: {
+      function: `${MODULE_ADDRESS}::z_apt::register`,
+      typeArguments: [],
+      functionArguments: [],
+    },
+  })
+
+  const senderAuthenticator = aptos.transaction.sign({
+    signer: userWallet,
+    transaction,
+  });
+  // const sponsorSignature = aptos.transaction.signAsFeePayer({ signer: sponsor, transaction });
+
+  const committedTransaction = await aptos.transaction.submit.simple({
+    transaction,
+    senderAuthenticator,
+  });
+
+  const txResult = await aptos.transaction.waitForTransaction({
+    transactionHash: committedTransaction.hash,
+  });
+
+  if (!txResult.success) {
     return null;
   }
 
   return {
     txnHash: txResult.hash,
-    version: (txResult as any).version,
+    version: txResult.version,
   };
 }
 
