@@ -25,6 +25,7 @@ import Link from "next/link";
 import { RPC_URL, getBalance, transferApt } from "@/lib/aptos";
 import { cn } from "@/lib/utils";
 import { magicContext } from "./MagicProvider";
+import { keylessContext } from "./KeylessProvider";
 
 const MAGIC_WALLET_ADDRESS =
   "0xa8256b208efd4be625e0de7d473d89bc5b8e09ef578c84642b09f89492e96054";
@@ -38,7 +39,8 @@ const SAMPLE_RAW_TRANSACTION = {
 
 export default function BalanceButton() {
   const { toast } = useToast()
-  const { isLoggedIn, userInfo, aptosWallet } = useContext(magicContext);
+  const { aptosWallet } = useContext(magicContext);
+  const { isLoggedIn, userInfo } = useContext(keylessContext);
   const [balance, setBalance] = useState<number | null>(null);
   const [recipientAddress, setRecipientAddress] = useState<string>("");
   const [transferAmount, setTransferAmount] = useState<string>("");
