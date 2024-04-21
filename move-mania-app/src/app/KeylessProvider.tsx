@@ -3,9 +3,11 @@
 import { createContext, useEffect } from "react";
 
 interface KeylessProviderProps {
+  logIn: () => Promise<void>;
 }
 
 export const keylessContext = createContext<KeylessProviderProps>({
+  logIn: async () => {}
 });
 
 export default function KeylessProvider({ children }: { children: React.ReactNode }) {
@@ -25,7 +27,9 @@ export default function KeylessProvider({ children }: { children: React.ReactNod
   }
 
   return (
-    <keylessContext.Provider value={{}}>
+    <keylessContext.Provider value={{
+      logIn: beginKeylessAuth
+    }}>
       {children}
     </keylessContext.Provider>
   )
