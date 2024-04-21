@@ -26,8 +26,8 @@ export default function NavbarDropdown() {
   const searchParams = useSearchParams();
   const referredBy = searchParams.get("ref");
 
-  const { isLoggedIn, logInEmail, logInPhone } = useContext(magicContext);
-  const { logIn } = useContext(keylessContext);
+  const { logInEmail, logInPhone } = useContext(magicContext);
+  const { logIn, isLoggedIn } = useContext(keylessContext);
 
   const [ emailPhoneToggle, setEmailPhoneToggle ] = useState<boolean>(false);
   const [ phoneInput, setPhoneInput ] = useState<string>("");
