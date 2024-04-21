@@ -39,8 +39,7 @@ const SAMPLE_RAW_TRANSACTION = {
 
 export default function BalanceButton() {
   const { toast } = useToast()
-  const { aptosWallet } = useContext(magicContext);
-  const { isLoggedIn, userInfo } = useContext(keylessContext);
+  const { isLoggedIn, userInfo, keylessAccount } = useContext(keylessContext);
   const [balance, setBalance] = useState<number | null>(null);
   const [recipientAddress, setRecipientAddress] = useState<string>("");
   const [transferAmount, setTransferAmount] = useState<string>("");
@@ -88,7 +87,7 @@ export default function BalanceButton() {
 
     // setResultB(null);
 
-    if (!userInfo || !aptosWallet) {
+    if (!userInfo || !keylessAccount) {
       console.warn("No account");
       return;
     }
@@ -111,7 +110,7 @@ export default function BalanceButton() {
     //   )
     // );
 
-    // const { hash } = await aptosWallet.signAndSubmitBCSTransaction(payload);
+    // const { hash } = await keylessAccount.signAndSubmitBCSTransaction(payload);
 
     // const client = new AptosClient(RPC_URL);
     // await client.waitForTransaction(hash, {
@@ -142,7 +141,7 @@ export default function BalanceButton() {
 
     setLoading(true);
 
-    const tx = await transferApt(aptosWallet, parseFloat(transferAmount), recipientAddress,  `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`);
+    const tx = await transferApt(keylessAccount, parseFloat(transferAmount), recipientAddress,  `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`);
 
     if (!tx) {
       toast({

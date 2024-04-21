@@ -53,35 +53,74 @@ export async function getBalance(userAddress: string, type: string) {
 
 }
 
-export async function transferApt(userWallet: MagicAptosWallet, amount: number, toAddress: string, type: string) {
-  const token = new TxnBuilderTypes.TypeTagStruct(
-    TxnBuilderTypes.StructTag.fromString(type)
-  );
-  const payload = new TxnBuilderTypes.TransactionPayloadEntryFunction(
-    TxnBuilderTypes.EntryFunction.natural(
-      "0x1::coin",
-      "transfer",
-      [token],
-      [
-        BCS.bcsToBytes(
-          TxnBuilderTypes.AccountAddress.fromHex(toAddress)
-        ),
-        BCS.bcsSerializeUint64(Math.floor(amount * APT)),
-      ]
-    )
-  );
+export async function transferApt(userWallet: MultiKeyAccount, amount: number, toAddress: string, type: string) {
+  // const token = new TxnBuilderTypes.TypeTagStruct(
+  //   TxnBuilderTypes.StructTag.fromString(type)
+  // );
+  // const payload = new TxnBuilderTypes.TransactionPayloadEntryFunction(
+  //   TxnBuilderTypes.EntryFunction.natural(
+  //     "0x1::coin",
+  //     "transfer",
+  //     [token],
+  //     [
+  //       BCS.bcsToBytes(
+  //         TxnBuilderTypes.AccountAddress.fromHex(toAddress)
+  //       ),
+  //       BCS.bcsSerializeUint64(Math.floor(amount * APT)),
+  //     ]
+  //   )
+  // );
 
-  const { hash } = await userWallet.signAndSubmitBCSTransaction(payload);
+  // const { hash } = await userWallet.signAndSubmitBCSTransaction(payload);
 
-  const txResult = await client.waitForTransactionWithResult(hash);
+  // const txResult = await client.waitForTransactionWithResult(hash);
 
-  if (!(txResult as any).success) {
+  const fundingAccount = Account.fromPrivateKey({
+    privateKey: new Ed25519PrivateKey(process.env.FUNDING_ACCOUNT_PRIVATE_KEY || '')
+  });
+
+  const transaction = await aptos.transaction.build.simple({
+    sender: userWallet.accountAddress,
+    withFeePayer: true,
+    data: {
+      function: `0x1::coin::transfer`,
+      typeArguments: [type],
+      functionArguments: [
+        toAddress,
+        Math.floor(amount * APT),
+      ],
+    },
+  })
+
+  // sign transaction
+  const senderAuthenticator = aptos.transaction.sign({
+    signer: userWallet,
+    transaction,
+  });
+
+  const feePayerSignerAuthenticator = aptos.transaction.signAsFeePayer({
+    signer: fundingAccount,
+    transaction,
+  });
+
+  // submit transaction
+  const committedTransaction = await aptos.transaction.submit.simple({
+    transaction,
+    senderAuthenticator,
+    feePayerAuthenticator: feePayerSignerAuthenticator,
+  });
+
+  const txResult = await aptos.transaction.waitForTransaction({
+    transactionHash: committedTransaction.hash,
+  });
+
+  if (!txResult.success) {
     return null;
   }
 
   return {
     txnHash: txResult.hash,
-    version: (txResult as any).version,
+    version: txResult.version,
   };
 }
 
