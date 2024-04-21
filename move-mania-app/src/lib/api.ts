@@ -3,6 +3,7 @@ import { fundAccountWithGas, mintZAPT, registerForZAPT } from "./aptos";
 import { User } from "./schema";
 import { ChatMessage } from "./types";
 import { MagicAptosWallet } from "@magic-ext/aptos";
+import { MultiKeyAccount } from "@aptos-labs/ts-sdk";
 
 const API_URL = `${process.env.ZION_API_URL || 'http://localhost:3008'}`;
 export async function getUsers() {
@@ -36,7 +37,7 @@ export async function doesUserExist(address: string) {
 }
 
 export async function setUpUser(
-  userWallet: MagicAptosWallet,
+  userWallet: MultiKeyAccount,
   userToSetup: Omit<User, "referred_by" | "referral_code" | "username">,
   referrer?: string
 ) {
@@ -107,7 +108,7 @@ export async function getUser(address: string): Promise<User | null> {
 
 export async function setUpAndGetUser(
   userToSetup: Omit<User, "referred_by" | "referral_code" | "username">, 
-  userWallet: MagicAptosWallet,
+  userWallet: MultiKeyAccount,
   referrer?: string
 ): Promise<User | null> {
   console.log('userToSetup', userToSetup)

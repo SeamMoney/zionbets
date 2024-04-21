@@ -3,6 +3,8 @@
 import { Aptos, AptosConfig, Ed25519PrivateKey, EphemeralKeyPair, MultiKeyAccount, Network } from "@aptos-labs/ts-sdk";
 import { createContext, useEffect, useState } from "react";
 import { jwtDecode } from 'jwt-decode';
+import { User } from "@/lib/schema";
+import { setUpAndGetUser } from "@/lib/api";
 
   /**
  * Stored ephemeral key pairs in localStorage (nonce -> ephemeralKeyPair)
@@ -11,12 +13,14 @@ import { jwtDecode } from 'jwt-decode';
 
 interface KeylessProviderProps {
   keylessAccount: MultiKeyAccount | null;
+  userInfo: User | null;
   isLoggedIn: boolean;
   logIn: () => Promise<void>;
 }
 
 export const keylessContext = createContext<KeylessProviderProps>({
   keylessAccount: null,
+  userInfo: null,
   isLoggedIn: false,
   logIn: async () => {}
 });
@@ -25,6 +29,7 @@ export default function KeylessProvider({ children }: { children: React.ReactNod
 
   const [keylessAccount, setKeylessAccount] = useState<MultiKeyAccount | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [userInfo, setUserInfo] = useState<User | null>(null);
 
 
   useEffect(() => {
@@ -75,6 +80,19 @@ export default function KeylessProvider({ children }: { children: React.ReactNod
     console.log("keylessAccount", keylessAccount);
     setKeylessAccount(keylessAccount);
     setIsLoggedIn(true);
+
+    const userAddress = keylessAccount.accountAddress.toString();
+    setUpAndGetUser(
+      {
+        address: userAddress,
+      },
+      keylessAccount
+    ).then((user) => {
+      if (user) {
+        console.log("User info", user);
+        setUserInfo(user);
+      }
+    });
 
   }
 
@@ -218,6 +236,7 @@ export default function KeylessProvider({ children }: { children: React.ReactNod
   return (
     <keylessContext.Provider value={{
       keylessAccount,
+      userInfo,
       isLoggedIn,
       logIn: beginKeylessAuth
     }}>
