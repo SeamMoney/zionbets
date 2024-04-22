@@ -34,7 +34,7 @@ export default function KeylessProvider({ children }: { children: React.ReactNod
   const [keylessAccount, setKeylessAccount] = useState<MultiKeyAccount | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [userInfo, setUserInfo] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
 
   useEffect(() => {
@@ -46,7 +46,7 @@ export default function KeylessProvider({ children }: { children: React.ReactNod
     console.log("beginKeylessAuth");
 
     const ephemeralKeyPair = EphemeralKeyPair.generate();
-    const redirectUri = 'http://localhost:3000'
+    const redirectUri = window.location.href;
     const clientId = process.env.GOOGLE_CLIENT_ID!
     // Get the nonce associated with ephemeralKeyPair
     const nonce = ephemeralKeyPair.nonce
@@ -67,6 +67,7 @@ export default function KeylessProvider({ children }: { children: React.ReactNod
     const jwt = parseJWTFromURL(window.location.href)
     if (!jwt) {
       console.log("No JWT found in URL")
+      setIsLoading(false);
       return
     }
     const payload = jwtDecode<{ nonce: string }>(jwt);
@@ -75,6 +76,7 @@ export default function KeylessProvider({ children }: { children: React.ReactNod
 
     if (!ephemeralKeyPair) {
       console.log("No ephemeral key pair found in local storage")
+      setIsLoading(false);
       return
     }
 
