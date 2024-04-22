@@ -1,7 +1,8 @@
-import { AptosAccount, AptosClient, BCS, CoinClient, FaucetClient, HexString, Provider, TxnBuilderTypes } from "aptos";
+import { AptosAccount, AptosClient, BCS, CoinClient, FaucetClient, HexString, Network, Provider, TxnBuilderTypes } from "aptos";
 import { BetData, CashOutData } from "./types";
 import { User } from "./schema";
 import { MagicAptosWallet } from "@magic-ext/aptos";
+import { Account, Aptos, AptosConfig, Ed25519PrivateKey, MultiKeyAccount } from "@aptos-labs/ts-sdk";
 
 const MODULE_ADDRESS = process.env.MODULE_ADDRESS as string;
 const MODULE_NAME = 'crash';
@@ -17,6 +18,8 @@ const coinClient = new CoinClient(client);
 const provider = new Provider({
   fullnodeUrl: RPC_URL,
 })
+const aptosConfig = new AptosConfig({ network: Network.DEVNET }); // default to devnet
+const aptos = new Aptos(aptosConfig);
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -50,35 +53,74 @@ export async function getBalance(userAddress: string, type: string) {
 
 }
 
-export async function transferApt(userWallet: MagicAptosWallet, amount: number, toAddress: string, type: string) {
-  const token = new TxnBuilderTypes.TypeTagStruct(
-    TxnBuilderTypes.StructTag.fromString(type)
-  );
-  const payload = new TxnBuilderTypes.TransactionPayloadEntryFunction(
-    TxnBuilderTypes.EntryFunction.natural(
-      "0x1::coin",
-      "transfer",
-      [token],
-      [
-        BCS.bcsToBytes(
-          TxnBuilderTypes.AccountAddress.fromHex(toAddress)
-        ),
-        BCS.bcsSerializeUint64(Math.floor(amount * APT)),
-      ]
-    )
-  );
+export async function transferApt(userWallet: MultiKeyAccount, amount: number, toAddress: string, type: string) {
+  // const token = new TxnBuilderTypes.TypeTagStruct(
+  //   TxnBuilderTypes.StructTag.fromString(type)
+  // );
+  // const payload = new TxnBuilderTypes.TransactionPayloadEntryFunction(
+  //   TxnBuilderTypes.EntryFunction.natural(
+  //     "0x1::coin",
+  //     "transfer",
+  //     [token],
+  //     [
+  //       BCS.bcsToBytes(
+  //         TxnBuilderTypes.AccountAddress.fromHex(toAddress)
+  //       ),
+  //       BCS.bcsSerializeUint64(Math.floor(amount * APT)),
+  //     ]
+  //   )
+  // );
 
-  const { hash } = await userWallet.signAndSubmitBCSTransaction(payload);
+  // const { hash } = await userWallet.signAndSubmitBCSTransaction(payload);
 
-  const txResult = await client.waitForTransactionWithResult(hash);
+  // const txResult = await client.waitForTransactionWithResult(hash);
 
-  if (!(txResult as any).success) {
+  const fundingAccount = Account.fromPrivateKey({
+    privateKey: new Ed25519PrivateKey(process.env.FUNDING_ACCOUNT_PRIVATE_KEY || '')
+  });
+
+  const transaction = await aptos.transaction.build.simple({
+    sender: userWallet.accountAddress,
+    withFeePayer: true,
+    data: {
+      function: `0x1::coin::transfer`,
+      typeArguments: [type],
+      functionArguments: [
+        toAddress,
+        Math.floor(amount * APT),
+      ],
+    },
+  })
+
+  // sign transaction
+  const senderAuthenticator = aptos.transaction.sign({
+    signer: userWallet,
+    transaction,
+  });
+
+  const feePayerSignerAuthenticator = aptos.transaction.signAsFeePayer({
+    signer: fundingAccount,
+    transaction,
+  });
+
+  // submit transaction
+  const committedTransaction = await aptos.transaction.submit.simple({
+    transaction,
+    senderAuthenticator,
+    feePayerAuthenticator: feePayerSignerAuthenticator,
+  });
+
+  const txResult = await aptos.transaction.waitForTransaction({
+    transactionHash: committedTransaction.hash,
+  });
+
+  if (!txResult.success) {
     return null;
   }
 
   return {
     txnHash: txResult.hash,
-    version: (txResult as any).version,
+    version: txResult.version,
   };
 }
 
@@ -108,38 +150,72 @@ export async function registerForAPT(userAccount: AptosAccount) {
   };
 }
 
-export async function registerForZAPT(userWallet: MagicAptosWallet) {
+export async function registerForZAPT(userWallet: MultiKeyAccount) {
 
-  const payload = new TxnBuilderTypes.TransactionPayloadEntryFunction(
-    TxnBuilderTypes.EntryFunction.natural(
-      `${MODULE_ADDRESS}::z_apt`,
-      "register",
-      [],
-      []
-    )
-  );
-
-  // const txn = await provider.generateTransaction(
-  //   userAccount.address(),
-  //   {
-  //     function: `${MODULE_ADDRESS}::z_apt::register`,
-  //     type_arguments: [],
-  //     arguments: [],
-  //   },
-  //   TRANSACTION_OPTIONS
+  // const payload = new TxnBuilderTypes.TransactionPayloadEntryFunction(
+  //   TxnBuilderTypes.EntryFunction.natural(
+  //     `${MODULE_ADDRESS}::z_apt`,
+  //     "register",
+  //     [],
+  //     []
+  //   )
   // );
 
-  const { hash } = await userWallet.signAndSubmitBCSTransaction(payload);
+  // // const txn = await provider.generateTransaction(
+  // //   userAccount.address(),
+  // //   {
+  // //     function: `${MODULE_ADDRESS}::z_apt::register`,
+  // //     type_arguments: [],
+  // //     arguments: [],
+  // //   },
+  // //   TRANSACTION_OPTIONS
+  // // );
 
-  const txResult = await client.waitForTransactionWithResult(hash);
+  // const { hash } = await userWallet.
 
-  if (!(txResult as any).success) {
+  // const txResult = await client.waitForTransactionWithResult(hash);
+
+  const fundingAccount = Account.fromPrivateKey({
+    privateKey: new Ed25519PrivateKey(process.env.FUNDING_ACCOUNT_PRIVATE_KEY || '')
+  });
+
+  const transaction = await aptos.transaction.build.simple({
+    sender: userWallet.accountAddress,
+    withFeePayer: true,
+    data: {
+      function: `${MODULE_ADDRESS}::z_apt::register`,
+      typeArguments: [],
+      functionArguments: [],
+    },
+  })
+
+  // sign transaction
+  const senderAuthenticator = aptos.transaction.sign({
+    signer: userWallet,
+    transaction,
+  });
+  const feePayerSignerAuthenticator = aptos.transaction.signAsFeePayer({
+    signer: fundingAccount,
+    transaction,
+  });
+  // submit transaction
+  const committedTransaction = await aptos.transaction.submit.simple({
+    transaction,
+    senderAuthenticator,
+    feePayerAuthenticator: feePayerSignerAuthenticator,
+  });
+
+  const txResult = await aptos.transaction.waitForTransaction({
+    transactionHash: committedTransaction.hash,
+  });
+
+  if (!txResult.success) {
     return null;
   }
 
   return {
     txnHash: txResult.hash,
-    version: (txResult as any).version,
+    version: txResult.version,
   };
 }
 
@@ -284,59 +360,135 @@ export async function quickRemoveGame() {
   };
 }
 
-export async function placeBet(userWallet: MagicAptosWallet, betData: BetData) {
+export async function placeBet(userWallet: MultiKeyAccount, betData: BetData) {
 
   // await faucetClient.fundAccount(userAccount.address(), 10_0000_0000, 5)
 
-  const payload = new TxnBuilderTypes.TransactionPayloadEntryFunction(
-    TxnBuilderTypes.EntryFunction.natural(
-      `${MODULE_ADDRESS}::${MODULE_NAME}`,
-      "place_bet",
-      [],
-      [
-        BCS.bcsSerializeUint64(Math.floor(betData.betAmount * APT)),
-      ]
-    )
-  );
+  // const payload = new TxnBuilderTypes.TransactionPayloadEntryFunction(
+  //   TxnBuilderTypes.EntryFunction.natural(
+  //     `${MODULE_ADDRESS}::${MODULE_NAME}`,
+  //     "place_bet",
+  //     [],
+  //     [
+  //       BCS.bcsSerializeUint64(Math.floor(betData.betAmount * APT)),
+  //     ]
+  //   )
+  // );
 
-  const { hash } = await userWallet.signAndSubmitBCSTransaction(payload);
+  // const { hash } = await userWallet.signAndSubmitBCSTransaction(payload);
 
-  const txResult = await client.waitForTransactionWithResult(hash);
+  // const txResult = await client.waitForTransactionWithResult(hash);
 
-  if (!(txResult as any).success) {
+  const fundingAccount = Account.fromPrivateKey({
+    privateKey: new Ed25519PrivateKey(process.env.FUNDING_ACCOUNT_PRIVATE_KEY || '')
+  });
+
+  const transaction = await aptos.transaction.build.simple({
+    sender: userWallet.accountAddress,
+    withFeePayer: true,
+    data: {
+      function: `${MODULE_ADDRESS}::${MODULE_NAME}::place_bet`,
+      typeArguments: [],
+      functionArguments: [
+        Math.floor(betData.betAmount * APT),
+      ],
+    },
+  })
+
+  // sign transaction
+  const senderAuthenticator = aptos.transaction.sign({
+    signer: userWallet,
+    transaction,
+  });
+  const feePayerSignerAuthenticator = aptos.transaction.signAsFeePayer({
+    signer: fundingAccount,
+    transaction,
+  });
+
+  // submit transaction
+  const committedTransaction = await aptos.transaction.submit.simple({
+    transaction,
+    senderAuthenticator,
+    feePayerAuthenticator: feePayerSignerAuthenticator,
+  });
+
+  const txResult = await aptos.transaction.waitForTransaction({
+    transactionHash: committedTransaction.hash,
+  });
+
+  if (!txResult.success) {
     return null;
   }
 
   return {
     txnHash: txResult.hash,
-    version: (txResult as any).version,
+    version: txResult.version,
   };
 }
 
-export async function cashOut(userWallet: MagicAptosWallet, cashOutData: CashOutData) {
+export async function cashOut(userWallet: MultiKeyAccount, cashOutData: CashOutData) {
 
-  const payload = new TxnBuilderTypes.TransactionPayloadEntryFunction(
-    TxnBuilderTypes.EntryFunction.natural(
-      `${MODULE_ADDRESS}::${MODULE_NAME}`,
-      "cash_out",
-      [],
-      [
-        BCS.bcsSerializeUint64(Math.floor(cashOutData.cashOutMultiplier * 100)),
-      ]
-    )
-  );
+  // const payload = new TxnBuilderTypes.TransactionPayloadEntryFunction(
+  //   TxnBuilderTypes.EntryFunction.natural(
+  //     `${MODULE_ADDRESS}::${MODULE_NAME}`,
+  //     "cash_out",
+  //     [],
+  //     [
+  //       BCS.bcsSerializeUint64(Math.floor(cashOutData.cashOutMultiplier * 100)),
+  //     ]
+  //   )
+  // );
 
-  const { hash } = await userWallet.signAndSubmitBCSTransaction(payload);
+  // const { hash } = await userWallet.signAndSubmitBCSTransaction(payload);
 
-  const txResult = await client.waitForTransactionWithResult(hash);
+  // const txResult = await client.waitForTransactionWithResult(hash);
 
-  if (!(txResult as any).success) {
+  const fundingAccount = Account.fromPrivateKey({
+    privateKey: new Ed25519PrivateKey(process.env.FUNDING_ACCOUNT_PRIVATE_KEY || '')
+  });
+
+  const transaction = await aptos.transaction.build.simple({
+    sender: userWallet.accountAddress,
+    withFeePayer: true,
+    data: {
+      function: `${MODULE_ADDRESS}::${MODULE_NAME}::cash_out`,
+      typeArguments: [],
+      functionArguments: [
+        Math.floor(cashOutData.cashOutMultiplier * 100),
+      ],
+    },
+  })
+
+  // sign transaction
+  const senderAuthenticator = aptos.transaction.sign({
+    signer: userWallet,
+    transaction,
+  });
+
+  const feePayerSignerAuthenticator = aptos.transaction.signAsFeePayer({
+    signer: fundingAccount,
+    transaction,
+  });
+
+  // submit transaction
+  const committedTransaction = await aptos.transaction.submit.simple({
+    transaction,
+    senderAuthenticator,
+    feePayerAuthenticator: feePayerSignerAuthenticator,
+  });
+
+  const txResult = await aptos.transaction.waitForTransaction({
+    transactionHash: committedTransaction.hash,
+  });
+  
+
+  if (!txResult.success) {
     return null;
   }
 
   return {
     txnHash: txResult.hash,
-    version: (txResult as any).version,
+    version: txResult.version,
   };
 }
 
