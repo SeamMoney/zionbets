@@ -21,13 +21,14 @@ import {
 
 import { socket } from "@/lib/socket";
 import { cn } from "@/lib/utils";
-import { magicContext } from "./MagicProvider";
+import { keylessContext } from "./KeylessProvider";
 
 export default function ChatWindow() {
   const [newMessage, setNewMessage] = useState<ChatMessage | null>(null);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
 
-  const { isLoggedIn, userInfo } = useContext(magicContext);
+  const { isLoggedIn, userInfo} = useContext(keylessContext);
+
 
   const inputRef = useRef<HTMLInputElement>(null);
 

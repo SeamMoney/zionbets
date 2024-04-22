@@ -24,7 +24,6 @@ import { useToast } from "@/components/ui/use-toast"
 import Link from "next/link";
 import { RPC_URL, getBalance, transferApt } from "@/lib/aptos";
 import { cn } from "@/lib/utils";
-import { magicContext } from "./MagicProvider";
 import { keylessContext } from "./KeylessProvider";
 
 const MAGIC_WALLET_ADDRESS =
