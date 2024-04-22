@@ -26,7 +26,6 @@ import { gameStatusContext } from "./CrashProvider";
 import { cashOut, placeBet } from "@/lib/aptos";
 import { useToast } from "@/components/ui/use-toast";
 import Link from "next/link";
-import { magicContext } from "./MagicProvider";
 import { keylessContext } from "./KeylessProvider";
 
 export type GameStatus = {

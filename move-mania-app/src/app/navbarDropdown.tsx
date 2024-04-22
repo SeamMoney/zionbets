@@ -14,7 +14,6 @@ import { getSession, signIn } from "next-auth/react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useContext, useEffect, useRef, useState } from "react";
-import { magicContext } from "./MagicProvider";
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { COUNTRY_CODES } from "@/lib/countryCodes";
 import { keylessContext } from "./KeylessProvider";
@@ -26,7 +25,6 @@ export default function NavbarDropdown() {
   const searchParams = useSearchParams();
   const referredBy = searchParams.get("ref");
 
-  const { logInEmail, logInPhone } = useContext(magicContext);
   const { logIn, isLoggedIn } = useContext(keylessContext);
 
   const [ emailPhoneToggle, setEmailPhoneToggle ] = useState<boolean>(false);

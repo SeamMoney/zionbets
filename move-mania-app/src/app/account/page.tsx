@@ -1,7 +1,6 @@
 'use client';
 
 import { useContext, useEffect, useState } from "react";
-import { magicContext } from "../MagicProvider";
 import { keylessContext } from "../KeylessProvider";
 
 
