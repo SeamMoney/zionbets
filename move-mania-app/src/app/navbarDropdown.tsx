@@ -25,7 +25,7 @@ export default function NavbarDropdown() {
   const searchParams = useSearchParams();
   const referredBy = searchParams.get("ref");
 
-  const { logIn, isLoggedIn } = useContext(keylessContext);
+  const { isLoading, logIn, isLoggedIn } = useContext(keylessContext);
 
   const [ emailPhoneToggle, setEmailPhoneToggle ] = useState<boolean>(false);
   const [ phoneInput, setPhoneInput ] = useState<string>("");
@@ -33,7 +33,7 @@ export default function NavbarDropdown() {
 
   const countryCodeRef = useRef<HTMLSelectElement>(null);
 
-  if (isLoggedIn === null) {
+  if (isLoading) {
     return (
       <button className="bg-white px-6 py-1 text-neutral-950 active:scale-95 active:opacity-50 transition-transform">
         <Loader2Icon className="animate-spin" />
@@ -49,7 +49,7 @@ export default function NavbarDropdown() {
           className="bg-white px-6 py-1 text-neutral-950 active:scale-95 active:opacity-50 transition-transform"
           onClick={logIn}
         >
-          Sign in
+          Log in
         </button>
       }
       <DropdownMenu>

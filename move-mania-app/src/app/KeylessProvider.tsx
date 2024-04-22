@@ -15,6 +15,7 @@ interface KeylessProviderProps {
   keylessAccount: MultiKeyAccount | null;
   userInfo: User | null;
   isLoggedIn: boolean;
+  isLoading: boolean;
   logIn: () => Promise<void>;
   logOut: () => Promise<void>;
 }
@@ -23,6 +24,7 @@ export const keylessContext = createContext<KeylessProviderProps>({
   keylessAccount: null,
   userInfo: null,
   isLoggedIn: false,
+  isLoading: false,
   logIn: async () => {},
   logOut: async () => {}
 });
@@ -32,6 +34,7 @@ export default function KeylessProvider({ children }: { children: React.ReactNod
   const [keylessAccount, setKeylessAccount] = useState<MultiKeyAccount | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [userInfo, setUserInfo] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
 
   useEffect(() => {
@@ -58,6 +61,8 @@ export default function KeylessProvider({ children }: { children: React.ReactNod
 
   const finishKeylessAuth = async () => {
     console.log("finishKeylessAuth");
+
+    setIsLoading(true);
 
     const jwt = parseJWTFromURL(window.location.href)
     if (!jwt) {
@@ -95,6 +100,8 @@ export default function KeylessProvider({ children }: { children: React.ReactNod
         setUserInfo(user);
       }
     });
+
+    setIsLoading(false);
 
   }
 
@@ -252,6 +259,7 @@ export default function KeylessProvider({ children }: { children: React.ReactNod
       keylessAccount,
       userInfo,
       isLoggedIn,
+      isLoading,
       logIn: beginKeylessAuth,
       logOut
     }}>
