@@ -46,7 +46,7 @@ export default function KeylessProvider({ children }: { children: React.ReactNod
     console.log("beginKeylessAuth");
 
     const ephemeralKeyPair = EphemeralKeyPair.generate();
-    const redirectUri = window.location.href;
+    const redirectUri = window.location.href.split('?')[0]
     const clientId = process.env.GOOGLE_CLIENT_ID!
     // Get the nonce associated with ephemeralKeyPair
     const nonce = ephemeralKeyPair.nonce
