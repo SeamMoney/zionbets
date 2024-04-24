@@ -14,8 +14,19 @@ module zion::z_apt {
   use aptos_std::comparator::{Self, Result};
   use aptos_framework::aptos_coin::{Self, AptosCoin};
 
+  use aptos_framework::object;
+  use aptos_framework::fungible_asset::{Self, MintRef, TransferRef, BurnRef, Metadata, FungibleStore, FungibleAsset};
+  use aptos_framework::object::Object;
+  use std::string::utf8;
+  use aptos_framework::primary_fungible_store;
+
+
   const SEED: vector<u8> = b"zion-apt";
   const COIN_DECIMALS: u8 = 8;
+  const ASSET_SYMBOL: vector<u8> = b"zAPT";
+  const ASSET_NAME: vector<u8> = b"Zion Bets Game Coin";
+  const ASSET_URI: vector<u8> = b"https://zion.bet";
+  const PROJECT_URI: vector<u8> = b"https://zion.bet";
 
   struct ZAPT {}
 
@@ -23,65 +34,62 @@ module zion::z_apt {
 
   struct State has key {
     signer_cap: account::SignerCapability,
-    aptos_coin_mint_cap: coin::MintCapability<ZAPT>,
-    aptos_coin_burn_cap: coin::BurnCapability<ZAPT>
+    mint_ref: MintRef, 
+    transfer_ref: TransferRef,
+    burn_ref: BurnRef
   }
 
   fun init_module(admin: &signer) {
+
     let (resource_account_signer, signer_cap) = account::create_resource_account(admin, SEED);
 
-    let (burn_cap, freeze_cap, mint_cap) = coin::initialize<ZAPT>(
-      admin, 
-      string::utf8(b"Zion Aptos Coin"),
-      string::utf8(b"zAPT"),
+    let constructor_ref = &object::create_named_object(&resource_account_signer, ASSET_SYMBOL);
+    primary_fungible_store::create_primary_store_enabled_fungible_asset(
+      constructor_ref,
+      option::none(),
+      utf8(ASSET_NAME),
+      utf8(ASSET_SYMBOL),
       COIN_DECIMALS,
-      true
+      utf8(ASSET_URI),
+      utf8(PROJECT_URI)
     );
-    coin::destroy_freeze_cap(freeze_cap);
 
-    move_to<State>(
+    let mint_ref = fungible_asset::generate_mint_ref(constructor_ref);
+    let transfer_ref = fungible_asset::generate_transfer_ref(constructor_ref);
+    let burn_ref = fungible_asset::generate_burn_ref(constructor_ref);
+    move_to(
       &resource_account_signer,
       State {
-        signer_cap: signer_cap,
-        aptos_coin_mint_cap: mint_cap,
-        aptos_coin_burn_cap: burn_cap
+        signer_cap,
+        mint_ref: mint_ref,
+        transfer_ref: transfer_ref,
+        burn_ref: burn_ref
       }
     );
-
-    coin::register<ZAPT>(&resource_account_signer);
   }
 
   public entry fun mint(
-    // _: &mut AdminCap, 
-    amount: u64, 
-    recipient: address
-  ) acquires State {
-    let state = borrow_global_mut<State>(get_resource_address());
-    let minted_coin = coin::mint(amount, &state.aptos_coin_mint_cap);
-    coin::deposit(recipient, minted_coin);
-  }
-
-  public entry fun register(recipient: &signer) {
-    coin::register<ZAPT>(recipient);
-  }
-
-  public entry fun actual_mint(
-    recipient: &signer,
+    admin: &signer, 
+    to: address,
     amount: u64
   ) acquires State {
-    let state = borrow_global_mut<State>(get_resource_address());
-    let minted_coin = coin::mint(amount, &state.aptos_coin_mint_cap);
-    coin::register<ZAPT>(recipient);
-    coin::deposit(signer::address_of(recipient), minted_coin);
+    let mint_ref = &borrow_global_mut<State>(get_resource_address()).mint_ref;
+    let metadata = get_metadata();
+    let primary_store = primary_fungible_store::ensure_primary_store_exists(to, metadata);
+    fungible_asset::mint_to(mint_ref, primary_store, amount);
   }
 
-  public entry fun burn(
-    owner: &signer,
-    amount: u64
-  ) acquires State {
-    let state = borrow_global_mut<State>(get_resource_address());
-    let coin_to_burn = coin::withdraw(owner, amount);
-    coin::burn(coin_to_burn, &state.aptos_coin_burn_cap);
+  public fun create_fungible_store(): Object<FungibleStore> acquires State {
+    fungible_asset::create_store(
+      &object::create_named_object(&get_resource_signer(), ASSET_SYMBOL),
+      get_metadata()
+    )
+  }
+
+  #[view]
+  public fun get_metadata(): Object<Metadata> {
+    let metadata_address = object::create_object_address(&get_resource_address(), ASSET_SYMBOL);
+    object::address_to_object<Metadata>(metadata_address)
   }
 
   /* 
@@ -90,5 +98,10 @@ module zion::z_apt {
   */ 
   inline fun get_resource_address(): address {
     account::create_resource_address(&@zion, SEED)
+  }
+
+  inline fun get_resource_signer(): signer {
+    let signer_cap = &borrow_global<State>(get_resource_address()).signer_cap;
+    account::create_signer_with_capability(signer_cap)
   }
 }
