@@ -1,25 +1,15 @@
 module zion::z_apt {
-    
-  use std::type_info;
+  
   use std::signer;
-  use aptos_framework::event;
-  use aptos_framework::option;
-  use aptos_framework::math128;
-  use aptos_framework::account;
-  use aptos_framework::timestamp;
-  use std::string::{Self, String};
-  use aptos_framework::string_utils;
-  use aptos_framework::resource_account;
-  use aptos_framework::coin::{Self, Coin};
-  use aptos_std::comparator::{Self, Result};
-  use aptos_framework::aptos_coin::{Self, AptosCoin};
-
-  use aptos_framework::object;
-  use aptos_framework::fungible_asset::{Self, MintRef, TransferRef, BurnRef, Metadata, FungibleStore, FungibleAsset};
-  use aptos_framework::object::Object;
   use std::string::utf8;
+  use aptos_framework::object;
+  use aptos_framework::option;
+  use aptos_framework::account;
+  use aptos_framework::string_utils;
+  use aptos_framework::object::Object;
+  use aptos_framework::resource_account;
   use aptos_framework::primary_fungible_store;
-
+  use aptos_framework::fungible_asset::{Self, MintRef, TransferRef, BurnRef, Metadata, FungibleStore, FungibleAsset};
 
   const SEED: vector<u8> = b"zion-apt";
   const COIN_DECIMALS: u8 = 8;
@@ -28,9 +18,7 @@ module zion::z_apt {
   const ASSET_URI: vector<u8> = b"https://zion.bet";
   const PROJECT_URI: vector<u8> = b"https://zion.bet";
 
-  struct ZAPT {}
-
-  struct AdminCap has key {}
+  // struct AdminCap has key {}
 
   struct State has key {
     signer_cap: account::SignerCapability,
@@ -85,6 +73,23 @@ module zion::z_apt {
       get_metadata()
     )
   }
+
+  public fun transfer(
+    admin: &signer, 
+    from: address, 
+    to: address, 
+    amount: u64
+  ) acquires State {
+    let metadata = get_metadata();
+    let sender_primary_store = primary_fungible_store::primary_store(from, metadata);
+    let receiver_primary_store = primary_fungible_store::ensure_primary_store_exists(to, metadata);
+    let transfer_ref = &borrow_global_mut<State>(get_resource_address()).transfer_ref;
+    fungible_asset::transfer(transfer_ref, sender_primary_store, receiver_primary_store, amount);
+  }
+
+  public(friend) fun withdraw(
+    
+  )
 
   #[view]
   public fun get_metadata(): Object<Metadata> {
