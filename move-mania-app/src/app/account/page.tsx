@@ -1,14 +1,12 @@
 'use client';
 
 import { useContext, useEffect, useState } from "react";
-import { magicContext } from "../MagicProvider";
-import AccountStats from "./accountStats";
-import Image from "next/image";
-import Quests from "./quests";
-import { quests } from "./questInfo";
+import { keylessContext } from "../KeylessProvider";
+
+
 export default function AccountPage() {
 
-  // const { isLoggedIn, setIsLoggedIn, publicAddress, userInfo, logOut } = useContext(magicContext);
+  const { isLoggedIn, userInfo, logOut } = useContext(keylessContext);
 
   const [username, setUsername] = useState("");
   const defaultImage = '/public/defaultProfile.png';
@@ -108,7 +106,7 @@ export default function AccountPage() {
             <input
               id="public_address"
               disabled
-              value={publicAddress || ''}
+              value={userInfo.address || ''}
               className="bg-transparent border-none outline-none text-right text-ellipsis cursor-not-allowed"
             />
           </span>

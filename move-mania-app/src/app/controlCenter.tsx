@@ -26,7 +26,7 @@ import { gameStatusContext } from "./CrashProvider";
 import { cashOut, placeBet } from "@/lib/aptos";
 import { useToast } from "@/components/ui/use-toast";
 import Link from "next/link";
-import { magicContext } from "./MagicProvider";
+import { keylessContext } from "./KeylessProvider";
 
 export type GameStatus = {
   status: "COUNTDOWN" | "IN_PROGRESS" | "END";
@@ -40,7 +40,7 @@ export default function ControlCenter() {
     gameStatus,
     latestAction
   } = useContext(gameStatusContext);
-  const { isLoggedIn, userInfo, aptosWallet } = useContext(magicContext);
+  const { isLoggedIn, userInfo, keylessAccount} = useContext(keylessContext);
 
   const { toast } = useToast()
 
@@ -85,13 +85,13 @@ export default function ControlCenter() {
 
     if (!socket) return;
 
-    if (!isLoggedIn || !userInfo || !aptosWallet) return;
+    if (!isLoggedIn || !userInfo || !keylessAccount) return;
 
     toast({
       title: "Placing bet at " + betAmount + " zAPT...",
     })
 
-    const blockchainRes = await placeBet(aptosWallet, {
+    const blockchainRes = await placeBet(keylessAccount, {
       roundId: 1,
       playerEmail: userInfo.address,
       betAmount: parseFloat(betAmount),
@@ -124,7 +124,7 @@ export default function ControlCenter() {
   const onCashOut = async () => {
     if (!socket) return;
 
-    if (!userInfo || !isLoggedIn || !aptosWallet) return;
+    if (!userInfo || !isLoggedIn || !keylessAccount) return;
 
     if (!gameStatus?.startTime) return;
 
@@ -135,7 +135,7 @@ export default function ControlCenter() {
     })
 
 
-    const blockchainRes = await cashOut(aptosWallet, {
+    const blockchainRes = await cashOut(keylessAccount, {
       roundId: 1,
       playerEmail: userInfo.address,
       cashOutMultiplier: cashoutMultipler,

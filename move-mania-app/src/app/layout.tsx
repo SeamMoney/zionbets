@@ -13,7 +13,7 @@ import logo from "@/../public/zionbet_nobackground.png"
 import NavbarDropdown from "./navbarDropdown";
 import { Suspense } from "react";
 import CrashProvider from "./CrashProvider";
-import MagicProvider from "./MagicProvider";
+import KeylessProvider from "./KeylessProvider";
 
 const baijamjuree = Bai_Jamjuree({
   weight: ['200', '300', '400', '500', '600'],
@@ -50,7 +50,7 @@ export default function RootLayout({
       <Analytics/>
       <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"></meta>
       <body className={baijamjuree.className + " text-white bg-[#020202] bg-noise"}>
-        <MagicProvider>
+        <KeylessProvider>
           <CrashProvider>
               <div className="flex h-full min-h-screen overflow-hidden">
                 <nav className="fixed w-full h-12 z-30 px-2 border-b border-neutral-700 bg-[#020202] bg-noise">
@@ -85,7 +85,7 @@ export default function RootLayout({
                 </aside>
               </div>
             </CrashProvider>
-          </MagicProvider>
+          </KeylessProvider>
         </body>
     </html>
   );

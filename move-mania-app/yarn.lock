@@ -37,6 +37,24 @@
     axios "1.6.2"
     got "^11.8.6"
 
+"@aptos-labs/ts-sdk@^1.10.0-zeta.6":
+  version "1.10.0-zeta.6"
+  resolved "https://registry.yarnpkg.com/@aptos-labs/ts-sdk/-/ts-sdk-1.10.0-zeta.6.tgz#73aace2ffb194baa21b67644cfa91174d4dc00f8"
+  integrity sha512-eUPyCtu/IF0MhcVu9rwgP6lbbdw4UFfZOvkl1PwYj9YYxDlMx8BFz4QJ4YsnTwf5RZejnX4vyfEACCr6PbrMbg==
+  dependencies:
+    "@aptos-labs/aptos-client" "^0.1.0"
+    "@noble/curves" "^1.3.0"
+    "@noble/hashes" "^1.3.3"
+    "@scure/bip32" "^1.3.3"
+    "@scure/bip39" "^1.2.1"
+    base-64 "^1.0.0"
+    eventemitter3 "^5.0.1"
+    form-data "^4.0.0"
+    jose "^5.1.3"
+    jwt-decode "^4.0.0"
+    poseidon-lite "^0.2.0"
+    tweetnacl "^1.0.3"
+
 "@aptos-labs/ts-sdk@^1.9.1":
   version "1.12.2"
   resolved "https://registry.yarnpkg.com/@aptos-labs/ts-sdk/-/ts-sdk-1.12.2.tgz#4d0a812452323d584fd2b5a54019d68e3ae3cda9"
@@ -1350,7 +1368,7 @@
   resolved "https://registry.yarnpkg.com/@next/swc-win32-x64-msvc/-/swc-win32-x64-msvc-14.1.0.tgz#e561fb330466d41807123d932b365cf3d33ceba2"
   integrity sha512-9WEbVRRAqJ3YFVqEZIxUqkiO8l1nool1LmNxygr5HWF8AcSYsEpneUDhmjUVJEzO2A04+oPtZdombzzPPkTtgg==
 
-"@noble/curves@^1.2.0", "@noble/curves@~1.4.0":
+"@noble/curves@^1.2.0", "@noble/curves@^1.3.0", "@noble/curves@~1.4.0":
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/@noble/curves/-/curves-1.4.0.tgz#f05771ef64da724997f69ee1261b2417a49522d6"
   integrity sha512-p+4cb332SFCrReJkCYe8Xzm0OWi4Jji5jVdIZRL/PmacmDkFNw6MrrV+gGpiPxLHbV+zKFRywUWbaseT+tZRXg==
@@ -2524,6 +2542,11 @@ balanced-match@^1.0.0:
   version "1.0.2"
   resolved "https://registry.npmjs.org/balanced-match/-/balanced-match-1.0.2.tgz"
   integrity sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==
+
+base-64@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/base-64/-/base-64-1.0.0.tgz#09d0f2084e32a3fd08c2475b973788eee6ae8f4a"
+  integrity sha512-kwDPIFCGx0NZHog36dj+tHiwP4QMzsZ3AgMViUBKI0+V5n4U0ufTCUMhnQ04diaRI8EX/QcPfql7zlhZ7j4zgg==
 
 base-x@^3.0.2:
   version "3.0.9"
@@ -4543,6 +4566,11 @@ jose@^4.11.4, jose@^4.15.4:
   resolved "https://registry.yarnpkg.com/jose/-/jose-4.15.4.tgz#02a9a763803e3872cf55f29ecef0dfdcc218cc03"
   integrity sha512-W+oqK4H+r5sITxfxpSU+MMdr/YSWGvgZMQDIsNoBDGGy4i7GBPTtvFKibQzW06n3U3TqHjhvBJsirShsEJ6eeQ==
 
+jose@^5.1.3:
+  version "5.2.4"
+  resolved "https://registry.yarnpkg.com/jose/-/jose-5.2.4.tgz#c0d296caeeed0b8444a8b8c3b68403d61aa4ed72"
+  integrity sha512-6ScbIk2WWCeXkmzF6bRPmEuaqy1m8SbsRFMa/FLrSCkGIhj8OLVG/IH+XHVmNMx/KUo8cVWEE6oKR4dJ+S0Rkg==
+
 js-sha3@0.8.0:
   version "0.8.0"
   resolved "https://registry.yarnpkg.com/js-sha3/-/js-sha3-0.8.0.tgz#b9b7a5da73afad7dedd0f8c463954cbde6818840"
@@ -4630,6 +4658,11 @@ jsonpointer@^5.0.0:
     array.prototype.flat "^1.3.1"
     object.assign "^4.1.4"
     object.values "^1.1.6"
+
+jwt-decode@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/jwt-decode/-/jwt-decode-4.0.0.tgz#2270352425fd413785b2faf11f6e755c5151bd4b"
+  integrity sha512-+KJGIyHgkGuIq3IEBNftfhW/LfWhXUIY6OmyVWjliu5KH1y0fw7VQ8YndE2O4qZdMSd9SqbnC8GOcZEy0Om7sA==
 
 keccak@^3.0.0:
   version "3.0.4"
@@ -5308,6 +5341,11 @@ pkg-dir@^4.1.0:
   integrity sha512-HRDzbaKjC+AOWVXxAU/x54COGeIv9eb+6CkDSQoNTt4XyWoIJvuPsXizxu/Fr23EiekbtZwmh1IcIG/l/a10GQ==
   dependencies:
     find-up "^4.0.0"
+
+poseidon-lite@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/poseidon-lite/-/poseidon-lite-0.2.0.tgz#dbc242ebd9c10c32d507a533fa497231d168fd72"
+  integrity sha512-vivDZnGmz8W4G/GzVA72PXkfYStjilu83rjjUfpL4PueKcC8nfX6hCPh2XhoC5FBgC6y0TA3YuUeUo5YCcNoig==
 
 possible-typed-array-names@^1.0.0:
   version "1.0.0"
