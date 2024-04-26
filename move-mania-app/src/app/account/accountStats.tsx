@@ -7,6 +7,7 @@ export default function AccountStats(account: any) {
         totalBets: 0,
         totalAddedLiquidity: 0,
     });
+    // const add
 
     // useEffect(() => {
     //     async function fetchStats() {
@@ -32,7 +33,7 @@ export default function AccountStats(account: any) {
     return (
         <div className="bg-purple-900 text-white p-4 rounded-lg">
             <h1 className="text-xl font-bold mb-4">Account Stats</h1>
-            {/* <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center">
                 <div>
                     <div className="text-sm uppercase">Betting Volume</div>
                     <div className="text-lg font-medium">{`$${stats.bettingVolume.toFixed(2)}`}</div>
@@ -45,7 +46,7 @@ export default function AccountStats(account: any) {
                     <div className="text-sm uppercase">Total Added Liquidity</div>
                     <div className="text-lg font-medium">{`$${stats.totalAddedLiquidity.toFixed(2)}`}</div>
                 </div>
-            </div> */}
+            </div>
         </div>
     );
 };

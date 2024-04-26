@@ -2,14 +2,17 @@
 
 import { useContext, useEffect, useState } from "react";
 import { keylessContext } from "../KeylessProvider";
-
+import Image from 'next/image';
+import Quests from "./quests";
+import { quests } from "./questInfo";
+import AccountStats from "./accountStats";
 
 export default function AccountPage() {
 
   const { isLoggedIn, userInfo, logOut } = useContext(keylessContext);
 
   const [username, setUsername] = useState("");
-  const defaultImage = '/public/defaultProfile.png';
+  const defaultImage = '/defaultProfile.png';
   const onSubmit = async () => {
     // if (!account) return;
 
@@ -33,16 +36,33 @@ export default function AccountPage() {
 
   return (
     <div className="px-2 pt-4 bg-black">
-      <Quests quests={quests} />
-      {/* <AccountStats account={userInfo}/> */}
-      <div>
-        <input type="text" autoFocus className="hidden" />
-        <span className="text-lg">Edit profile</span>
-        <p className="text-sm opacity-50">
-          Make changes to your profile here. Click save when you&apos;re
-          done.
-        </p>
+      <p className="text-center text-6xl text-bold pb-6">Dashboard</p>
+      <div className="flex flex-row justify-left">
+        <div className="rounded-xl">
+          <Image
+            className="rounded-full"
+            src={defaultImage}
+            width={100}
+            height={100}
+            alt="Picture of the author"
+          />
+
+        </div>
+        <div>
+          <UsernameItem/>
+          <input type="text" autoFocus className="hidden" />
+          {/* <span className="text-lg">Edit profile</span> */}
+          {/* <p className="text-sm opacity-50">
+            Make changes to your profile here. Click save when you&apos;re
+            done.
+          </p> */}
+        </div>
+          
+
       </div>
+      
+      {/* <AccountStats account={userInfo}/> */}
+      
       <div className="grid gap-4 py-4">
         <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
           <label htmlFor="username" className="text-left ">
@@ -61,9 +81,9 @@ export default function AccountPage() {
           </span> */}
         </div>
         <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
-          <label htmlFor="profile_pic" className="text-left ">
+          {/* <label htmlFor="profile_pic" className="text-left ">
             Profile picture
-          </label>
+          </label> */}
           <span className=" opacity-50 flex flex-row justify-center items-center gap-1">
             {/* <input
               id="profile_pic"
@@ -75,12 +95,7 @@ export default function AccountPage() {
               className="bg-transparent border-none outline-none text-right text-ellipsis"
             /> */}
           </span>
-          <Image
-            src={defaultImage}
-            width={500}
-            height={500}
-            alt="Picture of the author"
-          />
+          
         </div>
         {/* <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
           <label htmlFor="email" className="text-left ">
@@ -140,6 +155,8 @@ export default function AccountPage() {
           </span>
         </div> */}
       </div>
+      <AccountStats account={null}/>
+      <Quests quests={quests} />
       {/* <div className="flex flex-col items-center gap-2 w-full">
         <button
           type="submit"
@@ -156,6 +173,15 @@ export default function AccountPage() {
             Save changes
           </button>
       </div> */}
+    </div>
+  )
+}
+
+function UsernameItem() {
+  return (
+    <div className="flex flex-col justify-center ml-4">
+      <span className="text-4xl font-bold">user123</span>
+      <span className="text-xl opacity-50">Username</span>
     </div>
   )
 }
