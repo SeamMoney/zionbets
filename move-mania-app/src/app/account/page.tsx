@@ -2,14 +2,16 @@
 
 import { useContext, useEffect, useState } from "react";
 import { magicContext } from "../MagicProvider";
-
-
+import AccountStats from "./accountStats";
+import Image from "next/image";
+import Quests from "./quests";
+import { quests } from "./questInfo";
 export default function AccountPage() {
 
-  const { isLoggedIn, setIsLoggedIn, publicAddress, userInfo, logOut } = useContext(magicContext);
+  // const { isLoggedIn, setIsLoggedIn, publicAddress, userInfo, logOut } = useContext(magicContext);
 
   const [username, setUsername] = useState("");
-
+  const defaultImage = '/public/defaultProfile.png';
   const onSubmit = async () => {
     // if (!account) return;
 
@@ -29,10 +31,12 @@ export default function AccountPage() {
     // window.location.reload();
   };
 
-  if (!isLoggedIn || !userInfo) return <></>;
+  // if (!isLoggedIn || !userInfo) return <></>;
 
   return (
-    <div className="px-2 pt-4">
+    <div className="px-2 pt-4 bg-black">
+      <Quests quests={quests} />
+      {/* <AccountStats account={userInfo}/> */}
       <div>
         <input type="text" autoFocus className="hidden" />
         <span className="text-lg">Edit profile</span>
@@ -46,7 +50,7 @@ export default function AccountPage() {
           <label htmlFor="username" className="text-left ">
             Username
           </label>
-          <span className=" opacity-50 flex flex-row justify-center items-center gap-1">
+          {/* <span className=" opacity-50 flex flex-row justify-center items-center gap-1">
             <input
               id="username"
               value={username}
@@ -56,14 +60,14 @@ export default function AccountPage() {
               placeholder={userInfo.username}
               className="bg-transparent border-none outline-none text-right text-ellipsis"
             />
-          </span>
+          </span> */}
         </div>
-        {/* <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
+        <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
           <label htmlFor="profile_pic" className="text-left ">
             Profile picture
           </label>
           <span className=" opacity-50 flex flex-row justify-center items-center gap-1">
-            <input
+            {/* <input
               id="profile_pic"
               value={image}
               onChange={(e) => {
@@ -71,9 +75,15 @@ export default function AccountPage() {
               }}
               placeholder={account.image}
               className="bg-transparent border-none outline-none text-right text-ellipsis"
-            />
+            /> */}
           </span>
-        </div> */}
+          <Image
+            src={defaultImage}
+            width={500}
+            height={500}
+            alt="Picture of the author"
+          />
+        </div>
         {/* <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
           <label htmlFor="email" className="text-left ">
             Email
@@ -87,7 +97,7 @@ export default function AccountPage() {
             />
           </span>
         </div> */}
-        <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
+        {/* <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
           <label
             htmlFor="public_address"
             className="text-left "
@@ -102,7 +112,7 @@ export default function AccountPage() {
               className="bg-transparent border-none outline-none text-right text-ellipsis cursor-not-allowed"
             />
           </span>
-        </div>
+        </div> */}
         {/* <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
           <label
             htmlFor="private_key"
@@ -132,7 +142,7 @@ export default function AccountPage() {
           </span>
         </div> */}
       </div>
-      <div className="flex flex-col items-center gap-2 w-full">
+      {/* <div className="flex flex-col items-center gap-2 w-full">
         <button
           type="submit"
           className="border border-neutral-700 hover:bg-neutral-800/80 hover:bg-noise px-6 py-1 text-neutral-500 w-full active:scale-95 active:opacity-50 transition-transform"
@@ -147,7 +157,7 @@ export default function AccountPage() {
           >
             Save changes
           </button>
-      </div>
+      </div> */}
     </div>
   )
 }

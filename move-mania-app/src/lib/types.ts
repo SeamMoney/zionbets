@@ -34,3 +34,11 @@ export type ChatMessage = {
   authorUsername: string;
   message: string;
 };
+
+export type UserQuest = {
+  id: number;
+  title: string;
+  description: string;
+  reward: number;
+  completed: boolean;
+};
