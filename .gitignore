@@ -1,0 +1,8 @@
+move-mania-app/package-lock.json
+move-mania-app/yarn.lock
+move-mania-app/public/defaultProfile.png
+move-mania-server/.env.template
+move-mania-server/games.db
+move-mania-server/package-lock.json
+move-mania-server/package.json
+move-mania-server/yarn.lock
