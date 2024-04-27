@@ -8,6 +8,8 @@ module zion::z_apt {
   const SEED: vector<u8> = b"zion-apt";
   const COIN_DECIMALS: u8 = 8;
 
+  const EUserIsNotModuleOwner: u64 = 101;
+
   struct ZAPT {}
 
   struct AdminCap has key {}
@@ -43,10 +45,11 @@ module zion::z_apt {
   }
 
   public entry fun mint(
-    // _: &mut AdminCap, 
+    admin: &signer,
     amount: u64, 
     recipient: address
   ) acquires State {
+    assert_user_is_module_owner(admin);
     let state = borrow_global_mut<State>(get_resource_address());
     let minted_coin = coin::mint(amount, &state.aptos_coin_mint_cap);
     coin::deposit(recipient, minted_coin);
@@ -54,16 +57,6 @@ module zion::z_apt {
 
   public entry fun register(recipient: &signer) {
     coin::register<ZAPT>(recipient);
-  }
-
-  public entry fun actual_mint(
-    recipient: &signer,
-    amount: u64
-  ) acquires State {
-    let state = borrow_global_mut<State>(get_resource_address());
-    let minted_coin = coin::mint(amount, &state.aptos_coin_mint_cap);
-    coin::register<ZAPT>(recipient);
-    coin::deposit(signer::address_of(recipient), minted_coin);
   }
 
   public entry fun burn(
@@ -82,4 +75,10 @@ module zion::z_apt {
   inline fun get_resource_address(): address {
     account::create_resource_address(&@zion, SEED)
   }
+
+  inline fun assert_user_is_module_owner(user: &signer) {
+    let resource_address = get_resource_address();
+    assert(signer::address_of(signer) == resource_address, EUserIsNotModuleOwner);
+  }
+
 }
