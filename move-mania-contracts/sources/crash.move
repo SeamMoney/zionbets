@@ -9,11 +9,11 @@ module zion::crash {
   use aptos_framework::randomness;
   use std::option::{Self, Option};
   use std::string::{Self, String};
+  use aptos_framework::string_utils;
   use std::simple_map::{Self, SimpleMap};
-  use aptos_framework::coin::{Self, Coin};
+  use aptos_framework::coin;
   use aptos_framework::aptos_coin::{AptosCoin};
   use aptos_framework::event::{Self, EventHandle};
-  use aptos_framework::string_utils;
 
   use std::debug::print;
   
@@ -75,7 +75,7 @@ module zion::crash {
     winnings: u64
   }
 
-  /**
+  /*
   * Initializes the module by creating the module's resource account and initializing the state 
   * resource. 
   * @param admin - the signer of the admin account
@@ -99,7 +99,7 @@ module zion::crash {
     );
   }
 
-  /**
+  /*
   * Starts a new game of crash. This is to be called by the server via the admin account. The server
   * will generate a house secret and salt, hash them, and pass the hashes to this function as proof 
   * that the server generates the house secret and salt fairly and before the ranomness is revealed.
@@ -110,7 +110,7 @@ module zion::crash {
   */
   #[randomness]
   entry fun start_game(
-    admin: &signer, 
+    _admin: &signer, 
     house_secret_hash: vector<u8>, 
     salt_hash: vector<u8>
   ) acquires State {
@@ -165,7 +165,7 @@ module zion::crash {
     let cleared_betters = 0;
 
     while (cleared_betters < number_of_bets) {
-      let better = vector::pop_back(&mut betters);
+      vector::pop_back(&mut betters);
       let bet = vector::pop_back(&mut bets);
       let Bet {
         player: _,
@@ -179,7 +179,7 @@ module zion::crash {
     vector::destroy_empty(bets);
   }
 
-  /**
+  /*
   * Places a bet in the current game of crash. To be used by players via the client.
   * @param player - the signer of the player
   * @param bet_amount - the amount of the bet
@@ -215,7 +215,7 @@ module zion::crash {
   }
 
 
-  /**
+  /*
   * Allows a player to cash out their bet in the current game of crash. To be used by players via the client.
   * @param player - the signer of the player
   */
@@ -374,7 +374,7 @@ module zion::crash {
         let byte = (vector::pop_back(&mut hex) as u256);
         sum = sum + (byte / 16) * pow(16, exponent);
         exponent = exponent + 1;
-        continue;
+        continue
       };
       let byte = (vector::pop_back(&mut hex) as u256);
       sum = sum + (byte % 16) * pow(16, exponent) + (byte / 16) * pow(16, exponent + 1);
