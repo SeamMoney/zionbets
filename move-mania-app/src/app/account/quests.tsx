@@ -29,8 +29,8 @@ function Quest({ quest }: { quest: UserQuest }) {
             <p className="pl-6">{quest.description}</p>
         </div>
         <div className=" flex flex-row justify-between px-4 mx-4">
-        <QuestReward reward={quest.reward} />
-        <QuestStatus completed={quest.completed} />
+            <QuestReward reward={quest.reward} />
+            <QuestStatus completed={quest.completed} />
         </div>
         
     </li>

@@ -6,13 +6,21 @@ import Image from 'next/image';
 import Quests from "./quests";
 import { quests } from "./questInfo";
 import AccountStats from "./accountStats";
+import ReferralSection from "./referral";
 
 export default function AccountPage() {
 
   const { isLoggedIn, userInfo, logOut } = useContext(keylessContext);
-
+  type ReferralInfo = {
+    referralCode: string;
+    referralCount: number;
+  };
   const [username, setUsername] = useState("");
   const defaultImage = '/defaultProfile.png';
+  const [referrals, setReferrals] =useState<ReferralInfo>({
+    referralCode: "12345",
+    referralCount: 0,
+  }); 
   const onSubmit = async () => {
     // if (!account) return;
 
@@ -156,6 +164,9 @@ export default function AccountPage() {
         </div> */}
       </div>
       <AccountStats account={null}/>
+      <div>
+      </div>
+      <ReferralSection referralCode={referrals.referralCode} referralCount={referrals.referralCount} />
       <Quests quests={quests} />
       {/* <div className="flex flex-col items-center gap-2 w-full">
         <button
