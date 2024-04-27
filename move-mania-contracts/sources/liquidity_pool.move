@@ -5,8 +5,7 @@ module zion::liquidity_pool {
   use aptos_framework::option;
   use aptos_framework::math128;
   use aptos_framework::account;
-  use std::string::{Self, String};
-  use aptos_framework::resource_account;
+  use std::string;
   use aptos_framework::coin::{Self, Coin};
 
   use zion::z_apt::ZAPT;
@@ -219,8 +218,7 @@ module zion::liquidity_pool {
   }
 
   #[view]
-  public fun get_lp_coin_supply(): u128 acquires LiquidityPool {
-    let liquidity_pool = borrow_global<LiquidityPool>(get_resource_address());
+  public fun get_lp_coin_supply(): u128 {
     *option::borrow(&coin::supply<LPCoin>())
   }
 

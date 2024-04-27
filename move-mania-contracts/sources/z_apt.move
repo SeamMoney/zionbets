@@ -1,10 +1,9 @@
 module zion::z_apt {
     
   use std::signer;
+  use std::string;
+  use aptos_framework::coin;
   use aptos_framework::account;
-  use std::string::{Self, String};
-  use aptos_framework::resource_account;
-  use aptos_framework::coin::{Self, Coin};
 
   const SEED: vector<u8> = b"zion-apt";
   const COIN_DECIMALS: u8 = 8;
