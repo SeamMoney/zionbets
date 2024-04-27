@@ -4,6 +4,7 @@ module zion::crash {
   use std::signer;
   use std::vector;
   use zion::liquidity_pool;
+  use aptos_framework::coin;
   use aptos_framework::account;
   use aptos_framework::timestamp;
   use aptos_framework::randomness;
@@ -11,7 +12,6 @@ module zion::crash {
   use std::string::{Self, String};
   use aptos_framework::string_utils;
   use std::simple_map::{Self, SimpleMap};
-  use aptos_framework::coin;
   use aptos_framework::aptos_coin::{AptosCoin};
   use aptos_framework::event::{Self, EventHandle};
 
