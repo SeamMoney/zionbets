@@ -135,7 +135,6 @@ module zion::liquidity_pool {
   ) acquires LiquidityPool, State {
     let liquidity_pool = borrow_global_mut<LiquidityPool>(get_resource_address());
 
-
     let reserve_amount = coin::value(&liquidity_pool.reserve_coin);
     let lp_coin_supply = *option::borrow(&coin::supply<LPCoin>());
 
@@ -188,7 +187,7 @@ module zion::liquidity_pool {
     coin::extract(&mut liquidity_pool.reserve_coin, amount)
   }
 
-  public(friend) fun put_reserve_coins(
+  public fun put_reserve_coins(
     coin: Coin<ZAPT>
   ) acquires LiquidityPool, State {
     let liquidity_pool = borrow_global_mut<LiquidityPool>(get_resource_address());
