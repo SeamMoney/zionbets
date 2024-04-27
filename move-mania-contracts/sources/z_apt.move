@@ -78,7 +78,7 @@ module zion::z_apt {
 
   inline fun assert_user_is_module_owner(user: &signer) {
     let resource_address = get_resource_address();
-    assert(signer::address_of(signer) == resource_address, EUserIsNotModuleOwner);
+    assert!(signer::address_of(user) == resource_address, EUserIsNotModuleOwner);
   }
 
 }

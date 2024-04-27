@@ -20,6 +20,14 @@ module zion::crash {
   const SEED: vector<u8> = b"zion-crash";
   const MAX_CRASH_POINT: u128 = 340282366920938463463374607431768211455; // 2^64 - 1
   const COUNTDOWN_MS: u64 = 20 * 1_000_000;
+
+  const EUserIsNotModuleOwner: u64 = 1;
+  const ENoGameExists: u64 = 2;
+  const EGameNotStarted: u64 = 3;
+  const EGameStarted: u64 = 4;
+  const ENoBetToCashOut: u64 = 5;
+  const EGameAlreadyExists: u64 = 6;
+  const EHashesDoNotMatch: u64 = 7;
   
   struct State has key {
     signer_cap: account::SignerCapability,
@@ -32,13 +40,11 @@ module zion::crash {
   }
 
   struct Game has store {
-    // id: u64, 
     start_time_ms: u64,
     house_secret_hash: vector<u8>,
     salt_hash: vector<u8>,
     randomness: u64,
     bets: SimpleMap<address, Bet>,
-    // crash_point_ms: Option<u64>
   }
 
   struct Bet has store {
@@ -110,16 +116,17 @@ module zion::crash {
   */
   #[randomness]
   entry fun start_game(
-    _admin: &signer, 
+    admin: &signer, 
     house_secret_hash: vector<u8>, 
     salt_hash: vector<u8>
   ) acquires State {
-    // assume this is the admin account
+    assert_user_is_module_owner(admin);
+
     let state = borrow_global_mut<State>(get_resource_address());
 
     assert!(
       option::is_none(&state.current_game),
-      1
+      EGameAlreadyExists
     );
 
     let new_randomness = randomness::u64_integer();
@@ -147,7 +154,10 @@ module zion::crash {
     option::fill(&mut state.current_game, new_game);
   }
 
-  public entry fun hackathon_remove_game() acquires State {
+  public entry fun force_remove_game(
+    admin: &signer
+  ) acquires State {
+    assert_user_is_module_owner(admin);
     let state = borrow_global_mut<State>(get_resource_address());
     let game = option::extract(&mut state.current_game);
     let Game {
@@ -156,7 +166,6 @@ module zion::crash {
       salt_hash: _,
       randomness: _,
       bets: game_bets,
-      // crash_point_ms: _
     } = game;
 
     let (betters, bets) = simple_map::to_vec_pair(game_bets);
@@ -190,10 +199,10 @@ module zion::crash {
   ) acquires State {
     let state = borrow_global_mut<State>(get_resource_address());
 
-    assert!(option::is_some(&state.current_game), 1);
+    assert!(option::is_some(&state.current_game), ENoGameExists);
 
     let game_mut_ref = option::borrow_mut(&mut state.current_game);
-    assert!(timestamp::now_microseconds() < game_mut_ref.start_time_ms, 2);
+    assert!(timestamp::now_microseconds() < game_mut_ref.start_time_ms, EGameStarted);
 
     event::emit_event(
       &mut state.bet_placed_events,
@@ -220,22 +229,23 @@ module zion::crash {
   * @param player - the signer of the player
   */
   public entry fun cash_out(
-    player: &signer,
+    admin: &signer,
+    player: address,
     cash_out: u64
   ) acquires State {
     let state = borrow_global_mut<State>(get_resource_address());
-    assert!(option::is_some(&state.current_game), 1);
+    assert!(option::is_some(&state.current_game), ENoGameExists);
 
     let game_mut_ref = option::borrow_mut(&mut state.current_game);
-    assert!(timestamp::now_microseconds() > game_mut_ref.start_time_ms, 2);
+    assert!(timestamp::now_microseconds() > game_mut_ref.start_time_ms, EGameNotStarted);
 
-    let bet = simple_map::borrow_mut(&mut game_mut_ref.bets, &signer::address_of(player));
-    assert!(option::is_none(&bet.cash_out), 3);
+    let bet = simple_map::borrow_mut(&mut game_mut_ref.bets, &player);
+    assert!(option::is_none(&bet.cash_out), ENoBetToCashOut);
 
     event::emit_event(
       &mut state.cash_out_events,
       CashOutEvent {
-        player: signer::address_of(player),
+        player: player,
         cash_out
       }
     );
@@ -248,10 +258,10 @@ module zion::crash {
     salt: vector<u8>
   ) acquires State {
     let state = borrow_global_mut<State>(get_resource_address());
-    assert!(option::is_some(&state.current_game), 1);
+    assert!(option::is_some(&state.current_game), ENoGameExists);
 
     let game_mut_ref = option::borrow_mut(&mut state.current_game);
-    assert!(timestamp::now_microseconds() >= game_mut_ref.start_time_ms, 2);
+    assert!(timestamp::now_microseconds() >= game_mut_ref.start_time_ms, EGameNotStarted);
 
     assert!(
       verify_hashes(
@@ -260,7 +270,7 @@ module zion::crash {
         &game_mut_ref.house_secret_hash, 
         &game_mut_ref.salt_hash
       ), 
-      3
+      EHashesDoNotMatch
     );
 
     let game = option::extract(&mut state.current_game);
@@ -270,7 +280,6 @@ module zion::crash {
       salt_hash: _,
       randomness,
       bets: game_bets,
-      // crash_point_ms: _
     } = game;
     let (betters, bets) = simple_map::to_vec_pair(game_bets);
 
@@ -320,25 +329,16 @@ module zion::crash {
     house_secret: String
   ): u64 {
     let randomness_string = string_utils::to_string(&randomness);
-    // print(&randomness_string);
-    // print(&house_secret);
     string::append(&mut randomness_string, house_secret);
-    print(&randomness_string);
-
 
     let hash = hash::sha3_256(*string::bytes(&randomness_string));
 
-    // print(&hash);
-    // print(&parse_hex(hash, false));
-    // print(&(parse_hex(hash, false) % 33));
     if (parse_hex(hash, false) % 33 == 0) {
       0
     } else {
       vector::trim(&mut hash, 7);
       let value = parse_hex(hash, true);
-      // print(&value);
       let e = pow(2, 52);
-      // print(&e);
       let res = (((100 * e - value) / (e - value)) as u64);
       if (res == 1) {
         0
@@ -348,24 +348,7 @@ module zion::crash {
     }
   }
 
-  public entry fun test_out_calculate_crash_point_with_randomness(
-    randomness: u64, 
-    house_secret: vector<u8>
-  ) acquires State {
-    event::emit_event(
-      &mut borrow_global_mut<State>(get_resource_address()).crash_point_calculate_events,
-      CrashPointCalculateEvent {
-        house_secret: house_secret,
-        salt: house_secret,
-        crash_point: calculate_crash_point_with_randomness(randomness, string::utf8(house_secret))
-      }
-    );
-  }
-
   fun parse_hex(hex: vector<u8>, ignore_first: bool): u256 {
-
-    // print(&hex);
-
     let exponent = 0;
     let sum = 0;
 
@@ -380,8 +363,6 @@ module zion::crash {
       sum = sum + (byte % 16) * pow(16, exponent) + (byte / 16) * pow(16, exponent + 1);
       exponent = exponent + 2;
     };
-
-    // print(&sum);
 
     sum
   }
@@ -444,5 +425,10 @@ module zion::crash {
         0
       }
     }
+  }
+
+  inline fun assert_user_is_module_owner(user: &signer) {
+    let resource_address = get_resource_address();
+    assert!(signer::address_of(user) == resource_address, EUserIsNotModuleOwner);
   }
 }
