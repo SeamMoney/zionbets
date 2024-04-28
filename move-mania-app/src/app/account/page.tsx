@@ -7,10 +7,22 @@ import Quests from "./quests";
 import { quests } from "./questInfo";
 import AccountStats from "./accountStats";
 import ReferralSection from "./referral";
+import { FaEdit } from "react-icons/fa";
+import { iconButton } from "../TailwindBase";
 
 export default function AccountPage() {
 
   const { isLoggedIn, userInfo, logOut } = useContext(keylessContext);
+// create dummy user object if userInfo is null
+  const user = userInfo || {
+    username: "user123",
+    email: "jkdev222@gmail.com",
+    image: "/defaultProfile.png",
+    public_address: "0x1234",
+    private_key: "0x1234",
+    balance: 100,
+  };
+
   type ReferralInfo = {
     referralCode: string;
     referralCount: number;
@@ -58,12 +70,8 @@ export default function AccountPage() {
         </div>
         <div>
           <UsernameItem/>
-          <input type="text" autoFocus className="hidden" />
-          {/* <span className="text-lg">Edit profile</span> */}
-          {/* <p className="text-sm opacity-50">
-            Make changes to your profile here. Click save when you&apos;re
-            done.
-          </p> */}
+          <AddressItem/>
+
         </div>
           
 
@@ -89,9 +97,7 @@ export default function AccountPage() {
           </span> */}
         </div>
         <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
-          {/* <label htmlFor="profile_pic" className="text-left ">
-            Profile picture
-          </label> */}
+          
           <span className=" opacity-50 flex flex-row justify-center items-center gap-1">
             {/* <input
               id="profile_pic"
@@ -105,19 +111,7 @@ export default function AccountPage() {
           </span>
           
         </div>
-        {/* <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
-          <label htmlFor="email" className="text-left ">
-            Email
-          </label>
-          <span className=" opacity-50 flex flex-row justify-end items-center gap-1">
-            <input
-              id="email"
-              disabled
-              value={account.email}
-              className="bg-transparent border-none outline-none text-right text-ellipsis cursor-not-allowed"
-            />
-          </span>
-        </div> */}
+  
         {/* <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
           <label
             htmlFor="public_address"
@@ -186,13 +180,24 @@ export default function AccountPage() {
       </div> */}
     </div>
   )
-}
+  function UsernameItem() {
+    return (
+      <div className="flex flex-row justify-left ml-4">
+        <span className="text-4xl font-bold">{user.username}</span>
+        <div className={iconButton}>
+          <FaEdit />
+        </div>
 
-function UsernameItem() {
-  return (
-    <div className="flex flex-col justify-center ml-4">
-      <span className="text-4xl font-bold">user123</span>
-      <span className="text-xl opacity-50">Username</span>
-    </div>
-  )
+      </div>
+    )
+  }
+
+  function AddressItem(){
+    return (
+      <div className="flex flex-col justify-center ml-4">
+        <span className="text-4xl font-bold">{user.username||'0x0'}</span>
+        {/* <span className="text-xl opacity-50">Public Address</span> */}
+      </div>
+    )
+  }
 }
