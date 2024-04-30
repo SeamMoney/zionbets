@@ -233,6 +233,8 @@ module zion::crash {
     player: address,
     cash_out: u64
   ) acquires State {
+    assert_user_is_module_owner(admin);
+
     let state = borrow_global_mut<State>(get_resource_address());
     assert!(option::is_some(&state.current_game), ENoGameExists);
 
@@ -428,7 +430,6 @@ module zion::crash {
   }
 
   inline fun assert_user_is_module_owner(user: &signer) {
-    let resource_address = get_resource_address();
-    assert!(signer::address_of(user) == resource_address, EUserIsNotModuleOwner);
+    assert!(signer::address_of(user) == @zion, EUserIsNotModuleOwner);
   }
 }
