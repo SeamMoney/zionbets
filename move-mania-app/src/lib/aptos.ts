@@ -446,14 +446,18 @@ export async function cashOut(userWallet: MultiKeyAccount, cashOutData: CashOutD
   const fundingAccount = Account.fromPrivateKey({
     privateKey: new Ed25519PrivateKey(process.env.FUNDING_ACCOUNT_PRIVATE_KEY || '')
   });
+  const adminAccount = Account.fromPrivateKey({
+    privateKey: new Ed25519PrivateKey(process.env.ADMIN_ACCOUNT_PRIVATE_KEY || '')
+  });
 
   const transaction = await aptos.transaction.build.simple({
-    sender: userWallet.accountAddress,
+    sender: adminAccount.accountAddress,
     withFeePayer: true,
     data: {
       function: `${MODULE_ADDRESS}::${MODULE_NAME}::cash_out`,
       typeArguments: [],
       functionArguments: [
+        userWallet.accountAddress,
         Math.floor(cashOutData.cashOutMultiplier * 100),
       ],
     },
@@ -461,7 +465,7 @@ export async function cashOut(userWallet: MultiKeyAccount, cashOutData: CashOutD
 
   // sign transaction
   const senderAuthenticator = aptos.transaction.sign({
-    signer: userWallet,
+    signer: adminAccount,
     transaction,
   });
 
