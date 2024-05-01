@@ -1,6 +1,6 @@
 import { getLpInfo } from '@/lib/aptos';
 import React, { useState, useEffect } from 'react';
-import { baseGreenOutline, gradientGlowBox, statsContainer, statsText, statsTextSmall } from '../TailwindBase';
+import { baseGreenOutline, gradientGlowBox, statContainer, statsContainer, statsText, statsTextSmall } from '../TailwindBase';
 
 export default function AccountStats(account: any) {
     const [stats, setStats] = useState({
@@ -8,7 +8,6 @@ export default function AccountStats(account: any) {
         totalBets: 0,
         totalAddedLiquidity: 0,
     });
-    // const add
 
     // useEffect(() => {
     //     async function fetchStats() {
@@ -37,13 +36,12 @@ export default function AccountStats(account: any) {
         {title: "Added Liquidity", value: stats.totalAddedLiquidity.toFixed(2)}
     ];
 
-
     return (
         <div>
         <div className={` text-white p-4 rounded-lg`}>
             
             <h1 className="text-xl font-bold mb-4 text-center">Account Stats</h1>
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center text-center">
                {stat_lst.map((stat, index) => <StatsItem key={index} title={stat.title} value={stat.value.toString()} />)}
             </div>
             </div>
@@ -53,7 +51,7 @@ export default function AccountStats(account: any) {
 
 function StatsItem({ title, value }: { title: string; value: string }) {
     return (
-        <div className={statsContainer}>
+        <div className={statContainer}>
             <div className={statsText}>{value}</div>
             <div className={statsTextSmall}>{title}</div>
         </div>

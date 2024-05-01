@@ -16,6 +16,7 @@ import {
   hasUserCashOut,
   updateUser,
 } from "./database";
+import { getUserStats } from "./stats";
 require('dotenv').config();
 var cors = require("cors");
 const app = express();
@@ -42,6 +43,20 @@ app.get("/users", async (req, res) => {
   const users = await getUsers();
   res.send(users);
 });
+
+// this is the endpoint to get user stats by address
+app.get("/users/:address/stats", async (req, res) => {
+  const address = req.params.address;
+  const user = await getUserStats(address);
+  console.log(user);
+  if (user) {
+    res.send(user);
+  } else {
+    res.status(404).send("User not found");
+  }
+});
+
+
 /**
  * This is the endpoint to get all games
  */

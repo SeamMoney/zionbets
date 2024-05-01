@@ -15,7 +15,7 @@ export const referralContainer = `
 export const statsContainer = `m-4 rounded-xl 
     flex flex-col justify-center items-center
 `;
-export const statContainer = `flex flex-col justify-center items-center w-1/3 h-80 p-6 m-6`;
+export const statContainer = `flex flex-col justify-center items-center w-1/3 h-32 p-6 m-6`;
 
 export const statsText = `text-white text-2xl font-bold text-green-400`;
 export const statsTextSmall = `text-white text-md font-bold opacity-60`;
