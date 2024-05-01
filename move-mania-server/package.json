@@ -8,6 +8,7 @@
     "api": "nodemon src/api.ts"
   },
   "dependencies": {
+    "@aptos-labs/ts-sdk": "^1.13.2",
     "@types/node": "^20.11.16",
     "aptos": "^1.21.0",
     "cors": "^2.8.5",
