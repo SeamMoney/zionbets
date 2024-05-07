@@ -7,6 +7,8 @@ import {
   PlayerListEntry,
   PlayerListSchema,
   User,
+  UserDetails,
+  UserDetailsSchema,
   UserSchema,
 } from "./schema";
 import crypto from "crypto";
@@ -33,6 +35,16 @@ export async function initializeUsersTable() {
 
   await db.exec(UserSchema);
 }
+
+export async function initializeUserDetailsTable(){
+  const db = await open({
+    filename: "./db/userDetails.db",
+    driver: require("sqlite3").Database,
+  });
+  await db.exec(UserDetailsSchema);
+  await db.close();
+}
+
 
 export async function initializeChatMessagesTable() {
   const db = await open({
@@ -61,6 +73,7 @@ export async function initializeAllTables() {
   // await initializeUsersTable();
   // await initializeChatMessagesTable();
   // await initializePlayerListTable();
+  await initializeUserDetailsTable();
 
   const db = await open({
     filename: "./games.db",
@@ -90,6 +103,25 @@ export async function getUsers() {
   await db.close();
 
   return users;
+}
+
+export async function getUserDetails(address: string) {
+  await initializeAllTables(); // initialize tables if not yet initialized
+
+  // Open the database
+  const db = await open({
+    filename: "./db/userDetails.db",
+    driver: require("sqlite3").Database,
+  });
+
+  // Get the user with the given address
+  const user = (await db.get("SELECT * FROM user_details WHERE address = ?", address)) as
+    | UserDetails
+    | undefined;
+
+  await db.close();
+
+  return user;
 }
 
 export async function createUser(user: User) {
@@ -162,6 +194,7 @@ export async function deleteUser(address: string) {
 
   await db.close();
 }
+
 
 /**
  *
@@ -334,9 +367,43 @@ export async function getPlayerList() {
   );
 
   await db.close();
-
+  updateUserStats(players);
   return players as PlayerListEntry[];
 }
+
+export async function updateUserStats(players: PlayerListEntry[]) {
+  const db =await open({
+    filename: "./db/userDetails.db",
+    driver: require("sqlite3").Database,
+  });
+  const userStats = players.map((player) => {
+    const { user_id, bet_amount, crash_point } = player;
+    const profit = crash_point ? bet_amount * crash_point : -bet_amount;
+    return { user_id, bet_amount, profit };
+  }
+  );
+  userStats.forEach(async (userStat) => {
+    const user = await getUserDetails(userStat.user_id);
+    if (user) {
+      await db.run(
+        "UPDATE user_details SET bets = ?, profit = ?, bet_volume = ? WHERE address = ?",
+        user.bets + 1,
+        user.profit + userStat.profit,
+        user.bet_volume + userStat.bet_amount,
+        userStat.user_id
+      );
+    } else {
+      await db.run(
+        "INSERT INTO user_details (address, bets, profit, bet_volume) VALUES (?, ?, ?, ?)",
+        userStat.user_id,
+        1,
+        userStat.profit,
+        userStat.bet_amount
+      );
+    }
+  });
+
+};
 
 /**
  *
@@ -432,6 +499,8 @@ export async function clearPlayerList() {
   await db.close();
 }
 
+
+
 /**
  * @description Adds a chat message to the chat messages.
  * If there are more than 100 chat messages, the oldest chat messages are deleted.
@@ -508,6 +577,7 @@ export async function createKeyForUser(username: string) {
     filename: "./db/api_keys.db",
     driver: require("sqlite3").Database,
   });
+
 
   // Generate a random API key
   const apiKey = crypto.randomBytes(32).toString("hex");

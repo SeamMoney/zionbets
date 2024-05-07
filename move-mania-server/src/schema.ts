@@ -27,6 +27,13 @@ export type ChatMessage = {
   username: string;
 };
 
+export type UserDetails = {
+  address: string;
+  bets: number;
+  profit: number;
+  bet_volume: number;
+};
+
 export const UserSchema = `CREATE TABLE IF NOT EXISTS users (
   address TEXT PRIMARY KEY NOT NULL UNIQUE,
   username TEXT NOT NULL UNIQUE,
@@ -57,10 +64,20 @@ export const ChatMessageSchema = `CREATE TABLE IF NOT EXISTS chat_messages (
   FOREIGN KEY (user_id) REFERENCES users(address)
 )`;
 
+
+
+export const UserDetailsSchema = `CREATE TABLE IF NOT EXISTS user_details (
+  address TEXT PRIMARY KEY,
+  bets INTEGER,
+  profit INTEGER,
+  bet_volume INTEGER,
+  `
+
 export const AllSchemas = [
   UserSchema,
   GameSchema,
   PlayerListSchema,
   ChatMessageSchema,
+  UserDetailsSchema,
   "",
 ].join(";\n");

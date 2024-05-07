@@ -16,6 +16,17 @@ const FAUCET_URL = 'https://faucet.devnet.aptoslabs.com'
 
 const aptos = new Aptos(new AptosConfig({network: Network.DEVNET}));  // Only devnet supported as of now.
 
+// get info about liquidity providers
+export const getLpInfo = async () => {
+
+    const lpSupply = await aptos.getAccountCoinAmount({
+        accountAddress:MODULE_ADDRESS,
+        coinType: `0x1::coin::CoinStore<${MODULE_ADDRESS}>::liquidity_pool::LPCoin>`
+    });
+    return lpSupply;
+}
+
+
 export const getUserBets = async (address: string) => {
     const bets = await aptos.getAccountEventsByEventType({
         accountAddress: address,
@@ -38,9 +49,7 @@ export const getUserStats = async (address: string) => {
     const cashOuts = await getUserCashOuts(address);
 
     let totalBets = 0;
-    let totalCashOuts = 0;
     let totalProfit = 0;
-    let totalLoss = 0;
     let totalWinnings = 0;
 
     for (let i = 0; i < bets.length; i++) {
@@ -49,19 +58,11 @@ export const getUserStats = async (address: string) => {
         totalWinnings += bet.data.winnings;
     }
 
-    for (let i = 0; i < cashOuts.length; i++) {
-        const cashOut = cashOuts[i];
-        totalCashOuts += cashOut.data.amount;
-    }
-
     totalProfit = totalWinnings - totalBets;
-    totalLoss = totalBets - totalCashOuts;
 
     return {
         totalBets,
-        totalCashOuts,
         totalProfit,
-        totalLoss,
         totalWinnings
     }
 }

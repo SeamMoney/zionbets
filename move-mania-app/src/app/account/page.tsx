@@ -7,14 +7,15 @@ import Quests from "./quests";
 import { quests } from "./questInfo";
 import AccountStats from "./accountStats";
 import ReferralSection from "./referral";
-import { FaEdit } from "react-icons/fa";
-import { iconButton } from "../TailwindBase";
+import { FaCopy, FaEdit } from "react-icons/fa";
+import { copyButton, iconButton } from "../TailwindBase";
+import { User } from "@/lib/schema";
 
 export default function AccountPage() {
 
   const { isLoggedIn, userInfo, logOut } = useContext(keylessContext);
 // create dummy user object if userInfo is null
-  const user = userInfo || {
+  const user = {
     username: "user123",
     email: "jkdev222@gmail.com",
     image: "/defaultProfile.png",
@@ -80,25 +81,10 @@ export default function AccountPage() {
       {/* <AccountStats account={userInfo}/> */}
       
       <div className="grid gap-4 py-4">
-        <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
-          <label htmlFor="username" className="text-left ">
-            Username
-          </label>
-          {/* <span className=" opacity-50 flex flex-row justify-center items-center gap-1">
-            <input
-              id="username"
-              value={username}
-              onChange={(e) => {
-                setUsername(e.target.value);
-              }}
-              placeholder={userInfo.username}
-              className="bg-transparent border-none outline-none text-right text-ellipsis"
-            />
-          </span> */}
-        </div>
-        <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
+        
+        {/* <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2"> */}
           
-          <span className=" opacity-50 flex flex-row justify-center items-center gap-1">
+          {/* <span className=" opacity-50 flex flex-row justify-center items-center gap-1"> */}
             {/* <input
               id="profile_pic"
               value={image}
@@ -108,9 +94,9 @@ export default function AccountPage() {
               placeholder={account.image}
               className="bg-transparent border-none outline-none text-right text-ellipsis"
             /> */}
-          </span>
+          {/* </span> */}
           
-        </div>
+        {/* </div> */}
   
         {/* <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
           <label
@@ -195,9 +181,18 @@ export default function AccountPage() {
   function AddressItem(){
     return (
       <div className="flex flex-col justify-center ml-4">
-        <span className="text-4xl font-bold">{user.username||'0x0'}</span>
+        <div className="flex flex-row justify-center items-inline">
+
+        <span className="text-2xl opacity-60">{user.public_address||'0x0'}</span>
+        {CopyButton(user.public_address)}
+        </div>
         {/* <span className="text-xl opacity-50">Public Address</span> */}
       </div>
     )
   }
+}
+function CopyButton(value: string) {
+  return (
+    <FaCopy className={`${copyButton} bg-opacity-0`} onClick={() => navigator.clipboard.writeText(value)} />
+  );
 }

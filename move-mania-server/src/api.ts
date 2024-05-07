@@ -110,6 +110,9 @@ app.get("/games/current", async (req, res) => {
   res.send(game);
 });
 
+// get previous games
+
+
 app.delete("/games", async (req, res) => {
 
   await clearGames();

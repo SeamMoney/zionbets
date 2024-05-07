@@ -24,10 +24,26 @@ const LoseBigQuest: UserQuest = {
     reward: 200,
     completed: false
 }
+const closeCallQuest: UserQuest = {
+    id: 4,
+    title: "Close Call",
+    description: "Win a bet within 0.1x of the crash point",
+    reward: 200,
+    completed: false
+}
 
+const hotStreakQuest: UserQuest = {
+    id: 5,
+    title: "Hot Streak",
+    description: "Win 5 bets in a row over 2x",
+    reward: 500,
+    completed: false
+}
 
 export const quests: UserQuest[] = [
     BetVolumeQuest,
     BigWinQuest,
-    LoseBigQuest
+    LoseBigQuest,
+    closeCallQuest,
+    hotStreakQuest
 ];

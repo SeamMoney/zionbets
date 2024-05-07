@@ -30,6 +30,11 @@ export default function AccountStats(account: any) {
     //     fetchStats();
     // }, []);
 
+
+      
+
+    
+
     const stat_lst = [
         {title: "Betting Volume", value: `${stats.bettingVolume.toFixed(2)}`},
         {title: "Total Bets", value: stats.totalBets},
