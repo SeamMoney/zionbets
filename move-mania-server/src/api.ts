@@ -16,8 +16,11 @@ import {
   hasUserCashOut,
   updateUser,
 } from "./database";
+import { io } from "socket.io-client";
 import { getUserStats } from "./stats";
+import { SOCKET_EVENTS } from "./types";
 require('dotenv').config();
+const server = io("http://localhost:8080")
 var cors = require("cors");
 const app = express();
 app.use(express.json());
@@ -176,7 +179,10 @@ app.delete("/users/:email", async (req, res) => {
 /* 
   The server will listen on port PORT
 */
+
+
 app.listen(PORT, () => {
   console.log("Server is running on port " + PORT);
   console.log("CORS-enabled for ", process.env.ZION_APP_URL || "http://localhost:3000");
+  server.emit(SOCKET_EVENTS.START_ROUND)
 });

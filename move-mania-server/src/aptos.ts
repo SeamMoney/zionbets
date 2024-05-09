@@ -4,33 +4,38 @@ import { calculateCrashPoint } from "./crashPoint";
 
 require('dotenv').config();
 
-const MODULE_ADDRESS = process.env.MODULE_ADDRESS as string;
+const MODULE_ADDRESS = "0x998d7a90cc6b7d4f397be56eca974c7f1e53320a8612ecb898a4204ce5ea8abb" as string;
 const CRASH_RESOURCE_ACCOUNT_ADDRESS = process.env.CRASH_RESOURCE_ACCOUNT_ADDRESS as string;
 const LP_RESOURCE_ACCOUNT_ADDRESS = process.env.LP_RESOURCE_ACCOUNT_ADDRESS as string;
 const Z_APT_RESOURCE_ACCOUNT_ADDRESS = process.env.Z_APT_RESOURCE_ACCOUNT_ADDRESS as string;
 const ADMIN_ACCOUNT_PRIVATE_KEY = process.env.ADMIN_ACCOUNT_PRIVATE_KEY as string;
-
-const RPC_URL = 'https://fullnode.devnet.aptoslabs.com';
+const MOVEMENT_NODE_URL = "https://aptos.devnet.m1.movementlabs.xyz";
+const APTOS_NODE_URL = 'https://fullnode.devnet.aptoslabs.com';
 const FAUCET_URL = 'https://faucet.devnet.aptoslabs.com'
-
-const client = new AptosClient(RPC_URL);
+const MODE = process.env.MODE as string || 'Movement';
+const NODE_URL = MODE === 'Movement' ? MOVEMENT_NODE_URL : APTOS_NODE_URL;
+const client = new AptosClient(NODE_URL);
 const provider = new Provider({
-  fullnodeUrl: RPC_URL,
-  indexerUrl: 'https://indexer.devnet.aptoslabs.com',
+  fullnodeUrl: NODE_URL,
+  // indexerUrl: 'https://indexer.devnet.aptoslabs.com',
 })
 
-const TRANSACTION_OPTIONS = {
+const APTOS_TRANSACTION_OPTIONS = {
   max_gas_amount: '500000',
   gas_unit_price: '100',
 };
 
+const MOVEMENT_TRANSACTION_OPTIONS = {
+
+};
+
+const TRANSACTION_OPTIONS = MODE === 'Movement' ? MOVEMENT_TRANSACTION_OPTIONS : APTOS_TRANSACTION_OPTIONS;
 
 function delay(ms: number) {
   return new Promise( resolve => setTimeout(resolve, ms) );
 }
 
-const fromHexString = (hexString: any) =>
-  Uint8Array.from(hexString.match(/.{1,2}/g).map((byte: any) => parseInt(byte, 16)));
+const fromHexString = (hexString: any) =>Uint8Array.from(hexString.match(/.{1,2}/g).map((byte: any) => parseInt(byte, 16)));
 
 function getAdminAccount() {
   return new AptosAccount(
@@ -43,7 +48,8 @@ export async function createNewGame(house_secret: string, salt: string): Promise
 
   const hashed_salted_house_secret = crypto.createHash("SHA3-256").update(`${house_secret}${salt}`).digest('hex');
   const hashed_salt = crypto.createHash("SHA3-256").update(salt).digest('hex');
-
+  console.log("salted house secret", hashed_salted_house_secret);
+  console.log("salt", hashed_salt);
   const createGameTxn = await provider.generateTransaction(
     adminAccount.address(), 
     {
@@ -86,6 +92,7 @@ export async function createNewGame(house_secret: string, salt: string): Promise
     randomNumber: randomNumber as unknown as string
   }
 }
+// createNewGame("1000", "1000");
 
 export async function endGame(house_secret: string, salt: string, crashTime: number): Promise<{ txnHash: string } | null> {
 

@@ -15,6 +15,7 @@ import {
 import crypto from 'crypto';
 import { calculateCrashPoint } from "./crashPoint";
 import { createNewGame, endGame as endGameAptos } from "./aptos";
+import { tryEndGame, tryNewGame } from "./mv";
 
 require('dotenv').config();
 
@@ -28,6 +29,9 @@ const httpServer = http.createServer();
 const PORT = 8080,
   HOST = "localhost";
 
+// const test= tryNewGame('house_secret', 'seed')
+// const wait= new Promise(resolve => setTimeout(resolve, 2000))
+// const end = tryEndGame('house_secret', 'seed', 10000)
 const io = new Server(httpServer, {
   cors: {
     origin: process.env.ZION_APP_URL || "http://localhost:3000",
@@ -38,9 +42,16 @@ const io = new Server(httpServer, {
 
 httpServer.listen(PORT, HOST, () => {
   console.log("Server running on port:", PORT);
+  // cycleRounds();
+ 
 });
 
+
+
+
 io.on("connection", (socket) => {
+
+ 
   socket.on(SOCKET_EVENTS.SET_BET, async (betData) => {
     await addBetToPlayerList(betData);
     io.emit(SOCKET_EVENTS.BET_CONFIRMED, betData);
@@ -52,8 +63,9 @@ io.on("connection", (socket) => {
   });
 
   socket.on(SOCKET_EVENTS.START_ROUND, async () => {
+    console.log("start round")
     await clearPlayerList();
-
+    console.log("cleared player list")
     let blockchainTxn = await createNewGame('house_secret', 'salt')
     console.log("blockchainTxn", blockchainTxn)
     
@@ -72,12 +84,18 @@ io.on("connection", (socket) => {
       secret_crash_point: crashPoint,
       status: "IN_PROGRESS",
     });
+
     console.log("start rounded")
     io.emit(SOCKET_EVENTS.ROUND_START, {
       roundId: 1,
       startTime: startTime,
       crashPoint,
     });
+    
+    
+  
+
+    
 
     console.log(startTime + ((crashPoint == 0 ? 0 : log(EXPONENTIAL_FACTOR, crashPoint)) * 1000) - Date.now())
 
@@ -106,6 +124,7 @@ io.on("connection", (socket) => {
     });
     io.emit(SOCKET_EVENTS.CHAT_NOTIFICATION, message);
   });
+
 });
 
 async function cycleRounds() {

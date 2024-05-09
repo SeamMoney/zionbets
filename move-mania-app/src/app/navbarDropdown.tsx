@@ -25,7 +25,7 @@ export default function NavbarDropdown() {
   const searchParams = useSearchParams();
   const referredBy = searchParams.get("ref");
 
-  const { isLoading, logIn, isLoggedIn } = useContext(keylessContext);
+  const { isLoading, logIn, isLoggedIn,logOut } = useContext(keylessContext);
 
   const [ emailPhoneToggle, setEmailPhoneToggle ] = useState<boolean>(false);
   const [ phoneInput, setPhoneInput ] = useState<string>("");
@@ -51,7 +51,16 @@ export default function NavbarDropdown() {
         >
           Log in
         </button>
+
+        
       }
+       
+        <button
+          className="bg-white px-6 py-1 text-neutral-950 active:scale-95 active:opacity-50 transition-transform"
+          onClick={logOut} >
+          Log out
+        </button> 
+
       <DropdownMenu>
         <DropdownMenuTrigger><Ellipsis /></DropdownMenuTrigger>
         <DropdownMenuContent>

@@ -35,7 +35,7 @@ const SAMPLE_RAW_TRANSACTION = {
   arguments: [MAGIC_WALLET_ADDRESS, 1000],
 };
 
-
+const MODULE_ADDRESS = process.env.MODULE_ADDRESS as string;
 export default function BalanceButton() {
   const { toast } = useToast()
   const { isLoggedIn, userInfo, keylessAccount } = useContext(keylessContext);
@@ -57,7 +57,7 @@ export default function BalanceButton() {
     //     ).then((user) => {
           if (isLoggedIn && userInfo) {
             // setAccount(user);
-            getBalance(userInfo.address, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`).then((balance) => {
+            getBalance(MODULE_ADDRESS, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`).then((balance) => {
               setBalance(balance);
             });
           }
@@ -73,7 +73,7 @@ export default function BalanceButton() {
           if (isLoggedIn && userInfo) {
             // console.log('balance: ', user.balance)
             // setAccount(user);
-            getBalance(userInfo.address, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`).then((balance) => {
+            getBalance(MODULE_ADDRESS, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`).then((balance) => {
               setBalance(balance);
             });
           }
@@ -177,7 +177,7 @@ export default function BalanceButton() {
       <Dialog>
       <DialogTrigger asChild>
         <button className="bg-neutral-800 hover:bg-neutral-700 px-2 py-1 text-xs text-white font-semibold">
-          {balance?.toFixed(2) || parseInt('0').toFixed(2)} zAPT
+          {balance || parseInt('0').toFixed(2)} zAPT
         </button>
       </DialogTrigger>
       <DialogContent className="bg-neutral-950">

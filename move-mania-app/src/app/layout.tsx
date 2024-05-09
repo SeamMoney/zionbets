@@ -1,3 +1,4 @@
+// 'use client';
 import type { Metadata } from "next";
 import { Bai_Jamjuree, Inter } from "next/font/google";
 import "./globals.css";
@@ -14,6 +15,9 @@ import NavbarDropdown from "./navbarDropdown";
 import { Suspense } from "react";
 import CrashProvider from "./CrashProvider";
 import KeylessProvider from "./KeylessProvider";
+// import { AptosWalletAdapterProvider, useWallet } from "@aptos-labs/wallet-adapter-react";
+// import { PetraWallet } from "petra-plugin-wallet-adapter";
+
 
 const baijamjuree = Bai_Jamjuree({
   weight: ['200', '300', '400', '500', '600'],
@@ -41,12 +45,51 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({
+  
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // const {
+  //   connect,
+  //   account,
+  //   network,
+  //   connected,
+  //   disconnect,
+  //   wallet,
+  //   wallets,
+  //   signAndSubmitTransaction,
+  //   signTransaction,
+  //   signMessage,
+  // } = useWallet();
+
+
+  // const renderWalletConnectorGroup = () => {
+  //   return wallets?.map((wallet) => {
+  //     const option = wallet;
+  //     return (
+  //       <button
+  //         onClick={() => {
+  //           connect(wallet.name);
+  //         }}
+  //         className="flex flex-row seam-button items-center justify-center w-full h-12 rounded-md gap-4"
+  //         id={option.name}
+  //         key={option.name}
+  //         >
+  //         <img 
+  //           className="w-10 h-10 rounded-3xl ml-2 gap-4"
+  //           src={`/wallets/${option.name}.png`} alt={option.name} 
+  //         />
+  //         {option.name.split(' ')[0]}
+  //       </button>
+  //     );
+  //   });
+  // };
+
+
   return (
     <html lang="en">
+      {/* <AptosWalletAdapterProvider plugins={[new PetraWallet()]}> */}
       <Analytics/>
       <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"></meta>
       <body className={baijamjuree.className + " text-white bg-[#020202] bg-noise"}>
@@ -65,6 +108,8 @@ export default function RootLayout({
                       </Link> */}
                     </div>
                     <div className="flex flex-row gap-4 items-center">
+                      {/* {!connected ?
+                      renderWalletConnectorGroup(): wallet?.name} */}
                       <BalanceButton />
                       {/* <AccountButton /> */}
                       <Suspense>
@@ -87,6 +132,7 @@ export default function RootLayout({
             </CrashProvider>
           </KeylessProvider>
         </body>
+        {/* </AptosWalletAdapterProvider> */}
     </html>
   );
 }
