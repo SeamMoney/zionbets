@@ -3,10 +3,9 @@ import { fundAccountWithGas, mintZAPT, registerForZAPT } from "./aptos";
 import { User } from "./schema";
 import { ChatMessage } from "./types";
 import { MagicAptosWallet } from "@magic-ext/aptos";
-import { EphemeralKeyPair, KeylessAccount, MultiKeyAccount } from "@aptos-labs/ts-sdk";
-import { AptosAccount } from "aptos";
+import { MultiKeyAccount } from "@aptos-labs/ts-sdk";
 
-const API_URL = `${process.env.ZION_API_URL || 'http://localhost:3008'}`;
+const API_URL = `${process.env.ZION_API_URL || 'http://localhost'}:3008`;
 export async function getUsers() {
   try {
     const response = await fetch(`${API_URL}/users`, {
@@ -38,7 +37,7 @@ export async function doesUserExist(address: string) {
 }
 
 export async function setUpUser(
-  userWallet: KeylessAccount,
+  userWallet: MultiKeyAccount,
   userToSetup: Omit<User, "referred_by" | "referral_code" | "username">,
   referrer?: string
 ) {
@@ -51,11 +50,7 @@ export async function setUpUser(
   // }
 
   // const keyPair = await createAptosKeyPair();
-  await fundAccountWithGas(userToSetup.address);
-  // const account_emph = userWallet.ephemeralKeyPair;
-
-  // const account =  AptosAccount.fromEphemeralKeyPair(account_emph);
-  // console.log("account from pair", account);
+  // await fundAccountWithGas(userToSetup.address);
   await registerForZAPT(userWallet);
   await mintZAPT(userToSetup.address, 1000);
 
@@ -113,7 +108,7 @@ export async function getUser(address: string): Promise<User | null> {
 
 export async function setUpAndGetUser(
   userToSetup: Omit<User, "referred_by" | "referral_code" | "username">, 
-  userWallet: KeylessAccount,
+  userWallet: MultiKeyAccount,
   referrer?: string
 ): Promise<User | null> {
   console.log('userToSetup', userToSetup)
