@@ -1,4 +1,5 @@
 import express from "express";
+import {exec} from "child_process";
 import {
   addChatMessage,
   clearGames,
@@ -100,6 +101,7 @@ app.get("/users/:email", async (req, res) => {
 
   const email = req.params.email;
   const user = await getUser(email);
+  console.log("user", user);
   if (user) {
     res.send(user);
   } else {
@@ -182,6 +184,14 @@ app.delete("/users/:email", async (req, res) => {
 
 
 app.listen(PORT, () => {
+  exec("npm run server", (error, stdout, stderr) => {
+    if (error) {
+      console.error(`exec error: ${error}`);
+      return;
+    }
+    console.log(`stdout: ${stdout}`);
+    console.error(`stderr: ${stderr}`);
+  });
   console.log("Server is running on port " + PORT);
   console.log("CORS-enabled for ", process.env.ZION_APP_URL || "http://localhost:3000");
   server.emit(SOCKET_EVENTS.START_ROUND)
