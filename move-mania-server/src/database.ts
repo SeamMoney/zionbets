@@ -69,11 +69,11 @@ export async function initializePlayerListTable() {
 }
 
 export async function initializeAllTables() {
-  // await initializeGameTable();
-  // await initializeUsersTable();
-  // await initializeChatMessagesTable();
-  // await initializePlayerListTable();
-  await initializeUserDetailsTable();
+  await initializeGameTable();
+  await initializeUsersTable();
+  await initializeChatMessagesTable();
+  await initializePlayerListTable();
+  // await initializeUserDetailsTable();
 
   const db = await open({
     filename: "./games.db",
@@ -367,7 +367,7 @@ export async function getPlayerList() {
   );
 
   await db.close();
-  updateUserStats(players);
+  // updateUserStats(players);
   return players as PlayerListEntry[];
 }
 
