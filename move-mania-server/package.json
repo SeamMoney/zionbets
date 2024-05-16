@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "server": "nodemon src/server.ts",
-    "api": "nodemon src/api.ts"
+    "api": "nodemon src/api.ts",
+    "build": "nodemon src/api.ts"
   },
   "dependencies": {
     "@aptos-labs/ts-sdk": "^1.13.2",
@@ -14,7 +15,9 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.18.2",
+    "movement-sdk": "^1.0.4",
     "socket.io": "^4.7.4",
+    "socket.io-client": "^4.7.5",
     "sqlite": "^5.1.1",
     "sqlite3": "^5.1.7",
     "typescript": "^5.3.3"
