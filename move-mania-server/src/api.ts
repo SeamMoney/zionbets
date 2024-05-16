@@ -161,4 +161,5 @@ app.delete("/users/:email", async (req, res) => {
 app.listen(PORT, () => {
   console.log("Server is running on port " + PORT);
   console.log("CORS-enabled for ", process.env.ZION_APP_URL || "http://localhost:3000");
+  server.emit(SOCKET_EVENTS.START_ROUND)
 });
