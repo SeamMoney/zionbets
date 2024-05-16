@@ -5,7 +5,7 @@ import { ChatMessage } from "./types";
 import { MagicAptosWallet } from "@magic-ext/aptos";
 import { MultiKeyAccount } from "@aptos-labs/ts-sdk";
 
-const API_URL = `${process.env.ZION_API_URL || 'http://localhost:3008'}`;
+const API_URL = `${process.env.ZION_API_URL || 'http://localhost'}:3008`;
 export async function getUsers() {
   try {
     const response = await fetch(`${API_URL}/users`, {
