@@ -16,6 +16,7 @@ import {
   hasUserCashOut,
   updateUser,
 } from "./database";
+import { SOCKET_EVENTS } from "./types";
 require('dotenv').config();
 var cors = require("cors");
 const app = express();
