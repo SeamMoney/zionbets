@@ -27,7 +27,7 @@ app.use(cors({
 
 const PORT = 3008;
 
-
+const server = io("http://localhost:8080")
 /* 
   This is the entry point for the server. 
 */
