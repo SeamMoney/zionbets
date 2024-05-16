@@ -11,11 +11,10 @@ import {
   endGame,
   getUser,
 } from "./database";
-
 import crypto from 'crypto';
 import { calculateCrashPoint } from "./crashPoint";
 import { createNewGame, endGame as endGameAptos } from "./aptos";
-import { tryEndGame, tryNewGame } from "./mv";
+// import { tryEndGame, tryNewGame } from "./mv";
 
 require('dotenv').config();
 
