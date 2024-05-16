@@ -12,18 +12,3 @@ export const UserSchema = `CREATE TABLE IF NOT EXISTS users (
   public_address TEXT,
   private_key TEXT
 )`;
-
-
-export type UserDetails = {
-  address: string;
-  bets: number;
-  profit: number;
-  bet_volume: number;
-};
-
-export const UserDetailsSchema = `CREATE TABLE IF NOT EXISTS user_details (
-  address TEXT PRIMARY KEY,
-  bets INTEGER,
-  profit INTEGER,
-  bet_volume INTEGER,
-  `

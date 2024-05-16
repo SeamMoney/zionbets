@@ -2,38 +2,14 @@
 
 import { useContext, useEffect, useState } from "react";
 import { keylessContext } from "../KeylessProvider";
-import Image from 'next/image';
-import Quests from "./quests";
-import { quests } from "./questInfo";
-import AccountStats from "./accountStats";
-import ReferralSection from "./referral";
-import { FaCopy, FaEdit } from "react-icons/fa";
-import { copyButton, iconButton } from "../TailwindBase";
-import { User } from "@/lib/schema";
+
 
 export default function AccountPage() {
 
   const { isLoggedIn, userInfo, logOut } = useContext(keylessContext);
-// create dummy user object if userInfo is null
-  const user = {
-    username: "user123",
-    email: "jkdev222@gmail.com",
-    image: "/defaultProfile.png",
-    public_address: "0x1234",
-    private_key: "0x1234",
-    balance: 100,
-  };
 
-  type ReferralInfo = {
-    referralCode: string;
-    referralCount: number;
-  };
   const [username, setUsername] = useState("");
-  const defaultImage = '/defaultProfile.png';
-  const [referrals, setReferrals] =useState<ReferralInfo>({
-    referralCode: "12345",
-    referralCount: 0,
-  }); 
+
   const onSubmit = async () => {
     // if (!account) return;
 
@@ -53,39 +29,41 @@ export default function AccountPage() {
     // window.location.reload();
   };
 
-  // if (!isLoggedIn || !userInfo) return <></>;
+  if (!isLoggedIn || !userInfo) return <></>;
 
   return (
-    <div className="px-2 pt-4 bg-black">
-      <p className="text-center text-6xl text-bold pb-6">Dashboard</p>
-      <div className="flex flex-row justify-left">
-        <div className="rounded-xl">
-          <Image
-            className="rounded-full"
-            src={defaultImage}
-            width={100}
-            height={100}
-            alt="Picture of the author"
-          />
-
-        </div>
-        <div>
-          <UsernameItem/>
-          <AddressItem/>
-
-        </div>
-          
-
+    <div className="px-2 pt-4">
+      <div>
+        <input type="text" autoFocus className="hidden" />
+        <span className="text-lg">Edit profile</span>
+        <p className="text-sm opacity-50">
+          Make changes to your profile here. Click save when you&apos;re
+          done.
+        </p>
       </div>
-      
-      {/* <AccountStats account={userInfo}/> */}
-      
       <div className="grid gap-4 py-4">
-        
-        {/* <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2"> */}
-          
-          {/* <span className=" opacity-50 flex flex-row justify-center items-center gap-1"> */}
-            {/* <input
+        <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
+          <label htmlFor="username" className="text-left ">
+            Username
+          </label>
+          <span className=" opacity-50 flex flex-row justify-center items-center gap-1">
+            <input
+              id="username"
+              value={username}
+              onChange={(e) => {
+                setUsername(e.target.value);
+              }}
+              placeholder={userInfo.username}
+              className="bg-transparent border-none outline-none text-right text-ellipsis"
+            />
+          </span>
+        </div>
+        {/* <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
+          <label htmlFor="profile_pic" className="text-left ">
+            Profile picture
+          </label>
+          <span className=" opacity-50 flex flex-row justify-center items-center gap-1">
+            <input
               id="profile_pic"
               value={image}
               onChange={(e) => {
@@ -93,12 +71,23 @@ export default function AccountPage() {
               }}
               placeholder={account.image}
               className="bg-transparent border-none outline-none text-right text-ellipsis"
-            /> */}
-          {/* </span> */}
-          
-        {/* </div> */}
-  
+            />
+          </span>
+        </div> */}
         {/* <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
+          <label htmlFor="email" className="text-left ">
+            Email
+          </label>
+          <span className=" opacity-50 flex flex-row justify-end items-center gap-1">
+            <input
+              id="email"
+              disabled
+              value={account.email}
+              className="bg-transparent border-none outline-none text-right text-ellipsis cursor-not-allowed"
+            />
+          </span>
+        </div> */}
+        <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
           <label
             htmlFor="public_address"
             className="text-left "
@@ -113,7 +102,7 @@ export default function AccountPage() {
               className="bg-transparent border-none outline-none text-right text-ellipsis cursor-not-allowed"
             />
           </span>
-        </div> */}
+        </div>
         {/* <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
           <label
             htmlFor="private_key"
@@ -143,12 +132,7 @@ export default function AccountPage() {
           </span>
         </div> */}
       </div>
-      <AccountStats account={null}/>
-      <div>
-      </div>
-      <ReferralSection referralCode={referrals.referralCode} referralCount={referrals.referralCount} />
-      <Quests quests={quests} />
-      {/* <div className="flex flex-col items-center gap-2 w-full">
+      <div className="flex flex-col items-center gap-2 w-full">
         <button
           type="submit"
           className="border border-neutral-700 hover:bg-neutral-800/80 hover:bg-noise px-6 py-1 text-neutral-500 w-full active:scale-95 active:opacity-50 transition-transform"
@@ -163,36 +147,7 @@ export default function AccountPage() {
           >
             Save changes
           </button>
-      </div> */}
+      </div>
     </div>
   )
-  function UsernameItem() {
-    return (
-      <div className="flex flex-row justify-left ml-4">
-        <span className="text-4xl font-bold">{user.username}</span>
-        <div className={iconButton}>
-          <FaEdit />
-        </div>
-
-      </div>
-    )
-  }
-
-  function AddressItem(){
-    return (
-      <div className="flex flex-col justify-center ml-4">
-        <div className="flex flex-row justify-center items-inline">
-
-        <span className="text-2xl opacity-60">{user.public_address||'0x0'}</span>
-        {CopyButton(user.public_address)}
-        </div>
-        {/* <span className="text-xl opacity-50">Public Address</span> */}
-      </div>
-    )
-  }
-}
-function CopyButton(value: string) {
-  return (
-    <FaCopy className={`${copyButton} bg-opacity-0`} onClick={() => navigator.clipboard.writeText(value)} />
-  );
 }

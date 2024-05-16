@@ -1,41 +1,24 @@
 'use client';
 
-import { Aptos, AptosConfig, Ed25519PrivateKey, EphemeralKeyPair, MultiKeyAccount,Network,KeylessAccount } from "@aptos-labs/ts-sdk";
-// import dotenv from 'dotenv';
+import { Aptos, AptosConfig, Ed25519PrivateKey, EphemeralKeyPair, MultiKeyAccount, Network } from "@aptos-labs/ts-sdk";
 import { createContext, useEffect, useState } from "react";
 import { jwtDecode } from 'jwt-decode';
 import { User } from "@/lib/schema";
 import { setUpAndGetUser } from "@/lib/api";
-import { setLocalStorage } from "@aptos-labs/wallet-adapter-core";
-import { AptosAccount,  } from "aptos";
 
-// env
-const MOVEMENT_URL = process.env.MOVEMENT_URL || "https://aptos.devnet.m1.movementlabs.xyz";
-
-const aptos = new Aptos(new AptosConfig({fullnode:MOVEMENT_URL}));  // Only devnet supported as of now.
   /**
  * Stored ephemeral key pairs in localStorage (nonce -> ephemeralKeyPair)
  */
   export type StoredEphemeralKeyPairs = { [nonce: string]: EphemeralKeyPair };
 
 interface KeylessProviderProps {
-  keylessAccount: KeylessAccount | null | AptosAccount;
+  keylessAccount: MultiKeyAccount | null;
   userInfo: User | null;
   isLoggedIn: boolean;
   isLoading: boolean;
   logIn: () => Promise<void>;
   logOut: () => Promise<void>;
 }
-
-const tempAccount = new AptosAccount(Uint8Array.from(Buffer.from(process.env.ADMIN_ACCOUNT_PRIVATE_KEY!)));
-
-const tempUser: User = {
-  address: new AptosAccount(Uint8Array.from(Buffer.from(process.env.ADMIN_ACCOUNT_PRIVATE_KEY!))).address().toString(),
-  username: "jkjk",
-  referral_code: "jkjk",
-  referred_by: "jkjk"
-};
-
 
 export const keylessContext = createContext<KeylessProviderProps>({
   keylessAccount: null,
@@ -46,64 +29,50 @@ export const keylessContext = createContext<KeylessProviderProps>({
   logOut: async () => {}
 });
 
-
-
-
-
 export default function KeylessProvider({ children }: { children: React.ReactNode }) {
 
-  const [keylessAccount, setKeylessAccount] = useState<KeylessAccount | null>(null);
+  const [keylessAccount, setKeylessAccount] = useState<MultiKeyAccount | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  const [userInfo, setUserInfo] = useState<User | null>(tempUser);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  
+  const [userInfo, setUserInfo] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
 
   useEffect(() => {
     console.log("KeylessProvider mounted");
-      finishKeylessAuth();
-      // keylessAccount && setIsLoggedIn(true);
-      // setIsLoading(false);
-      // console.log(keylessAccount);
-      // setIsLoggedIn(true);
-    
+    finishKeylessAuth();
   }, [])
 
   const beginKeylessAuth = async () => {
     console.log("beginKeylessAuth");
 
     const ephemeralKeyPair = EphemeralKeyPair.generate();
-    const redirectUri = "http://localhost:3000";
-    console.log("redirectUri",redirectUri);
+    const redirectUri = window.location.href.split('?')[0]
+    console.log("redirectURI", redirectUri);
     const clientId = process.env.GOOGLE_CLIENT_ID!
     // Get the nonce associated with ephemeralKeyPair
     const nonce = ephemeralKeyPair.nonce
 
-    // const loginUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=id_token&scope=openid+email+profile&nonce=${nonce}&redirect_uri=${redirectUri}&client_id=${clientId}`
-    const loginUrl = `https://accounts.google.com/o/oauth2/v2/auth/oauthchooseaccount?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=id_token&scope=openid%20email&nonce=${nonce}`;
+    const loginUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=id_token&scope=openid+email+profile&nonce=${nonce}&redirect_uri=${redirectUri}&client_id=${clientId}`
+
     // Save the ephemeralKeyPair in local storage
     storeEphemeralKeyPair(ephemeralKeyPair);
 
-    // window.location.href = loginUrl
     window.location.href = loginUrl
   }
 
   const finishKeylessAuth = async () => {
-
     console.log("finishKeylessAuth");
 
     setIsLoading(true);
 
     const jwt = parseJWTFromURL(window.location.href)
-    // const jwt = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImFjM2UzZTU1ODExMWM3YzdhNzVjNWI2NTEzNGQyMmY2M2VlMDA2ZDAiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiIxODc1Mjg5MzkwOTAtb25mNHQ2bW9lcG1zbmZrbHQyZHNwY2Y4ODZhcjkwaGouYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiIxODc1Mjg5MzkwOTAtb25mNHQ2bW9lcG1zbmZrbHQyZHNwY2Y4ODZhcjkwaGouYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMDU1NzQyNzQzNjExNTM3NzE1ODgiLCJlbWFpbCI6ImphY2tsYXhqa0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibm9uY2UiOiIxMzc2Nzg4OTEzNzA5MDA5Njk2MjIyMjc2NTU0OTQ5ODc1MzE3NDIyNjUyNzA2NzU3MDcyNDUwODA4NTIzOTMzODc3MDA1NzI5NDEwMCIsIm5iZiI6MTcxNTE5Mjc5MCwibmFtZSI6IkphY2sgS2VsbHkiLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jSTVINDJQOFdjTlRRMWFkWEZXbWdTWmZWc3JjTk95TGJnZXpCZ1ZDU283aW10b2pRPXM5Ni1jIiwiZ2l2ZW5fbmFtZSI6IkphY2siLCJmYW1pbHlfbmFtZSI6IktlbGx5IiwiaWF0IjoxNzE1MTkzMDkwLCJleHAiOjE3MTUxOTY2OTAsImp0aSI6IjFhMjkzOWJmYThiNGJkNDE0M2Y5NTY0OGE3MTA2M2YwOWZlMDEzYjYifQ.m6eXKS74-gO11WXKGhmzXOnENWpDpj-xnOAnaWluCVHfYZqghUAez60qA-MvC8NN9klR1SlsQUmzA6Pt6UY6MFuWSvHh7peWQoo4788v7wC_UTsn7qoeDO9zRLCTxW6cNqA7oPoRYH69O6pS1CJO0JRxKvyvXEQ0ft2__Eyy2_7FD9ZSweeexBUtd3zmMUH7tR2KdTr5Xdm_g6uTgA-_scnlqTjqUbFAn_zZ_thGvkkK0D5eOzv93wczzq729EpjYsa7NStb-A0UApIIOL1UiARG3bAfJMGACsMpNuvNbltyi5mQYVSdtufQNeW-ULJELGH7W5ir86dvMmFtbSEVkg&authuser=1&prompt=consent&version_info=CmxfU1ZJX0VOWDM3NWJZX29VREdBUWlQMDFCUlVSSVpsOXhUMHhKTm5sQ1IzSkZkMnN6ZDBkbFFVVldabGhmVDFodGFHRlFVazFOUmxKWU1tSnRkVjlHYzFOak1VdFdPVkY2YlhsWVZ6Qllad18"
-    // window.location.href="http://localhost:3000";
     if (!jwt) {
       console.log("No JWT found in URL")
       setIsLoading(false);
       return
     }
-      const payload = jwtDecode<{ nonce: string }>(jwt);
-      const jwtNonce = payload.nonce
-      localStorage.setItem('jwt', jwt);
+    const payload = jwtDecode<{ nonce: string }>(jwt);
+    const jwtNonce = payload.nonce
     const ephemeralKeyPair = getLocalEphemeralKeyPair(jwtNonce);
 
     if (!ephemeralKeyPair) {
@@ -111,21 +80,18 @@ export default function KeylessProvider({ children }: { children: React.ReactNod
       setIsLoading(false);
       return
     }
+
+    const aptos = new Aptos(new AptosConfig({network: Network.DEVNET}));  // Only devnet supported as of now.
     const keylessAccount = await aptos.deriveKeylessAccount({
       jwt,
       ephemeralKeyPair,
     });
-    
-    
+
     console.log("keylessAccount", keylessAccount);
-    console.log("k",keylessAccount.publicKey.toString())
-    // console.log("AFTER",new AptosAccount(address:keylessAccount.accountAddress))
     setKeylessAccount(keylessAccount);
     setIsLoggedIn(true);
-    
 
     const userAddress = keylessAccount.accountAddress.toString();
-    console.log("dddd",userAddress);
     setUpAndGetUser(
       {
         address: userAddress,
@@ -148,7 +114,6 @@ export default function KeylessProvider({ children }: { children: React.ReactNod
     setUserInfo(null);
 
     // Clear the ephemeral key pair from localStorage
-    localStorage.clear()
     const keyPairs = getLocalEphemeralKeyPairs();
     for (const nonce in keyPairs) {
       removeEphemeralKeyPair(nonce);
@@ -185,8 +150,6 @@ export default function KeylessProvider({ children }: { children: React.ReactNod
    */
   const getLocalEphemeralKeyPairs = (): StoredEphemeralKeyPairs => {
     const rawEphemeralKeyPairs = localStorage.getItem("ephemeral-key-pairs");
-    console.log("Raw pairs", rawEphemeralKeyPairs);
-   
     try {
       return rawEphemeralKeyPairs
         ? decodeEphemeralKeyPairs(rawEphemeralKeyPairs)
@@ -301,7 +264,7 @@ export default function KeylessProvider({ children }: { children: React.ReactNod
       isLoggedIn,
       isLoading,
       logIn: beginKeylessAuth,
-      logOut: logOut
+      logOut
     }}>
       {children}
     </keylessContext.Provider>
