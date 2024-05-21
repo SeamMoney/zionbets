@@ -20,7 +20,7 @@ const provider = new Provider({
 })
 
 const TRANSACTION_OPTIONS = {
-  max_gas_amount: '10000',
+  max_gas_amount: '500000',
   gas_unit_price: '100',
 };
 
