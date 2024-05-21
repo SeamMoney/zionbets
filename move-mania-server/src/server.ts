@@ -34,8 +34,8 @@ const portHttps = 8080;
 // USE FOR PRODUCTION
 import https from 'https';
 import fs from 'fs';
-const CERT_PATH = "/etc/letsencrypt/live/api.zion.bet/fullchain.pem"
-const KEY_PATH = "/etc/letsencrypt/live/api.zion.bet/privkey.pem"
+const CERT_PATH = "/etc/letsencrypt/live/zionapi.xyz/fullchain.pem"
+const KEY_PATH = "/etc/letsencrypt/live/zionapi.xyz/privkey.pem"
 const options = {
   key: fs.readFileSync(KEY_PATH),
   cert: fs.readFileSync(CERT_PATH)
@@ -69,6 +69,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on(SOCKET_EVENTS.START_ROUND, async () => {
+    console.log("CREATE")
     await clearPlayerList();
 
     let blockchainTxn = await createNewGame('house_secret', 'salt')
