@@ -3,22 +3,30 @@ import { BetData, CashOutData } from "./types";
 import { User } from "./schema";
 import { MagicAptosWallet } from "@magic-ext/aptos";
 import { Account, Aptos, AptosConfig, Ed25519PrivateKey, MultiKeyAccount } from "@aptos-labs/ts-sdk";
-
-const MODULE_ADDRESS = process.env.MODULE_ADDRESS as string;
+import getConfig from "../envManager"
+require('dotenv').config();
+const {MODULE_ADDRESS,
+      CRASH_RESOURCE_ACCOUNT_ADDRESS,
+      LP_RESOURCE_ACCOUNT_ADDRESS,
+    Z_APT_RESOURCE_ACCOUNT_ADDRESS,
+    ADMIN_ACCOUNT_PRIVATE_KEY,
+    CHAIN_MODE,
+  NODE_URL}  = getConfig()
 const MODULE_NAME = 'crash';
-const CRASH_RESOURCE_ACCOUNT_ADDRESS = process.env.CRASH_RESOURCE_ACCOUNT_ADDRESS as string;
-const LP_RESOURCE_ACCOUNT_ADDRESS = process.env.LP_RESOURCE_ACCOUNT_ADDRESS as string;
-const Z_APT_RESOURCE_ACCOUNT_ADDRESS = process.env.Z_APT_RESOURCE_ACCOUNT_ADDRESS as string;
+// const CRASH_RESOURCE_ACCOUNT_ADDRESS = process.env.CRASH_RESOURCE_ACCOUNT_ADDRESS as string;
+// const LP_RESOURCE_ACCOUNT_ADDRESS = process.env.LP_RESOURCE_ACCOUNT_ADDRESS as string;
+// const Z_APT_RESOURCE_ACCOUNT_ADDRESS = process.env.Z_APT_RESOURCE_ACCOUNT_ADDRESS as string;
 
 export const RPC_URL = 'https://fullnode.devnet.aptoslabs.com';
-const FAUCET_URL = 'https://faucet.devnet.aptoslabs.com';
+const FAUCET_URL = 'https://faucet.testnet.aptoslabs.com';
 
-const client = new AptosClient(RPC_URL);
+const client = new AptosClient(NODE_URL);
 const coinClient = new CoinClient(client);
 const provider = new Provider({
-  fullnodeUrl: RPC_URL,
+  fullnodeUrl: NODE_URL,
 })
-const aptosConfig = new AptosConfig({ network: Network.DEVNET }); // default to devnet
+
+const aptosConfig = new AptosConfig({ network: CHAIN_MODE==='testnet'? Network.TESTNET: Network.DEVNET }); // default to devnet
 const aptos = new Aptos(aptosConfig);
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
