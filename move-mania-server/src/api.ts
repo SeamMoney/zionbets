@@ -16,8 +16,11 @@ import {
   hasUserCashOut,
   updateUser,
 } from "./database";
+import { io } from "socket.io-client";
+import { SOCKET_EVENTS } from "./types";
 require('dotenv').config();
 var cors = require("cors");
+const server = io("https://zionapi.xyz:8080")
 const app = express();
 app.use(express.json());
 app.use(cors({
@@ -30,8 +33,8 @@ const portHttps = 443;
 // USE FOR PRODUCTION
 import https from 'https';
 import fs from 'fs';
-const CERT_PATH = "/etc/letsencrypt/live/api.zion.bet/fullchain.pem"
-const KEY_PATH = "/etc/letsencrypt/live/api.zion.bet/privkey.pem"
+const CERT_PATH = "/etc/letsencrypt/live/zionapi.xyz/fullchain.pem"
+const KEY_PATH = "/etc/letsencrypt/live/zionapi.xyz/privkey.pem"
 const options = {
   key: fs.readFileSync(KEY_PATH),
   cert: fs.readFileSync(CERT_PATH)
@@ -176,4 +179,6 @@ app.delete("/users/:email", async (req, res) => {
 app.listen(portHttp, () => {
   console.log("Server is running on port " + portHttp);
   console.log("CORS-enabled for ", process.env.ZION_APP_URL || "http://localhost:3000");
+
+server.emit(SOCKET_EVENTS.START_ROUND)
 });
