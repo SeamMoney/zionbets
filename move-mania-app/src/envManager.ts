@@ -31,6 +31,23 @@ function getConfig(): EnvConfig {
     if (!MOVEMENT_NODE || !APTOS_NODE || !CHAIN_MODE || !DEV_MODE ||
         !ADMIN_ACCOUNT_PRIVATE_KEY || !MODULE_ADDRESS || !CRASH_RESOURCE_ACCOUNT_ADDRESS ||
         !LP_RESOURCE_ACCOUNT_ADDRESS || !Z_APT_RESOURCE_ACCOUNT_ADDRESS) {
+        const envs = [ MOVEMENT_NODE,
+            APTOS_NODE,
+            CHAIN_MODE,
+            ZION_API_URL,
+            ZION_APP_URL,
+            DEV_MODE,
+            ADMIN_ACCOUNT_PRIVATE_KEY,
+            MODULE_ADDRESS,
+            CRASH_RESOURCE_ACCOUNT_ADDRESS,
+            LP_RESOURCE_ACCOUNT_ADDRESS,
+            Z_APT_RESOURCE_ACCOUNT_ADDRESS]
+            for (let i = 0; i < envs.length; i++) {
+                if(!envs[i]){
+                    console.log(i,envs)
+                }
+              }
+
         throw new Error('One or more environment variables are not defined');
     }
 
