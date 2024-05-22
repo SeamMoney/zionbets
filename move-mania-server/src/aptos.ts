@@ -1,21 +1,26 @@
 import { AptosAccount, AptosClient, HexString, Provider, Network } from "aptos";
 import crypto from 'crypto';
 import { calculateCrashPoint } from "./crashPoint";
+import getConfig from "./envManager";
 
 require('dotenv').config();
+const {MODULE_ADDRESS,
+      CRASH_RESOURCE_ACCOUNT_ADDRESS,
+      LP_RESOURCE_ACCOUNT_ADDRESS,
+    Z_APT_RESOURCE_ACCOUNT_ADDRESS,
+    ADMIN_ACCOUNT_PRIVATE_KEY,
+  NODE_URL}  = getConfig()
+// const MODULE_ADDRESS = process.env.MODULE_ADDRESS as string;
+// const CRASH_RESOURCE_ACCOUNT_ADDRESS = process.env.CRASH_RESOURCE_ACCOUNT_ADDRESS as string;
+// const LP_RESOURCE_ACCOUNT_ADDRESS = process.env.LP_RESOURCE_ACCOUNT_ADDRESS as string;
+// const ADMIN_ACCOUNT_PRIVATE_KEY = process.env.ADMIN_ACCOUNT_PRIVATE_KEY as string;
 
-const MODULE_ADDRESS = process.env.MODULE_ADDRESS as string;
-const CRASH_RESOURCE_ACCOUNT_ADDRESS = process.env.CRASH_RESOURCE_ACCOUNT_ADDRESS as string;
-const LP_RESOURCE_ACCOUNT_ADDRESS = process.env.LP_RESOURCE_ACCOUNT_ADDRESS as string;
-const Z_APT_RESOURCE_ACCOUNT_ADDRESS = process.env.Z_APT_RESOURCE_ACCOUNT_ADDRESS as string;
-const ADMIN_ACCOUNT_PRIVATE_KEY = process.env.ADMIN_ACCOUNT_PRIVATE_KEY as string;
+// const RPC_URL = 'https://fullnode.devnet.aptoslabs.com';
+// const FAUCET_URL = 'https://faucet.devnet.aptoslabs.com'
 
-const RPC_URL = 'https://fullnode.devnet.aptoslabs.com';
-const FAUCET_URL = 'https://faucet.devnet.aptoslabs.com'
-
-const client = new AptosClient(RPC_URL);
+const client = new AptosClient(NODE_URL);
 const provider = new Provider({
-  fullnodeUrl: RPC_URL,
+  fullnodeUrl: NODE_URL,
   indexerUrl: 'https://indexer.devnet.aptoslabs.com',
 })
 
