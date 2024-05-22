@@ -4,6 +4,7 @@ import { User } from "./schema";
 import { MagicAptosWallet } from "@magic-ext/aptos";
 import { Account, Aptos, AptosConfig, Ed25519PrivateKey, MultiKeyAccount } from "@aptos-labs/ts-sdk";
 import getConfig from "../envManager"
+import {CHAIN_MODE} from '@/constants'
 // // require('dotenv').config();
 // const {MODULE_ADDRESS,
 //       CRASH_RESOURCE_ACCOUNT_ADDRESS,
@@ -13,7 +14,7 @@ import getConfig from "../envManager"
 //     CHAIN_MODE,
 //   NODE_URL}  = getConfig()
 const MODULE_NAME = 'crash';
-const CHAIN_MODE = process.env.CHAIN_MODE as string
+// const CHAIN_MODE = process.env.CHAIN_MODE as string
 const MODULE_ADDRESS = process.env.MODULE_ADDRESS
 const CRASH_RESOURCE_ACCOUNT_ADDRESS = process.env.CRASH_RESOURCE_ACCOUNT_ADDRESS as string;
 const LP_RESOURCE_ACCOUNT_ADDRESS = process.env.LP_RESOURCE_ACCOUNT_ADDRESS as string;

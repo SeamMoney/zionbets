@@ -27,6 +27,7 @@ import { cashOut, placeBet } from "@/lib/aptos";
 import { useToast } from "@/components/ui/use-toast";
 import Link from "next/link";
 import { keylessContext } from "./KeylessProvider";
+import { CHAIN_MODE } from "@/constants";
 
 export type GameStatus = {
   status: "COUNTDOWN" | "IN_PROGRESS" | "END";
@@ -117,7 +118,7 @@ export default function ControlCenter() {
 
     toast({
       title: "Bet placed at " + betAmount + " zAPT",
-      description: <Link href={`https://explorer.aptoslabs.com/txn/${blockchainRes.version}/?network=devnet`} target="_blank" className="underline">View transaction</Link>
+      description: <Link href={`https://explorer.aptoslabs.com/txn/${blockchainRes.version}/?network=${CHAIN_MODE}`} target="_blank" className="underline">View transaction</Link>
     })
   };
 
@@ -159,7 +160,7 @@ export default function ControlCenter() {
 
     toast({
       title: "Cashed out at " + cashoutMultipler + "x",
-      description: <Link href={`https://explorer.aptoslabs.com/txn/${blockchainRes.version}/?network=devnet`} target="_blank" className="underline">View transaction</Link>
+      description: <Link href={`https://explorer.aptoslabs.com/txn/${blockchainRes.version}/?network=${CHAIN_MODE}`} target="_blank" className="underline">View transaction</Link>
     })
 
   };
