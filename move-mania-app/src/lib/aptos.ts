@@ -4,7 +4,7 @@ import { User } from "./schema";
 import { MagicAptosWallet } from "@magic-ext/aptos";
 import { Account, Aptos, AptosConfig, Ed25519PrivateKey, MultiKeyAccount } from "@aptos-labs/ts-sdk";
 import getConfig from "../envManager"
-require('dotenv').config();
+// require('dotenv').config();
 const {MODULE_ADDRESS,
       CRASH_RESOURCE_ACCOUNT_ADDRESS,
       LP_RESOURCE_ACCOUNT_ADDRESS,
