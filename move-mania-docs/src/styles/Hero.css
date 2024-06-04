@@ -1,0 +1,14 @@
+html,
+.character-gradient {
+    background: linear-gradient(
+        245.29deg,
+        #6dc1dc 13.32%,
+        #a690fc 28.55%,
+        #fc96bb 55.55%,
+        #ffc397 84.12%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
+}
