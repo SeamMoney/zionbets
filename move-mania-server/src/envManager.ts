@@ -32,6 +32,8 @@ function getConfig(): EnvConfig {
         !ADMIN_ACCOUNT_PRIVATE_KEY || !MODULE_ADDRESS || !CRASH_RESOURCE_ACCOUNT_ADDRESS ||
         !LP_RESOURCE_ACCOUNT_ADDRESS || !Z_APT_RESOURCE_ACCOUNT_ADDRESS) {
         throw new Error('One or more environment variables are not defined');
+
+        
     }
 
     const config: EnvConfig = {
