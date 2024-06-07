@@ -9,6 +9,7 @@ const {MODULE_ADDRESS,
       LP_RESOURCE_ACCOUNT_ADDRESS,
     Z_APT_RESOURCE_ACCOUNT_ADDRESS,
     ADMIN_ACCOUNT_PRIVATE_KEY,
+    CHAIN_MODE,
   NODE_URL}  = getConfig()
 // const MODULE_ADDRESS = process.env.MODULE_ADDRESS as string;
 // const CRASH_RESOURCE_ACCOUNT_ADDRESS = process.env.CRASH_RESOURCE_ACCOUNT_ADDRESS as string;
@@ -21,7 +22,7 @@ const {MODULE_ADDRESS,
 const client = new AptosClient(NODE_URL);
 const provider = new Provider({
   fullnodeUrl: NODE_URL,
-  indexerUrl: 'https://indexer.devnet.aptoslabs.com',
+  indexerUrl: `https://indexer.testnet.aptoslabs.com`,
 })
 
 const TRANSACTION_OPTIONS = {
@@ -78,6 +79,7 @@ export async function createNewGame(house_secret: string, salt: string): Promise
     }
   });
   if ((txResult as any).success === false) { 
+    console.error("Transaction failed:", txResult);
     return null; 
   }
   // console.log({

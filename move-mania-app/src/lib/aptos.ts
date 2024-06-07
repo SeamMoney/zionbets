@@ -4,7 +4,7 @@ import { User } from "./schema";
 import { MagicAptosWallet } from "@magic-ext/aptos";
 import { Account, Aptos, AptosConfig, Ed25519PrivateKey, MultiKeyAccount } from "@aptos-labs/ts-sdk";
 import getConfig from "../envManager"
-import {CHAIN_MODE} from '@/constants'
+import {CHAIN_MODE, NETWORK_ID} from '@/constants'
 // // require('dotenv').config();
 // const {MODULE_ADDRESS,
 //       CRASH_RESOURCE_ACCOUNT_ADDRESS,
@@ -29,7 +29,7 @@ const provider = new Provider({
   fullnodeUrl: RPC_URL,
 })
 
-const aptosConfig = new AptosConfig({ network: CHAIN_MODE==='testnet'? Network.TESTNET: Network.DEVNET }); // default to devnet
+const aptosConfig = new AptosConfig({ network: NETWORK_ID }); // default to devnet
 const aptos = new Aptos(aptosConfig);
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
