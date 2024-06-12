@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://github.com/SeamMoney/zionbets/blob/main/move-mania-docs/src/images/zion_hero.png">
+</p>
+
 # Zion Bets: GambleFi on Aptos
 
 ## Introduction
@@ -10,6 +14,10 @@ Welcome to Zion Bets, a GambleFi project on the Aptos blockchain. Our platform i
 - **Fast:** Ultra-fast betting.
 - **Secure:** Audited MOVE contracts with built-in safety features.
 - **Smooth Mobile UX:** Play and chat live with friends in a seamless mobile experience.
+
+<p align="center">
+  <img src="https://github.com/SeamMoney/zionbets/blob/main/move-mania-docs/src/images/zion_app_showcase.png">
+</p>
 
 ## Modules
 The `crash.move` module implements the core functionality of the crash game. It includes the following key functions:
