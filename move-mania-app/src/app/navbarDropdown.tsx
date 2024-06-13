@@ -27,9 +27,9 @@ export default function NavbarDropdown() {
 
   const { isLoading, logIn, isLoggedIn } = useContext(keylessContext);
 
-  const [ emailPhoneToggle, setEmailPhoneToggle ] = useState<boolean>(false);
-  const [ phoneInput, setPhoneInput ] = useState<string>("");
-  const [ emailInput, setEmailInput ] = useState<string>("");
+  const [emailPhoneToggle, setEmailPhoneToggle] = useState<boolean>(false);
+  const [phoneInput, setPhoneInput] = useState<string>("");
+  const [emailInput, setEmailInput] = useState<string>("");
 
   const countryCodeRef = useRef<HTMLSelectElement>(null);
 
@@ -44,7 +44,7 @@ export default function NavbarDropdown() {
   return (
     <div className="flex flex-row items-center gap-2">
       {
-        !isLoggedIn && 
+        !isLoggedIn &&
         <button
           className="bg-white px-6 py-1 text-neutral-950 active:scale-95 active:opacity-50 transition-transform"
           onClick={logIn}
@@ -55,12 +55,10 @@ export default function NavbarDropdown() {
       <DropdownMenu>
         <DropdownMenuTrigger><Ellipsis /></DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DropdownMenuLabel>Navigation</DropdownMenuLabel>
           <Link href='/'><DropdownMenuItem>Crash</DropdownMenuItem></Link>
-          {/* <Link href='/pool'><DropdownMenuItem>Pool</DropdownMenuItem></Link> */}
+          <Link href='/pool'><DropdownMenuItem>Pool</DropdownMenuItem></Link>
           <Link href='/account'><DropdownMenuItem>My account</DropdownMenuItem></Link>
           <DropdownMenuSeparator />
-          <DropdownMenuLabel>Socials</DropdownMenuLabel>
           <Link href="https://twitter.com/zionbets" target="_blank"><DropdownMenuItem>Twitter</DropdownMenuItem></Link>
           <Link href="https://t.me/zion_bets" target="_blank"><DropdownMenuItem>Telegram</DropdownMenuItem></Link>
         </DropdownMenuContent>
