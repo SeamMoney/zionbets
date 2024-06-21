@@ -32,4 +32,108 @@ The `liquidity_pool.move` module manages the liquidity pool for Zion Bets. Key f
 - **calculate_payout:** Computes the payout for winning bets based on the current pool size.
 - **distribute_fees:** Allocates a portion of game fees to the liquidity pool and the platform.
 
-[![](https://mermaid.ink/img/pako:eNqtWPtPGzkQ_lesPXEEyaCE8NwiJAjlWl0oEaF3p15OK2fXJBb7qu0F0sL_fmN7H_bm0ZN6_JBsPONvZr552Mt3L8wi6vne1tb3SYoQS5n0kX5EaFvOaUK3fbQ9JYJuY3v1D8IZmcZUbNfqIMo5SwhfDLI442rfL93u9XW3W21tNO7pi2y0rvXfstZlxiPKN6DFLKUbxIKGWRq1HFJ_lo6kXDJHZcmbSsV1esnalISPM54VabTaUkJYevk4W-fGRmzJZLwp0hSyaNhaLQ_jQkAYa81X8g0QNJrRIZnS-NKJU3KSipxwmspVyjajRvqmvuDjbWtrkk7SGSf5HN1fGaEopmbhs6BcVHAIXUQJS_-eePp74v3TSEYxWVAOIvPgyIYjWB-yrwWLmFygEc-eWGTp0DRSLjiGJ96AEzFHv5GEopssKmI68RpILRxLIilA628kJC9CeTbl57tIsFlKeRCS3Edj_TwgOZmyGOwbjbDgiqtgBvg-us0ly9IzZezcyFVjZYVA759A6wNJI-gxJyjtgdoADmgnHfuScBlIltAgET4qjg7M-hwgaQD9wKkM5gDgoycayoyfFSelYUHidSJIcZQlKRU25JRKoYJM8pjekPyMRBEHDYwuqTxf9hhWwWH4dPzNddJ8VG6ukQOSQIFJy1wIGEFWyJozkLhmxir2khjDg-K4Q1TJ-OhXkxq8mQq8moaddsmF1MSTq8cAHO5UkdR2WlG4EAMwcFsohCquJT9b1GCLgSW4O_pESax5HmUsVbhcLwWhWsvVWgBJDCIG7LNpIWnwzNKUpTPRURHTKLB5WaZkPRsDEoeO5RAWihg6wxgPjPVnJudBU0idVk25eYG6AjfT2Y6W_aBfrQbPsnhFzw5HP9OwP2zI2r4ybw8c7Y5tDPJI-RPwkqlMD-Dz7MvF6L7ssjgLHyEPcbW91BiO1Felk-vNQaIo1U7fwJPl8krtacFTo30JT8vabhsVeR4v6iBUM-mVxrGOXmBOtZc6awv-jibZE7VRuV7ZjFoFsBb2_QucP6G8M8QCKjULgU216Nj7beLdti4snLxoY7STtvODsvydLlB9S0JQN7A3hbmUSmEXZ2lS4WpS1ldI50MWRwLB9QvlUFnbAj3AGSx2lmdt3YlN_9WTtDOo2jNCWoKe55RTDavmJdKbaBu2ch1Q62df4Y3fv79qnxg3F38Fg7uL8YdgdPvx0z3Y7u2fKMHg9vOn-6vbPz8FN-O1rb21pU9_9DGFGwnkEoZ9eRPQpz_a3T1__Qj3VAYxCO3zazP724pmMgoTlQn4dWlcmk3mAqF36Qkv1Ah_raf9ktId_VpQIYUezDCXX6upbjSHI611EUHO6iJ_bbeXo2uaxFFv9Y3FkXVNuaOQT0XTnOUlVc09RSNDziRcP8Vrc32w9DTICrU66ppei_yYfaPLeBVbWhFGMXtgK7RKojYrtbOktaEy_qMm1HmsVJ3jyeKvdWys4LA8N1rMOOO9VHQmvg6KpGSmPLXa27KtS3s30SfVKssNi3tNJO6sWxe5taEZaJbp6zh7RtkDulazo8yuW5JljuEcJmIphBWzXOtf0fX6ruNavVyCEcazZMWWxvWmiWS2jk531H4WQH1VZ3byq7Iw468qo7ouzJYwJkJc0QdUqBn0wOLYL9-FMBzl2SNt_dx9ZpGc-_v5Cw7V-5lfvly9a8GZe0AJaF6Ifg4Qhr-ejbWP6u-_QypxG_Kp5PB_hIzpDEb7zwPCm_7jWC7At4g-kCLWrxGbUGxHzHmAzezGMGxVbh2FZlzierbgagbichDgVTc7B6aek7jqYFyOOtzuVOzWJm41IW41GXabCFsNUhWC44nVKNg2Wp3dda6dXcMeHu7jYR8PD_DwsEzeOw97CeUJYZHne_qfPRNP_xNo4vnwGBH-qG40b6BHCpmNF2no-UAOxR7Pitnc8x_gCIZfRR4BjVeMwB0pqVdzkn7JMue353_3Xjx_t7e_d3p62OseHB91D7v9wxPsLTx___R4r9c77R2cHBz1D3v94zfsfdMIvb1uf79_cLR_1AX50XG___YvNpk57w?type=png)](https://mermaid.live/edit#pako:eNqtWPtPGzkQ_lesPXEEyaCE8NwiJAjlWl0oEaF3p15OK2fXJBb7qu0F0sL_fmN7H_bm0ZN6_JBsPONvZr552Mt3L8wi6vne1tb3SYoQS5n0kX5EaFvOaUK3fbQ9JYJuY3v1D8IZmcZUbNfqIMo5SwhfDLI442rfL93u9XW3W21tNO7pi2y0rvXfstZlxiPKN6DFLKUbxIKGWRq1HFJ_lo6kXDJHZcmbSsV1esnalISPM54VabTaUkJYevk4W-fGRmzJZLwp0hSyaNhaLQ_jQkAYa81X8g0QNJrRIZnS-NKJU3KSipxwmspVyjajRvqmvuDjbWtrkk7SGSf5HN1fGaEopmbhs6BcVHAIXUQJS_-eePp74v3TSEYxWVAOIvPgyIYjWB-yrwWLmFygEc-eWGTp0DRSLjiGJ96AEzFHv5GEopssKmI68RpILRxLIilA628kJC9CeTbl57tIsFlKeRCS3Edj_TwgOZmyGOwbjbDgiqtgBvg-us0ly9IzZezcyFVjZYVA759A6wNJI-gxJyjtgdoADmgnHfuScBlIltAgET4qjg7M-hwgaQD9wKkM5gDgoycayoyfFSelYUHidSJIcZQlKRU25JRKoYJM8pjekPyMRBEHDYwuqTxf9hhWwWH4dPzNddJ8VG6ukQOSQIFJy1wIGEFWyJozkLhmxir2khjDg-K4Q1TJ-OhXkxq8mQq8moaddsmF1MSTq8cAHO5UkdR2WlG4EAMwcFsohCquJT9b1GCLgSW4O_pESax5HmUsVbhcLwWhWsvVWgBJDCIG7LNpIWnwzNKUpTPRURHTKLB5WaZkPRsDEoeO5RAWihg6wxgPjPVnJudBU0idVk25eYG6AjfT2Y6W_aBfrQbPsnhFzw5HP9OwP2zI2r4ybw8c7Y5tDPJI-RPwkqlMD-Dz7MvF6L7ssjgLHyEPcbW91BiO1Felk-vNQaIo1U7fwJPl8krtacFTo30JT8vabhsVeR4v6iBUM-mVxrGOXmBOtZc6awv-jibZE7VRuV7ZjFoFsBb2_QucP6G8M8QCKjULgU216Nj7beLdti4snLxoY7STtvODsvydLlB9S0JQN7A3hbmUSmEXZ2lS4WpS1ldI50MWRwLB9QvlUFnbAj3AGSx2lmdt3YlN_9WTtDOo2jNCWoKe55RTDavmJdKbaBu2ch1Q62df4Y3fv79qnxg3F38Fg7uL8YdgdPvx0z3Y7u2fKMHg9vOn-6vbPz8FN-O1rb21pU9_9DGFGwnkEoZ9eRPQpz_a3T1__Qj3VAYxCO3zazP724pmMgoTlQn4dWlcmk3mAqF36Qkv1Ah_raf9ktId_VpQIYUezDCXX6upbjSHI611EUHO6iJ_bbeXo2uaxFFv9Y3FkXVNuaOQT0XTnOUlVc09RSNDziRcP8Vrc32w9DTICrU66ppei_yYfaPLeBVbWhFGMXtgK7RKojYrtbOktaEy_qMm1HmsVJ3jyeKvdWys4LA8N1rMOOO9VHQmvg6KpGSmPLXa27KtS3s30SfVKssNi3tNJO6sWxe5taEZaJbp6zh7RtkDulazo8yuW5JljuEcJmIphBWzXOtf0fX6ruNavVyCEcazZMWWxvWmiWS2jk531H4WQH1VZ3byq7Iw468qo7ouzJYwJkJc0QdUqBn0wOLYL9-FMBzl2SNt_dx9ZpGc-_v5Cw7V-5lfvly9a8GZe0AJaF6Ifg4Qhr-ejbWP6u-_QypxG_Kp5PB_hIzpDEb7zwPCm_7jWC7At4g-kCLWrxGbUGxHzHmAzezGMGxVbh2FZlzierbgagbichDgVTc7B6aek7jqYFyOOtzuVOzWJm41IW41GXabCFsNUhWC44nVKNg2Wp3dda6dXcMeHu7jYR8PD_DwsEzeOw97CeUJYZHne_qfPRNP_xNo4vnwGBH-qG40b6BHCpmNF2no-UAOxR7Pitnc8x_gCIZfRR4BjVeMwB0pqVdzkn7JMue353_3Xjx_t7e_d3p62OseHB91D7v9wxPsLTx___R4r9c77R2cHBz1D3v94zfsfdMIvb1uf79_cLR_1AX50XG___YvNpk57w)
+```mermaid
+%%{
+  init: {
+    'theme': 'base',
+    'themeVariables': {
+      'primaryColor': '#00FF00',
+      'primaryTextColor': '#FFFFFF',
+      'primaryBorderColor': '#00FF00',
+      'lineColor': '#00FF00',
+      'secondaryColor': '#000000',
+      'tertiaryColor': '#FFFFFF',
+      'tertiaryTextColor': '#00FF00',
+      'background': '#000000',
+      'mainBkg': '#000000',
+      'textColor': '#00FF00',
+      'titleColor': '#00FF00',
+      'nodeBorder': '#00FF00',
+      'clusterBkg': '#000000',
+      'clusterBorder': '#00FF00',
+      'edgeLabelBackground': 'transparent',
+      'edgeLabel': '#FFFFFF'
+    }
+  }
+}%%
+
+graph TD
+    subgraph Users
+        Admin["Admin"]
+        Player["Player"]
+        LP["Liquidity Provider"]
+    end
+
+    subgraph "Crash Game Module"
+        CrashState["State struct<br>- signer_cap: SignerCapability<br>- current_game: Option<Game><br>- Various EventHandles"]
+        CrashGame["Game struct<br>- start_time_ms: u64<br>- house_secret_hash: vector<u8><br>- salt_hash: vector<u8><br>- randomness: u64<br>- bets: SimpleMap<address, Bet>"]
+        CrashBet["Bet struct<br>- player: address<br>- bet_amount: u64<br>- cash_out: Option<u64>"]
+        StartGame["start_game(admin: &signer, house_secret_hash: vector<u8>, salt_hash: vector<u8>)"]
+        PlaceBet["place_bet(player: &signer, bet_amount: u64)"]
+        CashOut["cash_out(admin: &signer, player: address, cash_out: u64)"]
+        RevealCrashPoint["reveal_crashpoint_and_distribute_winnings(salted_house_secret: vector<u8>, salt: vector<u8>)"]
+        CalcCrashPoint["calculate_crash_point_with_randomness(randomness: u64, house_secret: String): u64"]
+    end
+
+    subgraph "Liquidity Pool Module"
+        LPState["State struct<br>- signer_cap: SignerCapability<br>- Various EventHandles"]
+        LiquidityPool["LiquidityPool struct<br>- reserve_coin: Coin<ZAPT><br>- locked_liquidity: Coin<LPCoin><br>- lp_coin_mint_cap: MintCapability<LPCoin><br>- lp_coin_burn_cap: BurnCapability<LPCoin>"]
+        SupplyLiquidity["supply_liquidity(supplier: &signer, supply_amount: u64)"]
+        RemoveLiquidity["remove_liquidity(supplier: &signer, lp_coin_amount: u64)"]
+        ExtractReserve["extract_reserve_coins(amount: u64): Coin<ZAPT>"]
+        PutReserve["put_reserve_coins(coin: Coin<ZAPT>)"]
+    end
+
+    subgraph "Key Variables and Constants"
+        ReserveCoin["reserve_coin: Coin<ZAPT><br>(Holds the pool's funds)"]
+        CrashPoint["crash_point: u64<br>(Calculated point where the game crashes)"]
+        Constants["Constants:<br>SEED: vector<u8><br>MAX_CRASH_POINT: u128<br>COUNTDOWN_MS: u64"]
+    end
+
+    %% User Interactions
+    Admin -->|Initiates game| StartGame
+    Admin -->|Reveals crash point| RevealCrashPoint
+    Player -->|Places bet| PlaceBet
+    Player -->|Requests cashout| CashOut
+    LP -->|Adds liquidity| SupplyLiquidity
+    LP -->|Removes liquidity| RemoveLiquidity
+
+    %% Crash Game Relationships
+    CrashState -->|Contains| CrashGame
+    CrashGame -->|Contains| CrashBet
+    StartGame -->|Initializes| CrashGame
+    PlaceBet -->|Modifies| CrashGame
+    CashOut -->|Modifies| CrashGame
+    RevealCrashPoint -->|Uses| CrashGame
+    RevealCrashPoint -->|Calls| CalcCrashPoint
+
+    %% Liquidity Pool Relationships
+    LPState -->|Contains| LiquidityPool
+    LiquidityPool -->|Manages| ReserveCoin
+
+    %% Inter-module Relationships
+    PlaceBet -.->|Calls| ExtractReserve
+    RevealCrashPoint -.->|Calls| PutReserve
+
+    %% Flow of Funds
+    SupplyLiquidity -->|Increases| ReserveCoin
+    RemoveLiquidity -->|Decreases| ReserveCoin
+    ExtractReserve -->|Extracts from| ReserveCoin
+    PutReserve -->|Adds to| ReserveCoin
+
+    %% Key Variables Usage
+    CalcCrashPoint -->|Calculates| CrashPoint
+
+
+    classDef user fill:#00FF00,stroke:#00FF00,stroke-width:2px,color:#000000;
+    classDef struct fill:#FFFFFF,stroke:#00FF00,stroke-width:2px,color:#000000;
+    classDef function fill:#000000,stroke:#00FF00,stroke-width:2px,color:#00FF00;
+    classDef variable fill:#000000,stroke:#00FF00,stroke-width:2px,color:#00FF00;
+    classDef legend fill:#000000,stroke:#00FF00,stroke-width:2px,color:#00FF00;
+    linkStyle default stroke:#00FF00,stroke-width:2px;
+    class Admin,Player,LP user;
+    class CrashState,CrashGame,CrashBet,LPState,LiquidityPool struct;
+    class StartGame,PlaceBet,CashOut,RevealCrashPoint,CalcCrashPoint,SupplyLiquidity,RemoveLiquidity,ExtractReserve,PutReserve function;
+    class ReserveCoin,CrashPoint,Constants variable;
+    class L1,L2,L3,L4,L5 legend;
+```
