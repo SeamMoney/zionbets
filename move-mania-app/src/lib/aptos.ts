@@ -64,7 +64,7 @@ export async function getBalance(userAddress: string, type: string) {
 
 }
 
-export async function transferApt(userWallet: MultiKeyAccount, amount: number, toAddress: string, type: string) {
+export async function transferApt(userWallet: Account, amount: number, toAddress: string, type: string) {
   // const token = new TxnBuilderTypes.TypeTagStruct(
   //   TxnBuilderTypes.StructTag.fromString(type)
   // );
