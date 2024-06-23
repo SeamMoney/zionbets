@@ -161,7 +161,7 @@ export async function registerForAPT(userAccount: AptosAccount) {
   };
 }
 
-export async function registerForZAPT(userWallet: MultiKeyAccount) {
+export async function registerForZAPT(userWallet: Account) {
 
   // const payload = new TxnBuilderTypes.TransactionPayloadEntryFunction(
   //   TxnBuilderTypes.EntryFunction.natural(
@@ -371,7 +371,7 @@ export async function quickRemoveGame() {
   };
 }
 
-export async function placeBet(userWallet: MultiKeyAccount, betData: BetData) {
+export async function placeBet(userWallet: Account, betData: BetData) {
 
   // await faucetClient.fundAccount(userAccount.address(), 10_0000_0000, 5)
 
@@ -437,7 +437,7 @@ export async function placeBet(userWallet: MultiKeyAccount, betData: BetData) {
   };
 }
 
-export async function cashOut(userWallet: MultiKeyAccount, cashOutData: CashOutData) {
+export async function cashOut(userWallet: Account, cashOutData: CashOutData) {
 
   // const payload = new TxnBuilderTypes.TransactionPayloadEntryFunction(
   //   TxnBuilderTypes.EntryFunction.natural(
