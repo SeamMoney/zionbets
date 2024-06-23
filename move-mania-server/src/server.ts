@@ -1,5 +1,5 @@
 import http from "http";
-
+import {AptosClient} from "aptos";
 import { Server } from "socket.io";
 import { ChatMessage, SOCKET_EVENTS } from "./types";
 import {
@@ -31,6 +31,8 @@ app.use(cors());
 
 const portHttps = 8080;
 
+const aptosClient = new AptosClient(`${ process.env.APTOS_NODE}/v1`);
+
 // USE FOR PRODUCTION
 import https from 'https';
 import fs from 'fs';
@@ -56,6 +58,12 @@ const io = new Server(httpsServer, {
 // httpsServer.listen(portHttps, () => {
 //   console.log("Server running on port:", portHttps);
 // });
+
+const getDateNow = async()=>{
+  const ledgerInfo = await aptosClient.getLedgerInfo();
+  const timestampInMicroseconds = ledgerInfo.ledger_timestamp;
+  return Math.floor(parseInt(timestampInMicroseconds)/1000);
+}
 
 io.on("connection", (socket) => {
   socket.on(SOCKET_EVENTS.SET_BET, async (betData) => {
@@ -97,7 +105,8 @@ io.on("connection", (socket) => {
       crashPoint,
     });
 
-    console.log(startTime + ((crashPoint == 0 ? 0 : log(EXPONENTIAL_FACTOR, crashPoint)) * 1000) - Date.now())
+    const now = await getDateNow();
+    console.log(startTime + ((crashPoint == 0 ? 0 : log(EXPONENTIAL_FACTOR, crashPoint)) * 1000) - now)
 
     setTimeout(async () => {
       const blockchainTxn = await endGameAptos('house_secret', 'salt', startTime + ((crashPoint == 0 ? 0 : log(EXPONENTIAL_FACTOR, crashPoint)) * 1000))
@@ -114,7 +123,7 @@ io.on("connection", (socket) => {
       setTimeout(async () => {
         await cycleRounds();
       }, SUMMARY);
-    }, startTime + ((crashPoint == 0 ? 0 : log(EXPONENTIAL_FACTOR, crashPoint)) * 1000) - Date.now());
+    }, startTime + ((crashPoint == 0 ? 0 : log(EXPONENTIAL_FACTOR, crashPoint)) * 1000) - now + 100);
   });
 
   socket.on(SOCKET_EVENTS.CHAT_MESSAGE, async (message) => {
@@ -128,7 +137,7 @@ io.on("connection", (socket) => {
 
 async function cycleRounds() {
   await clearPlayerList();
-  
+  const now = await getDateNow();
   let blockchainTxn = await createNewGame('house_secret', 'salt')
   console.log("blockchainTxn", blockchainTxn)
     
@@ -154,7 +163,7 @@ async function cycleRounds() {
     crashPoint,
   });
 
-  console.log(startTime + ((crashPoint == 0 ? 0 : log(EXPONENTIAL_FACTOR, crashPoint)) * 1000) - Date.now())
+  console.log(startTime + ((crashPoint == 0 ? 0 : log(EXPONENTIAL_FACTOR, crashPoint)) * 1000) - now)
 
   setTimeout(async () => {
     const blockchainTxn = await endGameAptos('house_secret', 'salt', startTime + ((crashPoint == 0 ? 0 : log(EXPONENTIAL_FACTOR, crashPoint)) * 1000))
@@ -171,7 +180,7 @@ async function cycleRounds() {
     setTimeout(async () => {
       await cycleRounds();
     }, SUMMARY);
-  }, startTime + ((crashPoint == 0 ? 0 : log(EXPONENTIAL_FACTOR, crashPoint)) * 1000) - Date.now());
+  }, startTime + ((crashPoint == 0 ? 0 : log(EXPONENTIAL_FACTOR, crashPoint)) * 1000) - now + 100);
 }
 
 
