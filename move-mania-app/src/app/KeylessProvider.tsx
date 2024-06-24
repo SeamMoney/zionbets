@@ -1,6 +1,6 @@
 'use client';
 
-import { Aptos, AptosConfig, Ed25519PrivateKey, EphemeralKeyPair, MultiKeyAccount, Network } from "@aptos-labs/ts-sdk";
+import { Aptos, Account, AptosConfig, Ed25519PrivateKey, EphemeralKeyPair, MultiKeyAccount, Network, Hex } from "@aptos-labs/ts-sdk";
 import { createContext, useEffect, useState } from "react";
 import { jwtDecode } from 'jwt-decode';
 import { User } from "@/lib/schema";
@@ -12,7 +12,7 @@ import { setUpAndGetUser } from "@/lib/api";
   export type StoredEphemeralKeyPairs = { [nonce: string]: EphemeralKeyPair };
 
 interface KeylessProviderProps {
-  keylessAccount: MultiKeyAccount | null;
+  keylessAccount: Account | null;
   userInfo: User | null;
   isLoggedIn: boolean;
   isLoading: boolean;
@@ -31,7 +31,7 @@ export const keylessContext = createContext<KeylessProviderProps>({
 
 export default function KeylessProvider({ children }: { children: React.ReactNode }) {
 
-  const [keylessAccount, setKeylessAccount] = useState<MultiKeyAccount | null>(null);
+  const [keylessAccount, setKeylessAccount] = useState<Account | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [userInfo, setUserInfo] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -46,6 +46,7 @@ export default function KeylessProvider({ children }: { children: React.ReactNod
     console.log("beginKeylessAuth");
 
     const ephemeralKeyPair = EphemeralKeyPair.generate();
+
     const redirectUri = window.location.href.split('?')[0]
     const clientId = process.env.GOOGLE_CLIENT_ID!
     // Get the nonce associated with ephemeralKeyPair
@@ -63,14 +64,15 @@ export default function KeylessProvider({ children }: { children: React.ReactNod
     console.log("finishKeylessAuth");
 
     setIsLoading(true);
-
     const jwt = parseJWTFromURL(window.location.href)
     if (!jwt) {
       console.log("No JWT found in URL")
       setIsLoading(false);
       return
     }
+
     const payload = jwtDecode<{ nonce: string }>(jwt);
+
     const jwtNonce = payload.nonce
     const ephemeralKeyPair = getLocalEphemeralKeyPair(jwtNonce);
 
@@ -80,16 +82,20 @@ export default function KeylessProvider({ children }: { children: React.ReactNod
       return
     }
 
-    const aptos = new Aptos(new AptosConfig({network: Network.DEVNET}));  // Only devnet supported as of now.
-    const keylessAccount = await aptos.deriveKeylessAccount({
-      jwt,
-      ephemeralKeyPair,
+    // const aptos = new Aptos(new AptosConfig({network: Network.DEVNET}));  // Only devnet supported as of now.
+    //to get privateKey from ephemeralKeyPair
+    const sKeyPair = JSON.stringify(ephemeralKeyPair);
+    const ephemeralKeyPairObj = JSON.parse(sKeyPair);
+    const privKeyObj = ephemeralKeyPairObj.privateKey.signingKey.data;
+    const privkeyArray:number[] = [];
+    Object.keys(privKeyObj).forEach(key => {
+      privkeyArray[Number(key)] = privKeyObj[key]
     });
-
+    const hexObj =new Hex(new Uint8Array(privkeyArray));
+    const keylessAccount = Account.fromPrivateKey({privateKey: new Ed25519PrivateKey(hexObj.toString())});
     console.log("keylessAccount", keylessAccount);
     setKeylessAccount(keylessAccount);
     setIsLoggedIn(true);
-
     const userAddress = keylessAccount.accountAddress.toString();
     setUpAndGetUser(
       {
@@ -216,17 +222,10 @@ export default function KeylessProvider({ children }: { children: React.ReactNod
    * Encoding for the EphemeralKeyPair class to be stored in localStorage
    */
   const EphemeralKeyPairEncoding = {
-    decode: (e: any) =>
-      new EphemeralKeyPair({
-        blinder: new Uint8Array(e.blinder),
-        expiryDateSecs: BigInt(e.expiryDateSecs),
-        privateKey: new Ed25519PrivateKey(e.privateKey),
-      }),
+    decode: (e: any) =>EphemeralKeyPair.fromBytes(e.data),
     encode: (e: EphemeralKeyPair) => ({
       __type: "EphemeralKeyPair",
-      blinder: Array.from(e.blinder),
-      expiryDateSecs: e.expiryDateSecs.toString(),
-      privateKey: e.privateKey.toString(),
+      data: e.bcsToBytes(),
     }),
   };
 
@@ -238,6 +237,8 @@ export default function KeylessProvider({ children }: { children: React.ReactNod
   ): string =>
     JSON.stringify(keyPairs, (_, e) => {
       if (typeof e === "bigint") return { __type: "bigint", value: e.toString() };
+      if (e instanceof Uint8Array)
+        return { __type: "Uint8Array", value: Array.from(e) };
       if (e instanceof EphemeralKeyPair)
         return EphemeralKeyPairEncoding.encode(e);
       return e;
@@ -251,10 +252,12 @@ export default function KeylessProvider({ children }: { children: React.ReactNod
   ): StoredEphemeralKeyPairs =>
     JSON.parse(encodedEphemeralKeyPairs, (_, e) => {
       if (e && e.__type === "bigint") return BigInt(e.value);
+      if (e && e.__type === "Uint8Array") return new Uint8Array(e.value);
       if (e && e.__type === "EphemeralKeyPair")
         return EphemeralKeyPairEncoding.decode(e);
       return e;
     });
+
 
   return (
     <keylessContext.Provider value={{
