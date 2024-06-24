@@ -1,3 +1,4 @@
+import http from "http";
 import express from "express";
 import {
   addChatMessage,
@@ -41,7 +42,8 @@ const options = {
 };
 const httpsServer = https.createServer(options, app);
 httpsServer.listen(portHttps, () => {
-    console.log('HTTPs Server running on port ', portHttps);
+    console.log('HTTP Server running on port ', portHttps);
+    server.emit(SOCKET_EVENTS.START_ROUND)
 });
 
 
@@ -176,9 +178,9 @@ app.delete("/users/:email", async (req, res) => {
 /* 
   The server will listen on port PORT
 */
-app.listen(portHttp, () => {
-  console.log("Server is running on port " + portHttp);
-  console.log("CORS-enabled for ", process.env.ZION_APP_URL || "http://localhost:3000");
+// app.listen(portHttp, () => {
+//   console.log("Server is running on port " + portHttp);
+//   console.log("CORS-enabled for ", process.env.ZION_APP_URL || "http://localhost:3000");
 
-server.emit(SOCKET_EVENTS.START_ROUND)
-});
+// server.emit(SOCKET_EVENTS.START_ROUND)
+// });
