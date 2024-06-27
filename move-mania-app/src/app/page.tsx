@@ -1,7 +1,7 @@
 import ControlCenter from "./controlCenter";
 import GameScreen from "./gameScreen";
 import PlayerList from "./playerList";
-import Leaderboard from "./Leaderboard";
+import Leaderboard from "./leaderboard";
 
 export default function CrashPage() {
 
