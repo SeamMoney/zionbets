@@ -31,11 +31,11 @@ export default function Leaderboard() {
     useEffect(() => {
         getUsers().then((users) => {
             console.log("got users", users)
-            getBalances(users).then((balances) => {
-                console.log(balances)
-                setUsers(balances);
-                console.log("Updated leaderboard")
-            });
+            // getBalances(users).then((balances) => {
+            //     console.log(balances)
+            //     setUsers(balances);
+            //     console.log("Updated leaderboard")
+            // });
         });
     }, [account]);
 
