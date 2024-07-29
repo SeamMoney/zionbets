@@ -4,7 +4,7 @@ import { User } from "./schema";
 import { MagicAptosWallet } from "@magic-ext/aptos";
 import { Account, Aptos, AptosConfig, Ed25519PrivateKey, MultiKeyAccount } from "@aptos-labs/ts-sdk";
 import getConfig from "../envManager"
-import {CHAIN_MODE, NETWORK_ID} from '@/constants'
+import { CHAIN_MODE, NETWORK_ID } from '@/constants'
 // // require('dotenv').config();
 // const {MODULE_ADDRESS,
 //       CRASH_RESOURCE_ACCOUNT_ADDRESS,
@@ -20,8 +20,8 @@ const CRASH_RESOURCE_ACCOUNT_ADDRESS = process.env.CRASH_RESOURCE_ACCOUNT_ADDRES
 const LP_RESOURCE_ACCOUNT_ADDRESS = process.env.LP_RESOURCE_ACCOUNT_ADDRESS as string;
 const Z_APT_RESOURCE_ACCOUNT_ADDRESS = process.env.Z_APT_RESOURCE_ACCOUNT_ADDRESS as string;
 
-export const RPC_URL = 'https://fullnode.testnet.aptoslabs.com';
-const FAUCET_URL = 'https://faucet.testnet.aptoslabs.com';
+export const RPC_URL = 'https://aptos.testnet.suzuka.movementlabs.xyz/v1';
+const FAUCET_URL = 'https://aptos.testnet.suzuka.movementlabs.xyz/v1';
 
 const client = new AptosClient(RPC_URL);
 const coinClient = new CoinClient(client);
@@ -284,7 +284,7 @@ export async function fundAccountWithGas(userAddress: string) {
 //   const fundTx = await client.waitForTransactionWithResult(transfer, { checkSuccess: true });
 //   console.log('fund', fundTx);
 //   // await sleep(5000);
-  
+
 //   await registerForZAPT(privateKey);
 
 //   const txn = await provider.generateTransaction(
@@ -495,7 +495,7 @@ export async function cashOut(userWallet: Account, cashOutData: CashOutData) {
   const txResult = await aptos.transaction.waitForTransaction({
     transactionHash: committedTransaction.hash,
   });
-  
+
 
   if (!txResult.success) {
     return null;
@@ -507,20 +507,31 @@ export async function cashOut(userWallet: Account, cashOutData: CashOutData) {
   };
 }
 
-export async function getDeposits() {
+/* export async function getDeposits() {
   try {
     const response = await provider.getEventsByEventHandle(
       LP_RESOURCE_ACCOUNT_ADDRESS,
       `${MODULE_ADDRESS}::liquidity_pool::State`,
       'deposit_events',
       {
-        limit: 100, 
+        limit: 100,
       }
     );
-  
-    
-  
+
+
+
     return response;
+  } catch (e) {
+    console.error(e);
+  }
+} */
+
+// Using REST API endpoint instead of indexer for querying events
+export async function getDeposits() {
+  try {
+    const response = await fetch(`${RPC_URL}/accounts/${LP_RESOURCE_ACCOUNT_ADDRESS}/events/${MODULE_ADDRESS}::liquidity_pool::State/deposit_events?limit=100`);
+    const data = await response.json();
+    return data;
   } catch (e) {
     console.error(e);
   }
@@ -528,18 +539,9 @@ export async function getDeposits() {
 
 export async function getWithdrawals() {
   try {
-    const response = await provider.getEventsByEventHandle(
-      LP_RESOURCE_ACCOUNT_ADDRESS,
-      `${MODULE_ADDRESS}::liquidity_pool::State`,
-      'withdraw_events',
-      {
-        limit: 100, 
-      }
-    );
-  
-    
-  
-    return response;
+    const response = await fetch(`${RPC_URL}/accounts/${LP_RESOURCE_ACCOUNT_ADDRESS}/events/${MODULE_ADDRESS}::liquidity_pool::State/withdraw_events?limit=100`);
+    const data = await response.json();
+    return data;
   } catch (e) {
     console.error(e);
   }
@@ -547,18 +549,9 @@ export async function getWithdrawals() {
 
 export async function getExtracts() {
   try {
-    const response = await provider.getEventsByEventHandle(
-      LP_RESOURCE_ACCOUNT_ADDRESS,
-      `${MODULE_ADDRESS}::liquidity_pool::State`,
-      'extract_events',
-      {
-        limit: 100, 
-      }
-    );
-  
-    
-  
-    return response;
+    const response = await fetch(`${RPC_URL}/accounts/${LP_RESOURCE_ACCOUNT_ADDRESS}/events/${MODULE_ADDRESS}::liquidity_pool::State/extract_events?limit=100`);
+    const data = await response.json();
+    return data;
   } catch (e) {
     console.error(e);
   }
@@ -566,18 +559,9 @@ export async function getExtracts() {
 
 export async function getPuts() {
   try {
-    const response = await provider.getEventsByEventHandle(
-      LP_RESOURCE_ACCOUNT_ADDRESS,
-      `${MODULE_ADDRESS}::liquidity_pool::State`,
-      'put_events',
-      {
-        limit: 100, 
-      }
-    );
-  
-    
-  
-    return response;
+    const response = await fetch(`${RPC_URL}/accounts/${LP_RESOURCE_ACCOUNT_ADDRESS}/events/${MODULE_ADDRESS}::liquidity_pool::State/put_events?limit=100`);
+    const data = await response.json();
+    return data;
   } catch (e) {
     console.error(e);
   }
@@ -585,18 +569,9 @@ export async function getPuts() {
 
 export async function getLocks() {
   try {
-    const response = await provider.getEventsByEventHandle(
-      LP_RESOURCE_ACCOUNT_ADDRESS,
-      `${MODULE_ADDRESS}::liquidity_pool::State`,
-      'lock_events',
-      {
-        limit: 100, 
-      }
-    );
-  
-    
-  
-    return response;
+    const response = await fetch(`${RPC_URL}/accounts/${LP_RESOURCE_ACCOUNT_ADDRESS}/events/${MODULE_ADDRESS}::liquidity_pool::State/lock_events?limit=100`);
+    const data = await response.json();
+    return data;
   } catch (e) {
     console.error(e);
   }
@@ -610,9 +585,9 @@ export async function getPoolAptSupply(version?: string) {
       arguments: [],
     },
     version
-  );  
+  );
 
-  
+
 
   return response;
 }
@@ -625,9 +600,9 @@ export async function getLPCoinSupply(version?: string) {
       arguments: [],
     },
     version
-  );  
+  );
 
-  
+
 
   return parseInt(response[0].toString()) / APT
 }
@@ -640,9 +615,9 @@ export async function getLockedLPCoinSupply(version?: string) {
       arguments: [],
     },
     version
-  );  
+  );
 
-  
+
 
   return parseInt(response[0].toString()) / APT
 }
@@ -700,17 +675,14 @@ export async function withdrawPool(userWallet: MagicAptosWallet, amount: number)
   };
 }
 
-
-
 export async function getCrashCalculationEvents() {
-  const res = await provider.getEventsByCreationNumber(
-    '0x44d6cd854567d0bb4fc23ee3df1cb7eec15fea87c8cb844713c6166982826715',
-    "5"
-  );
-
-  
-
-  return res;
+  try {
+    const response = await fetch(`${RPC_URL}/accounts/0x44d6cd854567d0bb4fc23ee3df1cb7eec15fea87c8cb844713c6166982826715/events/5?limit=100`);
+    const data = await response.json();
+    return data;
+  } catch (e) {
+    console.error(e);
+  }
 }
 
 export async function simulateDeposit(userWallet: MagicAptosWallet, amount: number) {
@@ -751,7 +723,7 @@ export async function simulateDeposit(userWallet: MagicAptosWallet, amount: numb
   //   let lp_coin_received = 0;
 
   //   tx[0].changes.forEach((change) => {
-      
+
   //     if ((change as any).data && (change as any).data.type === `0x1::coin::CoinStore<${MODULE_ADDRESS}::liquidity_pool::LPCoin>`) {
   //       // console.log((change as any).data);
   //       // console.log((change as any).data.data.coin.value);
@@ -793,7 +765,7 @@ export async function simulateWithdraw(userWallet: MagicAptosWallet, amount: num
   //   let apt_received = 0;
 
   //   tx[0].changes.forEach((change) => {
-      
+
   //     if ((change as any).data && (change as any).data.type === `0x1::coin::CoinStore<${MODULE_ADDRESS}::z_apt::ZAPT>`) {
   //       // console.log((change as any).data);
   //       // console.log((change as any).data.data.coin.value);
