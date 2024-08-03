@@ -1,5 +1,5 @@
 import { PlayerState } from "@/app/playerList";
-import { fundAccountWithGas, mintZAPT, registerForZAPT } from "./aptos";
+import { fundAccountWithGas, mintGMOVE, registerForGMOVE } from "./aptos";
 import { User } from "./schema";
 import { ChatMessage } from "./types";
 import { MagicAptosWallet } from "@magic-ext/aptos";
@@ -51,8 +51,8 @@ export async function setUpUser(
 
   // const keyPair = await createAptosKeyPair();
   await fundAccountWithGas(userToSetup.address);
-  await registerForZAPT(userWallet);
-  await mintZAPT(userToSetup.address, 1000);
+  await registerForGMOVE(userWallet);
+  await mintGMOVE(userToSetup.address, 1000);
 
   try {
     const response = await fetch(`${API_URL}/users`, {
@@ -107,7 +107,7 @@ export async function getUser(address: string): Promise<User | null> {
 }
 
 export async function setUpAndGetUser(
-  userToSetup: Omit<User, "referred_by" | "referral_code" | "username">, 
+  userToSetup: Omit<User, "referred_by" | "referral_code" | "username">,
   userWallet: Account,
   referrer?: string
 ): Promise<User | null> {

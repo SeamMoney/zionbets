@@ -10,7 +10,7 @@ interface EnvConfig {
     MODULE_ADDRESS: string;
     CRASH_RESOURCE_ACCOUNT_ADDRESS: string;
     LP_RESOURCE_ACCOUNT_ADDRESS: string;
-    Z_APT_RESOURCE_ACCOUNT_ADDRESS: string;
+    G_MOVE_RESOURCE_ACCOUNT_ADDRESS: string;
 }
 
 function getConfig(): EnvConfig {
@@ -25,13 +25,13 @@ function getConfig(): EnvConfig {
         MODULE_ADDRESS,
         CRASH_RESOURCE_ACCOUNT_ADDRESS,
         LP_RESOURCE_ACCOUNT_ADDRESS,
-        Z_APT_RESOURCE_ACCOUNT_ADDRESS
+        G_MOVE_RESOURCE_ACCOUNT_ADDRESS
     } = process.env;
 
     if (!MOVEMENT_NODE || !APTOS_NODE || !CHAIN_MODE || !DEV_MODE ||
         !ADMIN_ACCOUNT_PRIVATE_KEY || !MODULE_ADDRESS || !CRASH_RESOURCE_ACCOUNT_ADDRESS ||
-        !LP_RESOURCE_ACCOUNT_ADDRESS || !Z_APT_RESOURCE_ACCOUNT_ADDRESS) {
-        const envs = [ MOVEMENT_NODE,
+        !LP_RESOURCE_ACCOUNT_ADDRESS || !G_MOVE_RESOURCE_ACCOUNT_ADDRESS) {
+        const envs = [MOVEMENT_NODE,
             APTOS_NODE,
             CHAIN_MODE,
             ZION_API_URL,
@@ -41,19 +41,19 @@ function getConfig(): EnvConfig {
             MODULE_ADDRESS,
             CRASH_RESOURCE_ACCOUNT_ADDRESS,
             LP_RESOURCE_ACCOUNT_ADDRESS,
-            Z_APT_RESOURCE_ACCOUNT_ADDRESS]
-            for (let i = 0; i < envs.length; i++) {
-                if(!envs[i]){
-                    console.log(i,envs)
-                }
-              }
+            G_MOVE_RESOURCE_ACCOUNT_ADDRESS]
+        for (let i = 0; i < envs.length; i++) {
+            if (!envs[i]) {
+                console.log(i, envs)
+            }
+        }
 
         throw new Error('One or more environment variables are not defined');
     }
 
     const config: EnvConfig = {
-        NODE_URL: (CHAIN_MODE === 'Aptos' ? APTOS_NODE : MOVEMENT_NODE) as string,
-        CHAIN_MODE: CHAIN_MODE,
+        NODE_URL: "https://aptos.testnet.suzuka.movementlabs.xyz/v1",
+        CHAIN_MODE: "Movement",
         ZION_API_URL: DEV_MODE === 'local' ? 'http://localhost:3008' : 'https://api.zionapi.xyz',
         ZION_APP_URL: DEV_MODE === 'local' ? 'http://localhost:3000' : 'https://app.zion.bet',
         DEV_MODE: DEV_MODE,
@@ -62,7 +62,7 @@ function getConfig(): EnvConfig {
         MODULE_ADDRESS: MODULE_ADDRESS as string,
         CRASH_RESOURCE_ACCOUNT_ADDRESS: CRASH_RESOURCE_ACCOUNT_ADDRESS as string,
         LP_RESOURCE_ACCOUNT_ADDRESS: LP_RESOURCE_ACCOUNT_ADDRESS as string,
-        Z_APT_RESOURCE_ACCOUNT_ADDRESS: Z_APT_RESOURCE_ACCOUNT_ADDRESS as string
+        G_MOVE_RESOURCE_ACCOUNT_ADDRESS: G_MOVE_RESOURCE_ACCOUNT_ADDRESS as string
     };
     console.log(config)
 

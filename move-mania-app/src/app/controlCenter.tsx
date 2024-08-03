@@ -33,7 +33,7 @@ export type GameStatus = {
   status: "COUNTDOWN" | "IN_PROGRESS" | "END";
   roundId: string;
   startTime: number;
-  crashPoint : number;
+  crashPoint: number;
 };
 
 export default function ControlCenter() {
@@ -41,7 +41,7 @@ export default function ControlCenter() {
     gameStatus,
     latestAction
   } = useContext(gameStatusContext);
-  const { isLoggedIn, userInfo, keylessAccount} = useContext(keylessContext);
+  const { isLoggedIn, userInfo, keylessAccount } = useContext(keylessContext);
 
   const { toast } = useToast()
 
@@ -89,14 +89,14 @@ export default function ControlCenter() {
     if (!isLoggedIn || !userInfo || !keylessAccount) return;
 
     toast({
-      title: "Placing bet at " + betAmount + " zAPT...",
+      title: "Placing bet at " + betAmount + " GMOVE...",
     })
 
     const blockchainRes = await placeBet(keylessAccount, {
       roundId: 1,
       playerEmail: userInfo.address,
       betAmount: parseFloat(betAmount),
-      coinType: "APT",
+      coinType: "MOVE",
     })
 
     if (!blockchainRes) {
@@ -112,13 +112,13 @@ export default function ControlCenter() {
       roundId: 1,
       playerEmail: userInfo.address,
       betAmount: parseFloat(betAmount),
-      coinType: "APT",
+      coinType: "MOVE",
     };
     const success = setNewBet(data);
 
     toast({
-      title: "Bet placed at " + betAmount + " zAPT",
-      description: <Link href={`https://explorer.aptoslabs.com/txn/${blockchainRes.version}/?network=${CHAIN_MODE}`} target="_blank" className="underline">View transaction</Link>
+      title: "Bet placed at " + betAmount + " GMOVE",
+      description: <Link href={`https://blue.explorer.movementlabs.xyz/txn/${blockchainRes.version}/?network=testnet`} target="_blank" className="underline">View transaction</Link>
     })
   };
 
@@ -160,7 +160,7 @@ export default function ControlCenter() {
 
     toast({
       title: "Cashed out at " + cashoutMultipler + "x",
-      description: <Link href={`https://explorer.aptoslabs.com/txn/${blockchainRes.version}/?network=${CHAIN_MODE}`} target="_blank" className="underline">View transaction</Link>
+      description: <Link href={`https://blue.explorer.movementlabs.xyz/txn/${blockchainRes.version}/?network=testnet`} target="_blank" className="underline">View transaction</Link>
     })
 
   };
@@ -181,49 +181,45 @@ export default function ControlCenter() {
                 placeholder="2.50"
                 disabled={!(gameStatus?.startTime !== undefined && gameStatus.startTime > Date.now())}
               ></input>
-              <span>APT</span>
+              <span>GMOVE</span>
             </span>
           </div>
           <div className="flex flex-row items-center text-xs w-full">
             <div
-              className={`border px-2 py-1 cursor-pointer grow text-center ${
-                parseFloat(betAmount) === 1
-                  ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
-                  : "opacity-50 border-neutral-700"
-              }`}
+              className={`border px-2 py-1 cursor-pointer grow text-center ${parseFloat(betAmount) === 1
+                ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
+                : "opacity-50 border-neutral-700"
+                }`}
               onClick={() => setBetAmount("1")}
             >
-              1 APT
+              1 GMOVE
             </div>
             <div
-              className={`border px-2 py-1 cursor-pointer grow text-center ${
-                parseFloat(betAmount) === 5
-                  ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
-                  : "opacity-50 border-neutral-700"
-              }`}
+              className={`border px-2 py-1 cursor-pointer grow text-center ${parseFloat(betAmount) === 5
+                ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
+                : "opacity-50 border-neutral-700"
+                }`}
               onClick={() => setBetAmount("5")}
             >
-              5 APT
+              5 GMOVE
             </div>
             <div
-              className={`border px-2 py-1 cursor-pointer grow text-center ${
-                parseFloat(betAmount) === 10
-                  ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
-                  : "opacity-50 border-neutral-700"
-              }`}
+              className={`border px-2 py-1 cursor-pointer grow text-center ${parseFloat(betAmount) === 10
+                ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
+                : "opacity-50 border-neutral-700"
+                }`}
               onClick={() => setBetAmount("10")}
             >
-              10 APT
+              10 GMOVE
             </div>
             <div
-              className={`border px-2 py-1 cursor-pointer grow text-center ${
-                parseFloat(betAmount) === 25
-                  ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
-                  : "opacity-50 border-neutral-700"
-              }`}
+              className={`border px-2 py-1 cursor-pointer grow text-center ${parseFloat(betAmount) === 25
+                ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
+                : "opacity-50 border-neutral-700"
+                }`}
               onClick={() => setBetAmount("25")}
             >
-              25 APT
+              25 GMOVE
             </div>
           </div>
         </div>
@@ -246,7 +242,7 @@ export default function ControlCenter() {
                   !hasBet
                     ? "cursor-not-allowed"
                     : "bg-[#264234]/40 hover:cursor-pointer border-green-700 text-green-500",
-                    (parseFloat(betAmount) > 0) && !hasBet && "bg-[#404226]/40 active:scale-95 active:opacity-80 transition-transform",
+                  (parseFloat(betAmount) > 0) && !hasBet && "bg-[#404226]/40 active:scale-95 active:opacity-80 transition-transform",
                 )}
                 onClick={onSetBet}
                 disabled={!(parseFloat(betAmount) > 0) || hasBet}
@@ -258,7 +254,7 @@ export default function ControlCenter() {
             )
           }
           {
-            isLoggedIn && userInfo && gameStatus?.status === "IN_PROGRESS" && hasBet &&  (
+            isLoggedIn && userInfo && gameStatus?.status === "IN_PROGRESS" && hasBet && (
               <button
                 className={cn(
                   "border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 w-full",
@@ -277,7 +273,7 @@ export default function ControlCenter() {
             )
           }
           {
-            isLoggedIn && userInfo && gameStatus?.status === "IN_PROGRESS" && !hasBet &&  (
+            isLoggedIn && userInfo && gameStatus?.status === "IN_PROGRESS" && !hasBet && (
               <button
                 className="border px-6 py-1 border-yellow-700 text-yellow-500 bg-neutral-950 cursor-not-allowed w-full"
                 disabled
@@ -322,11 +318,10 @@ export default function ControlCenter() {
                 </div>
                 <div className="flex flex-row items-center text-xs">
                   <div
-                    className={`text-center border px-2 py-1 cursor-pointer grow ${
-                      parseFloat(autoCashoutAmount) === 1.01
-                        ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
-                        : "opacity-50 border-neutral-700"
-                    }`}
+                    className={`text-center border px-2 py-1 cursor-pointer grow ${parseFloat(autoCashoutAmount) === 1.01
+                      ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
+                      : "opacity-50 border-neutral-700"
+                      }`}
                     onClick={() => {
                       setAutoCashout(false);
                       setAutoCashoutAmount("1.01");
@@ -335,11 +330,10 @@ export default function ControlCenter() {
                     1.01x
                   </div>
                   <div
-                    className={`text-center border px-2 py-1 cursor-pointer grow ${
-                      parseFloat(autoCashoutAmount) === 1.5
-                        ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
-                        : "opacity-50 border-neutral-700"
-                    }`}
+                    className={`text-center border px-2 py-1 cursor-pointer grow ${parseFloat(autoCashoutAmount) === 1.5
+                      ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
+                      : "opacity-50 border-neutral-700"
+                      }`}
                     onClick={() => {
                       setAutoCashout(false);
                       setAutoCashoutAmount("1.5");
@@ -348,11 +342,10 @@ export default function ControlCenter() {
                     1.5x
                   </div>
                   <div
-                    className={`text-center border px-2 py-1 cursor-pointer grow ${
-                      parseFloat(autoCashoutAmount) === 2
-                        ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
-                        : "opacity-50 border-neutral-700"
-                    }`}
+                    className={`text-center border px-2 py-1 cursor-pointer grow ${parseFloat(autoCashoutAmount) === 2
+                      ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
+                      : "opacity-50 border-neutral-700"
+                      }`}
                     onClick={() => {
                       setAutoCashout(false);
                       setAutoCashoutAmount("2");
@@ -361,11 +354,10 @@ export default function ControlCenter() {
                     2x
                   </div>
                   <div
-                    className={`text-center border px-2 py-1 cursor-pointer grow ${
-                      parseFloat(autoCashoutAmount) === 5
-                        ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
-                        : "opacity-50 border-neutral-700"
-                    }`}
+                    className={`text-center border px-2 py-1 cursor-pointer grow ${parseFloat(autoCashoutAmount) === 5
+                      ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
+                      : "opacity-50 border-neutral-700"
+                      }`}
                     onClick={() => {
                       setAutoCashout(false);
                       setAutoCashoutAmount("5");
@@ -396,11 +388,11 @@ export default function ControlCenter() {
                         (parseFloat(autoCashoutAmount) > 0) && " active:scale-95 active:opacity-80 transition-transform",
                       )}
                       onClick={() => {
-                        if (!autoCashoutAmount || parseFloat(autoCashoutAmount) <= 0){
-                          return 
+                        if (!autoCashoutAmount || parseFloat(autoCashoutAmount) <= 0) {
+                          return
                         }
                         setAutoCashout(!autoCashout);
-                  
+
                       }}
                     >
                       {
@@ -416,7 +408,7 @@ export default function ControlCenter() {
       </Accordion>
 
 
-      
+
 
     </div>
   );

@@ -2,9 +2,13 @@
 name = "zion"
 version = "1.0.0"
 authors = []
+upgrade_policy = "compatible"
 
 [addresses]
-zion = "44d161f68d7ecdb6e0a52572cecd35249ac1e0f8f3857f199578e7a5c03bd381"
+zion = "fb75a7fa8d5c9153e55bc01d59c4f4ad0b250caf8305a0b57529f562531c07c4"
+g_move = "2fed926a32b8dfefd78f19b83abb8a0d5b37c36de7abbdeecccb83ef453fcc5a"
+liquidity_pool = "d27f6cb7edddb432031925b92bb71a95f787cd03df5f1e9f2292a222d85b239b"
+crash = "a7930d58b5ab4d61c7ffa7c0b9255094fde5f62b6c4cf7ef7b84606f5c26b7cd"
 std = "0x1"
 aptos_std = "0x1"
 aptos_framework = "0x1"
