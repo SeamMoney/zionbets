@@ -16,7 +16,7 @@ import { User } from "@/lib/schema";
 import { cashOutBet, setNewBet } from "@/lib/socket";
 import { SOCKET_EVENTS } from "@/lib/types";
 import { EXPONENTIAL_FACTOR, calculateCurrentCrashPoint, cn, log } from "@/lib/utils";
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { socket } from "@/lib/socket";
 import { gameStatusContext } from "./CrashProvider";
 import { cashOut, placeBet } from "@/lib/aptos";
@@ -57,64 +57,7 @@ export default function ControlCenter() {
     }
   }, [gameStatus, account, latestAction]);
 
-  useEffect(() => {
-    if (gameStatus?.status === "IN_PROGRESS") {
-      checkAutoCashout();
-    }
-  }, [gameStatus]);
-
-  const checkAutoCashout = () => {
-    const timeUntilCrash = gameStatus?.startTime! + log(EXPONENTIAL_FACTOR, gameStatus?.crashPoint!) * 1000 - Date.now();
-    const timeUntilCashout = gameStatus?.startTime! + log(EXPONENTIAL_FACTOR, parseFloat(autoCashoutAmount)!) * 1000 - Date.now();
-    if (hasBet && autoCashout && timeUntilCashout < timeUntilCrash && timeUntilCashout > 0) {
-      setTimeout(() => {
-        onCashOut();
-      }, timeUntilCashout);
-    }
-  }
-
-  const onSetBet = async () => {
-    if (!socket || !account || !gameStatus) return;
-
-    toast({
-      title: "Placing bet at " + betAmount + " GMOVE...",
-    })
-
-    try {
-      const blockchainRes = await placeBet(account.private_key, {
-        roundId: parseInt(gameStatus.roundId),
-        playerEmail: account.email,
-        betAmount: parseFloat(betAmount),
-        coinType: "GMOVE",
-      });
-
-      if (!blockchainRes) {
-        throw new Error('Error placing bet');
-      }
-
-      const data = {
-        roundId: parseInt(gameStatus.roundId),
-        playerEmail: account.email,
-        betAmount: parseFloat(betAmount),
-        coinType: "GMOVE",
-      };
-      setNewBet(data);
-
-      toast({
-        title: "Bet placed at " + betAmount + " GMOVE",
-        description: <Link href={`https://blue.explorer.movementlabs.xyz/txn/${blockchainRes.txnHash}/?network=testnet`} target="_blank" className="underline">View transaction</Link>
-      })
-      setHasBet(true);
-    } catch (error) {
-      console.error('Error placing bet:', error);
-      toast({
-        title: "Error placing bet",
-        description: "Please try again"
-      })
-    }
-  };
-
-  const onCashOut = async () => {
+  const onCashOut = useCallback(async () => {
     if (!socket || !account || !gameStatus?.startTime) return;
 
     const cashoutMultipler = Number(calculateCurrentCrashPoint((Date.now() - gameStatus.startTime) / 1000).toFixed(2));
@@ -153,7 +96,67 @@ export default function ControlCenter() {
         description: "Please try again"
       })
     }
-  };
+  }, [socket, account, gameStatus, toast]);
+
+
+  const checkAutoCashout = useCallback(() => {
+    const timeUntilCrash = gameStatus?.startTime! + log(EXPONENTIAL_FACTOR, gameStatus?.crashPoint!) * 1000 - Date.now();
+    const timeUntilCashout = gameStatus?.startTime! + log(EXPONENTIAL_FACTOR, parseFloat(autoCashoutAmount)!) * 1000 - Date.now();
+    if (hasBet && autoCashout && timeUntilCashout < timeUntilCrash && timeUntilCashout > 0) {
+      setTimeout(() => {
+        onCashOut();
+      }, timeUntilCashout);
+    }
+  }, [gameStatus, autoCashout, autoCashoutAmount, hasBet, onCashOut]);
+
+  useEffect(() => {
+    if (gameStatus?.status === "IN_PROGRESS") {
+      checkAutoCashout();
+    }
+  }, [gameStatus, checkAutoCashout]);
+
+  const onSetBet = useCallback(async () => {
+    if (!socket || !account || !gameStatus) return;
+
+    toast({
+      title: "Placing bet at " + betAmount + " GMOVE...",
+    })
+
+    try {
+      const blockchainRes = await placeBet(account.private_key, {
+        roundId: parseInt(gameStatus.roundId),
+        playerEmail: account.email,
+        betAmount: parseFloat(betAmount),
+        coinType: "GMOVE",
+      });
+
+      if (!blockchainRes) {
+        throw new Error('Error placing bet');
+      }
+
+      const data = {
+        roundId: parseInt(gameStatus.roundId),
+        playerEmail: account.email,
+        betAmount: parseFloat(betAmount),
+        coinType: "GMOVE",
+      };
+      setNewBet(data);
+
+      toast({
+        title: "Bet placed at " + betAmount + " GMOVE",
+        description: <Link href={`https://blue.explorer.movementlabs.xyz/txn/${blockchainRes.txnHash}/?network=testnet`} target="_blank" className="underline">View transaction</Link>
+      })
+      setHasBet(true);
+    } catch (error) {
+      console.error('Error placing bet:', error);
+      toast({
+        title: "Error placing bet",
+        description: "Please try again"
+      })
+    }
+  }, [socket, account, gameStatus, betAmount, toast]);
+
+
 
   return (
     <div className="w-full h-full flex flex-col gap-4 items-start p-2">

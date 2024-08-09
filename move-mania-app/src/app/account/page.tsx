@@ -42,7 +42,7 @@ export default function AccountPage() {
         <input type="text" autoFocus className="hidden" />
         <span className="text-lg">Edit profile</span>
         <p className="text-sm opacity-50">
-          Make changes to your profile here. Click save when you're done.
+          Make changes to your profile here.
         </p>
       </div>
       <div className="grid gap-4 py-4">
