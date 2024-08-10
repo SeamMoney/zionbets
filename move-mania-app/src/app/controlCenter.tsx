@@ -96,7 +96,7 @@ export default function ControlCenter() {
         description: "Please try again"
       })
     }
-  }, [socket, account, gameStatus, toast]);
+  }, [account, gameStatus, toast]);
 
 
   const checkAutoCashout = useCallback(() => {
@@ -154,7 +154,7 @@ export default function ControlCenter() {
         description: "Please try again"
       })
     }
-  }, [socket, account, gameStatus, betAmount, toast]);
+  }, [account, gameStatus, betAmount, toast, setNewBet, setHasBet]);
 
 
 
