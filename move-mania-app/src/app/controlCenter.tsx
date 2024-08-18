@@ -86,7 +86,7 @@ export default function ControlCenter() {
 
       toast({
         title: "Cashed out at " + cashoutMultipler + "x",
-        description: <Link href={`https://blue.explorer.movementlabs.xyz/txn/${blockchainRes.txnHash}/?network=testnet`} target="_blank" className="underline">View transaction</Link>
+        description: <Link href={`https://explorer.aptoslabs.com/txn/${blockchainRes.txnHash}/?network=testnet`} target="_blank" className="underline">View transaction</Link>
       })
       setHasCashOut(true);
     } catch (error) {
@@ -119,7 +119,7 @@ export default function ControlCenter() {
     if (!socket || !account || !gameStatus) return;
 
     toast({
-      title: "Placing bet at " + betAmount + " GMOVE...",
+      title: "Placing bet at " + betAmount + " ZAPT...",
     })
 
     try {
@@ -127,7 +127,7 @@ export default function ControlCenter() {
         roundId: parseInt(gameStatus.roundId),
         playerEmail: account.email,
         betAmount: parseFloat(betAmount),
-        coinType: "GMOVE",
+        coinType: "ZAPT",
       });
 
       if (!blockchainRes) {
@@ -138,13 +138,13 @@ export default function ControlCenter() {
         roundId: parseInt(gameStatus.roundId),
         playerEmail: account.email,
         betAmount: parseFloat(betAmount),
-        coinType: "GMOVE",
+        coinType: "ZAPT",
       };
       setNewBet(data);
 
       toast({
-        title: "Bet placed at " + betAmount + " GMOVE",
-        description: <Link href={`https://blue.explorer.movementlabs.xyz/txn/${blockchainRes.txnHash}/?network=testnet`} target="_blank" className="underline">View transaction</Link>
+        title: "Bet placed at " + betAmount + " ZAPT",
+        description: <Link href={`https://explorer.aptoslabs.com/txn/${blockchainRes.txnHash}/?network=testnet`} target="_blank" className="underline">View transaction</Link>
       })
       setHasBet(true);
     } catch (error) {
@@ -174,7 +174,7 @@ export default function ControlCenter() {
                 placeholder="2.50"
                 disabled={!(gameStatus?.startTime !== undefined && gameStatus.startTime > Date.now())}
               ></input>
-              <span>GMOVE</span>
+              <span>ZAPT</span>
             </span>
           </div>
           <div className="flex flex-row items-center text-xs w-full">
@@ -185,7 +185,7 @@ export default function ControlCenter() {
                 }`}
               onClick={() => setBetAmount("1")}
             >
-              1 GMOVE
+              1 ZAPT
             </div>
             <div
               className={`border px-2 py-1 cursor-pointer grow text-center ${parseFloat(betAmount) === 5
@@ -194,7 +194,7 @@ export default function ControlCenter() {
                 }`}
               onClick={() => setBetAmount("5")}
             >
-              5 GMOVE
+              5 ZAPT
             </div>
             <div
               className={`border px-2 py-1 cursor-pointer grow text-center ${parseFloat(betAmount) === 10
@@ -203,7 +203,7 @@ export default function ControlCenter() {
                 }`}
               onClick={() => setBetAmount("10")}
             >
-              10 GMOVE
+              10 ZAPT
             </div>
             <div
               className={`border px-2 py-1 cursor-pointer grow text-center ${parseFloat(betAmount) === 25
@@ -212,7 +212,7 @@ export default function ControlCenter() {
                 }`}
               onClick={() => setBetAmount("25")}
             >
-              25 GMOVE
+              25 ZAPT
             </div>
           </div>
         </div>

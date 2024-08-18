@@ -28,7 +28,7 @@ export default function BalanceButton() {
 
   useEffect(() => {
     if (account) {
-      getBalance(account.public_address, `${process.env.MODULE_ADDRESS}::g_move::GMOVE`).then((balance) => {
+      getBalance(account.public_address, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`).then((balance) => {
         setBalance(balance);
       });
     }
@@ -37,7 +37,7 @@ export default function BalanceButton() {
   useEffect(() => {
     if (account) {
       const interval = setInterval(() => {
-        getBalance(account.public_address, `${process.env.MODULE_ADDRESS}::g_move::GMOVE`).then((balance) => {
+        getBalance(account.public_address, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`).then((balance) => {
           setBalance(balance);
         });
       }, 1000);
@@ -73,7 +73,7 @@ export default function BalanceButton() {
         account.private_key,
         parseFloat(transferAmount),
         recipientAddress,
-        `${process.env.MODULE_ADDRESS}::g_move::GMOVE`
+        `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`
       );
 
       if (!tx) {
@@ -82,8 +82,9 @@ export default function BalanceButton() {
 
       toast({
         title: "Funds withdrawn",
-        description: <Link href={`https://blue.explorer.movementlabs.xyz/txn/${tx.txnHash}/?network=testnet`} target="_blank" className="underline">View transaction</Link>
+        description: <Link href={`https://explorer.aptoslabs.com/txn/${tx.txnHash}/?network=testnet`} target="_blank" className="underline">View transaction</Link>
       });
+
 
       setRecipientAddress('');
       setTransferAmount('');
@@ -106,15 +107,15 @@ export default function BalanceButton() {
     <Dialog>
       <DialogTrigger asChild>
         <button className="bg-neutral-800 hover:bg-neutral-700 px-2 py-1 text-xs text-white font-semibold">
-          {balance?.toFixed(2) || '0.00'} GMOVE
+          {balance?.toFixed(2) || '0.00'} ZAPT
         </button>
       </DialogTrigger>
       <DialogContent className="bg-neutral-950">
         <input type="text" autoFocus className="hidden" />
-        <DialogTitle>Your balance: <span className="font-normal">{balance?.toFixed(2) || '0.00'} GMOVE</span></DialogTitle>
+        <DialogTitle>Your balance: <span className="font-normal">{balance?.toFixed(2) || '0.00'} ZAPT</span></DialogTitle>
         <DialogTitle>Deposit Funds</DialogTitle>
         <DialogDescription>
-          Send GMOVE to the public address below to deposit funds into your account.
+          Send ZAPT to the public address below to deposit funds into your account.
         </DialogDescription>
         <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2">
           <label
@@ -140,7 +141,7 @@ export default function BalanceButton() {
         </div>
         <DialogTitle>Withdraw Funds</DialogTitle>
         <DialogDescription>
-          Withdraw GMOVE from your account to the address specified below.
+          Withdraw ZAPT from your account to the address specified below.
         </DialogDescription>
         <div className="flex flex-col w-full items-end w-full gap-2">
           <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2 w-full">
@@ -158,7 +159,7 @@ export default function BalanceButton() {
                 onChange={(e) => setTransferAmount(e.target.value)}
                 className="bg-transparent border-none outline-none text-right text-ellipsis"
               />
-              <span>GMOVE</span>
+              <span>ZAPT</span>
             </span>
           </div>
           <div className="border border-neutral-700 bg-neutral-800/20 bg-noise flex flex-row justify-between px-4 py-2 w-full">
@@ -190,9 +191,9 @@ export default function BalanceButton() {
             {loading ? <Loader2Icon className="animate-spin" /> : 'Withdraw'}
           </button>
         </div>
-        <DialogTitle>Movement on-ramp (COMING SOON)</DialogTitle>
+        <DialogTitle>Aptos on-ramp (COMING SOON)</DialogTitle>
         <DialogDescription>
-          Purchase GMOVE with your credit card and deposit it into your account.
+          Purchase ZAPT with your credit card and deposit it into your account.
         </DialogDescription>
       </DialogContent>
     </Dialog>

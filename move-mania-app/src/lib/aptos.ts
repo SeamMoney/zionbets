@@ -10,10 +10,10 @@ const MODULE_NAME = 'crash';
 const MODULE_ADDRESS = process.env.MODULE_ADDRESS
 const CRASH_RESOURCE_ACCOUNT_ADDRESS = process.env.CRASH_RESOURCE_ACCOUNT_ADDRESS as string;
 const LP_RESOURCE_ACCOUNT_ADDRESS = process.env.LP_RESOURCE_ACCOUNT_ADDRESS as string;
-const G_MOVE_RESOURCE_ACCOUNT_ADDRESS = process.env.G_MOVE_RESOURCE_ACCOUNT_ADDRESS as string;
+const Z_APT_RESOURCE_ACCOUNT_ADDRESS = process.env.Z_APT_RESOURCE_ACCOUNT_ADDRESS as string;
 
-export const RPC_URL = 'https://aptos.testnet.suzuka.movementlabs.xyz/v1';
-const FAUCET_URL = 'https://aptos.testnet.suzuka.movementlabs.xyz/v1';
+export const RPC_URL = 'https://fullnode.testnet.aptoslabs.com';
+const FAUCET_URL = 'https://faucet.testnet.aptoslabs.com';
 
 const client = new AptosClient(RPC_URL);
 const coinClient = new CoinClient(client);
@@ -33,7 +33,7 @@ const TRANSACTION_OPTIONS = {
   gas_unit_price: '100',
 };
 
-const MOVE = 1_0000_0000;
+const APT = 1_0000_0000;
 
 async function getUserAccount(userPrivateKey: string) {
   return new AptosAccount(new HexString(userPrivateKey).toUint8Array());
@@ -45,7 +45,7 @@ export async function getBalance(userAddress: string, type: string) {
     type_arguments: [type],
     arguments: [userAddress],
   })
-  return parseInt(res[0].toString()) / MOVE;
+  return parseInt(res[0].toString()) / APT;
 }
 
 export async function transferApt(userPrivateKey: string, amount: number, toAddress: string, type: string) {
@@ -66,7 +66,7 @@ export async function transferApt(userPrivateKey: string, amount: number, toAddr
     data: {
       function: `0x1::coin::transfer`,
       typeArguments: [type],
-      functionArguments: [toAddress, Math.floor(amount * MOVE)],
+      functionArguments: [toAddress, Math.floor(amount * APT)],
     },
   });
 
@@ -114,7 +114,7 @@ export async function registerForAPT(userAccount: AptosAccount) {
   };
 }
 
-export async function registerForGMOVE(userWallet: Account) {
+export async function registerForZAPT(userWallet: Account) {
   const fundingAccount = Account.fromPrivateKey({
     privateKey: new Ed25519PrivateKey(process.env.FUNDING_ACCOUNT_PRIVATE_KEY || '')
   });
@@ -123,7 +123,7 @@ export async function registerForGMOVE(userWallet: Account) {
     sender: userWallet.accountAddress,
     withFeePayer: true,
     data: {
-      function: `${MODULE_ADDRESS}::g_move::register`,
+      function: `${MODULE_ADDRESS}::z_apt::register`,
       typeArguments: [],
       functionArguments: [],
     },
@@ -208,7 +208,7 @@ export async function createAptosKeyPair(): Promise<{
 
     await aptos.transaction.waitForTransaction({ transactionHash: fundCommittedTransaction.hash });
 
-    await registerForGMOVE(account);
+    await registerForZAPT(account);
 
     return {
       account,
@@ -250,16 +250,16 @@ export async function fundAccountWithGas(userAddress: string) {
   console.log('fund', fundTx);
 }
 
-export async function mintGMOVE(userAddress: string, amount: number) {
+export async function mintZAPT(userAddress: string, amount: number) {
   const adminAccount = await getUserAccount(process.env.ADMIN_ACCOUNT_PRIVATE_KEY || '');
 
   const txn = await provider.generateTransaction(
     adminAccount.address(),
     {
-      function: `${MODULE_ADDRESS}::g_move::mint`,
+      function: `${MODULE_ADDRESS}::z_apt::mint`,
       type_arguments: [],
       arguments: [
-        Math.floor(amount * MOVE),
+        Math.floor(amount * APT),
         userAddress
       ],
     },
@@ -295,7 +295,7 @@ export async function placeBet(userPrivateKey: string, betData: BetData) {
     data: {
       function: `${MODULE_ADDRESS}::${MODULE_NAME}::place_bet`,
       typeArguments: [],
-      functionArguments: [Math.floor(betData.betAmount * MOVE)],
+      functionArguments: [Math.floor(betData.betAmount * APT)],
     },
   })
 
@@ -420,7 +420,7 @@ export async function getLPCoinSupply(version?: string) {
     version
   );
 
-  return parseInt(response[0].toString()) / MOVE;
+  return parseInt(response[0].toString()) / APT;
 }
 
 export async function getLockedLPCoinSupply(version?: string) {
@@ -433,7 +433,7 @@ export async function getLockedLPCoinSupply(version?: string) {
     version
   );
 
-  return parseInt(response[0].toString()) / MOVE;
+  return parseInt(response[0].toString()) / APT;
 }
 
 export async function supplyPool(user: User, amount: number) {
@@ -445,7 +445,7 @@ export async function supplyPool(user: User, amount: number) {
       function: `${MODULE_ADDRESS}::liquidity_pool::supply_liquidity`,
       type_arguments: [],
       arguments: [
-        Math.floor(amount * MOVE),
+        Math.floor(amount * APT),
       ],
     },
     TRANSACTION_OPTIONS
@@ -474,7 +474,7 @@ export async function withdrawPool(user: User, amount: number) {
       function: `${MODULE_ADDRESS}::liquidity_pool::remove_liquidity`,
       type_arguments: [],
       arguments: [
-        Math.floor(amount * MOVE),
+        Math.floor(amount * APT),
       ],
     },
     TRANSACTION_OPTIONS
@@ -496,7 +496,7 @@ export async function withdrawPool(user: User, amount: number) {
 
 export async function getCrashCalculationEvents() {
   try {
-    const response = await fetch(`${RPC_URL}/accounts/a7930d58b5ab4d61c7ffa7c0b9255094fde5f62b6c4cf7ef7b84606f5c26b7cd/events/5?limit=100`);
+    const response = await fetch(`${RPC_URL}/accounts/44d6cd854567d0bb4fc23ee3df1cb7eec15fea87c8cb844713c6166982826715/events/5?limit=100`);
     const data = await response.json();
     return data;
   } catch (e) {

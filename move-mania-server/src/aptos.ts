@@ -7,7 +7,7 @@ require('dotenv').config();
 const { MODULE_ADDRESS,
   CRASH_RESOURCE_ACCOUNT_ADDRESS,
   LP_RESOURCE_ACCOUNT_ADDRESS,
-  G_MOVE_RESOURCE_ACCOUNT_ADDRESS,
+  ZAPT_RESOURCE_ACCOUNT_ADDRESS,
   ADMIN_ACCOUNT_PRIVATE_KEY,
   CHAIN_MODE,
   NODE_URL } = getConfig()
@@ -16,8 +16,8 @@ const { MODULE_ADDRESS,
 // const LP_RESOURCE_ACCOUNT_ADDRESS = process.env.LP_RESOURCE_ACCOUNT_ADDRESS as string;
 // const ADMIN_ACCOUNT_PRIVATE_KEY = process.env.ADMIN_ACCOUNT_PRIVATE_KEY as string;
 
-const RPC_URL = 'https://aptos.testnet.suzuka.movementlabs.xyz/v1';
-const FAUCET_URL = 'https://aptos.testnet.suzuka.movementlabs.xyz/v1'
+const RPC_URL = 'https://fullnode.testnet.aptoslabs.com';
+const FAUCET_URL = 'https://faucet.testnet.aptoslabs.com'
 
 const client = new AptosClient(NODE_URL);
 const provider = new Provider({

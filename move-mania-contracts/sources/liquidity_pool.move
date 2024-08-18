@@ -8,7 +8,7 @@ module zion::liquidity_pool {
   use aptos_framework::account;
   use aptos_framework::coin::{Self, Coin};
 
-  use zion::g_move::GMOVE;
+  use zion::z_apt::ZAPT;
 
   friend zion::crash;
 
@@ -18,7 +18,7 @@ module zion::liquidity_pool {
   struct LPCoin {}
 
   struct LiquidityPool has key {
-    reserve_coin: Coin<GMOVE>,
+    reserve_coin: Coin<ZAPT>,
     locked_liquidity: Coin<LPCoin>,
     // mint cap of the specific pool's LP token
     lp_coin_mint_cap: coin::MintCapability<LPCoin>,
@@ -77,7 +77,7 @@ module zion::liquidity_pool {
     move_to(
       &resource_account_signer,
       LiquidityPool {
-        reserve_coin: coin::zero<GMOVE>(),
+        reserve_coin: coin::zero<ZAPT>(),
         locked_liquidity: coin::zero<LPCoin>(),
         lp_coin_mint_cap,
         lp_coin_burn_cap
@@ -174,7 +174,7 @@ module zion::liquidity_pool {
 
   public(friend) fun extract_reserve_coins(
     amount: u64
-  ): Coin<GMOVE> acquires LiquidityPool, State {
+  ): Coin<ZAPT> acquires LiquidityPool, State {
     let liquidity_pool = borrow_global_mut<LiquidityPool>(get_resource_address());
 
     event::emit_event(
@@ -188,7 +188,7 @@ module zion::liquidity_pool {
   }
 
   public fun put_reserve_coins(
-    coin: Coin<GMOVE>
+    coin: Coin<ZAPT>
   ) acquires LiquidityPool, State {
     let liquidity_pool = borrow_global_mut<LiquidityPool>(get_resource_address());
 
