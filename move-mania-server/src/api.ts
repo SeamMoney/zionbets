@@ -21,7 +21,7 @@ import { io } from "socket.io-client";
 import { SOCKET_EVENTS } from "./types";
 require('dotenv').config();
 var cors = require("cors");
-const server = io("https://api.zionapi.xyz:8080")
+const server = io(process.env.ZION_API_URL || "https://api.zionapi.xyz:8080");
 const app = express();
 app.use(express.json());
 
