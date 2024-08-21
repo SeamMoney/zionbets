@@ -43,8 +43,9 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
   const [showPWAInstall, setShowPWAInstall] = useState(false);
 
   useEffect(() => {
-
+    console.log("CrashProvider useEffect running");
     getSession().then((session) => {
+      console.log("Session retrieved:", session);
       if (session && session.user) {
         setUpAndGetUser({
           username: session.user.name || "",
