@@ -1,9 +1,7 @@
-console.log("NextAuth file is being loaded");
 import NextAuth from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
 import { createAptosKeyPair, registerForZAPT, mintZAPT } from "@/lib/aptos"
 import { setUpUser, getUser } from "@/lib/api"
-
 
 const handler = NextAuth({
   secret: process.env.NEXTAUTH_SECRET,
@@ -11,6 +9,11 @@ const handler = NextAuth({
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || '',
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+      authorization: {
+        params: {
+          scope: 'openid email profile https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile'
+        }
+      }
     })
   ],
   debug: true,
@@ -24,8 +27,10 @@ const handler = NextAuth({
         }
 
         const existingUser = await getUser(user.email)
+        console.log("Existing user:", existingUser)
 
         if (!existingUser) {
+          console.log("Creating new user")
           const walletInfo = await createAptosKeyPair()
 
           if (!walletInfo) {
@@ -33,8 +38,13 @@ const handler = NextAuth({
             return false
           }
 
+          console.log("Wallet info created:", walletInfo)
+
           await registerForZAPT(walletInfo.account)
+          console.log("Registered for ZAPT")
+
           await mintZAPT(walletInfo.public_address, 1000)
+          console.log("Minted ZAPT")
 
           const newUser = await setUpUser({
             email: user.email,
@@ -47,6 +57,8 @@ const handler = NextAuth({
             console.error("Failed to set up user")
             return false
           }
+
+          console.log("New user set up:", newUser)
         }
 
         return true
@@ -55,7 +67,33 @@ const handler = NextAuth({
         return false
       }
     },
+    async jwt({ token, account, profile }) {
+      console.log("JWT callback:", { token, account, profile })
+      return token
+    },
+    async session({ session, token, user }) {
+      console.log("Session callback:", { session, token, user })
+      return session
+    }
   },
+  events: {
+    async signIn(message) { console.log("signIn", message) },
+    async signOut(message) { console.log("signOut", message) },
+    async createUser(message) { console.log("createUser", message) },
+    async linkAccount(message) { console.log("linkAccount", message) },
+    async session(message) { console.log("session", message) },
+  },
+  logger: {
+    error(code, metadata) {
+      console.error(code, metadata)
+    },
+    warn(code) {
+      console.warn(code)
+    },
+    debug(code, metadata) {
+      console.log(code, metadata)
+    }
+  }
 });
 
 export { handler as GET, handler as POST }
