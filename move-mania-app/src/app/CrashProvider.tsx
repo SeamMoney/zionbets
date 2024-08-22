@@ -51,7 +51,6 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
           username: session.user.name || "",
           image: session.user.image || "",
           email: session.user.email || "",
-          address: "", // We'll generate this on the backend
           referral_code: "", // We'll generate this on the backend
           referred_by: null, // This can be null initially
         }).then((user) => {
