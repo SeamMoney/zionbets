@@ -1,11 +1,9 @@
+console.log("NextAuth file is being loaded");
 import NextAuth from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
+import { createAptosKeyPair, registerForZAPT, mintZAPT } from "@/lib/aptos"
+import { setUpUser, getUser } from "@/lib/api"
 
-console.log("NextAuth configuration file is being executed")
-console.log("NEXTAUTH_URL:", process.env.NEXTAUTH_URL)
-console.log("GOOGLE_CLIENT_ID:", process.env.GOOGLE_CLIENT_ID)
-console.log("GOOGLE_CLIENT_SECRET:", process.env.GOOGLE_CLIENT_SECRET ? "Set" : "Not set")
-console.log("NEXTAUTH_SECRET:", process.env.NEXTAUTH_SECRET ? "Set" : "Not set")
 
 const handler = NextAuth({
   secret: process.env.NEXTAUTH_SECRET,
@@ -19,7 +17,43 @@ const handler = NextAuth({
   callbacks: {
     async signIn({ user, account, profile, email, credentials }) {
       console.log("Sign in attempt:", { user, account, profile, email })
-      return true
+      try {
+        if (!user.email) {
+          console.error("User email is missing")
+          return false
+        }
+
+        const existingUser = await getUser(user.email)
+
+        if (!existingUser) {
+          const walletInfo = await createAptosKeyPair()
+
+          if (!walletInfo) {
+            console.error("Failed to create Aptos wallet")
+            return false
+          }
+
+          await registerForZAPT(walletInfo.account)
+          await mintZAPT(walletInfo.public_address, 1000)
+
+          const newUser = await setUpUser({
+            email: user.email,
+            username: user.name || '',
+            image: user.image || '',
+            referred_by: null,
+          })
+
+          if (!newUser) {
+            console.error("Failed to set up user")
+            return false
+          }
+        }
+
+        return true
+      } catch (error) {
+        console.error("Error in sign in callback:", error)
+        return false
+      }
     },
   },
 });

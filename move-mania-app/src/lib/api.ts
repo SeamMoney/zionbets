@@ -37,7 +37,7 @@ export async function doesUserExist(email: string) {
 }
 
 export async function setUpUser(
-  userToSetup: Omit<User, "public_address" | "private_key" | "balance">,
+  userToSetup: Omit<User, "public_address" | "private_key" | "balance" | "referral_code">,
   referrer?: string
 ) {
   if (referrer) {
@@ -52,8 +52,15 @@ export async function setUpUser(
   }
 
   await fundAccountWithGas(keyPair.public_address);
-  // registerForGMOVE is already called in createAptosKeyPair
   await mintZAPT(keyPair.public_address, 1000);
+
+  const newUser = {
+    ...userToSetup,
+    public_address: keyPair.public_address,
+    private_key: keyPair.private_key,
+    balance: 1000,
+    referral_code: keyPair.public_address.slice(2, 8),
+  };
 
   try {
     const response = await fetch(`${API_URL}/users`, {
@@ -62,11 +69,7 @@ export async function setUpUser(
         "Content-Type": "application/json",
         "api-key": process.env.ZION_API_KEY || "",
       },
-      body: JSON.stringify({
-        ...userToSetup,
-        public_address: keyPair.public_address,
-        private_key: keyPair.private_key,
-      }),
+      body: JSON.stringify(newUser),
     });
     return response.ok;
   } catch (e) {
