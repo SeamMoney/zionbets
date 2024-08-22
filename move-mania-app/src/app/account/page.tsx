@@ -121,7 +121,7 @@ export default function AccountPage() {
           <input
             id="address"
             disabled
-            value={account.address}
+            value={account.public_address}
             className="bg-transparent border-none outline-none text-right text-ellipsis cursor-not-allowed"
           />
         </div>
