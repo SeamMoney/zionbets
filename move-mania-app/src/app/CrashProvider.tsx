@@ -46,12 +46,11 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
     console.log("CrashProvider useEffect running");
     getSession().then((session) => {
       console.log("Session retrieved:", session);
-      if (session && session.user) {
+      if (session && session.user && session.user.email) {
         setUpAndGetUser({
+          email: session.user.email,
           username: session.user.name || "",
           image: session.user.image || "",
-          email: session.user.email || "",
-          referral_code: "", // We'll generate this on the backend
           referred_by: null, // This can be null initially
         }).then((user) => {
           if (user) {
