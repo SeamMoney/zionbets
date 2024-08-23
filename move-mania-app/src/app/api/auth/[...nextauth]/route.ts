@@ -29,16 +29,14 @@ const handler = NextAuth({
           referred_by: null,
         })
 
-        if (!newUser) {
-          console.error("Failed to set up user")
-          return false
-        }
+        console.log("User setup result:", newUser);
 
-        console.log("User setup successful", newUser);
+        // Always return true to allow sign in
         return true
       } catch (error) {
         console.error("Error in sign in callback:", error)
-        return false
+        // Still return true to allow sign in
+        return true
       }
     },
   },
