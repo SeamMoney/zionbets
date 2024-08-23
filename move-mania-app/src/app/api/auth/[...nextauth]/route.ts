@@ -12,12 +12,15 @@ const handler = NextAuth({
   ],
   callbacks: {
     async signIn({ user, account, profile, email, credentials }) {
+      console.log("SignIn callback started", { user, account, profile, email });
+
       if (!user.email) {
         console.error("User email is missing")
         return false
       }
 
       try {
+        console.log("Attempting to set up user", user.email);
         const newUser = await setUpAndGetUser({
           username: user.name || "",
           image: user.image || "",
@@ -31,6 +34,7 @@ const handler = NextAuth({
           return false
         }
 
+        console.log("User setup successful", newUser);
         return true
       } catch (error) {
         console.error("Error in sign in callback:", error)
@@ -41,13 +45,13 @@ const handler = NextAuth({
   debug: true,
   logger: {
     error(code, metadata) {
-      console.error(code, metadata)
+      console.error("NextAuth Error:", code, metadata)
     },
     warn(code) {
-      console.warn(code)
+      console.warn("NextAuth Warning:", code)
     },
     debug(code, metadata) {
-      console.log(code, metadata)
+      console.log("NextAuth Debug:", code, metadata)
     }
   }
 });

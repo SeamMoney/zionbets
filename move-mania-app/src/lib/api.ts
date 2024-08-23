@@ -109,23 +109,32 @@ export async function getUser(email: string): Promise<User | null> {
   }
 }
 
-export async function setUpAndGetUser(
-  userToSetup: Omit<User, "public_address" | "private_key" | "balance">,
-  referrer?: string
-): Promise<User | null> {
-  console.log('userToSetup', userToSetup)
-  const userExists = await doesUserExist(userToSetup.email);
-  console.log('userExists', userExists);
-  if (!userExists) {
-    const res = await setUpUser(userToSetup, referrer);
-    console.log('res from setting up user', res)
-    if (res) {
-      return getUser(userToSetup.email);
+export async function setUpAndGetUser(userToSetup: Omit<User, "public_address" | "private_key" | "balance" | "referral_code">, referrer?: string) {
+  console.log('setUpAndGetUser started', userToSetup);
+  try {
+    const userExists = await doesUserExist(userToSetup.email);
+    console.log('User exists check:', userExists);
+
+    if (!userExists) {
+      console.log('Setting up new user');
+      const res = await setUpUser(userToSetup, referrer);
+      console.log('setUpUser result:', res);
+      if (res) {
+        const user = await getUser(userToSetup.email);
+        console.log('New user retrieved:', user);
+        return user;
+      } else {
+        console.error('Failed to set up user');
+        return null;
+      }
     } else {
-      return null;
+      const user = await getUser(userToSetup.email);
+      console.log('Existing user retrieved:', user);
+      return user;
     }
-  } else {
-    return getUser(userToSetup.email);
+  } catch (error) {
+    console.error('Error in setUpAndGetUser:', error);
+    return null;
   }
 }
 
