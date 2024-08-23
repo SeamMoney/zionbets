@@ -101,13 +101,15 @@ export async function createUser(user: User) {
   });
 
   await db.run(
-    "INSERT INTO users (username, image, email, public_address, private_key, balance) VALUES (?, ?, ?, ?, ?, ?)",
+    "INSERT INTO users (username, image, email, public_address, private_key, balance, referral_code, referred_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
     user.username,
     user.image,
     user.email,
     user.public_address,
     user.private_key,
-    STARTING_BALANCE
+    STARTING_BALANCE,
+    user.referral_code,
+    user.referred_by
   );
 
   await db.close();
@@ -392,17 +394,15 @@ export async function addCashOutToPlayerList(cashOut: CashOutData) {
 }
 
 export async function getUserByReferralCode(referralCode: string) {
-  await initializeAllTables(); // initialize tables if not yet initialized
+  await initializeAllTables();
 
-  // Open the database
   const db = await open({
     filename: "games.db",
     driver: require("sqlite3").Database,
   });
 
-  // Get the user with the given referral code
   const user = await db.get(
-    "SELECT * FROM users WHERE public_address LIKE CONCAT('%', ?)",
+    "SELECT * FROM users WHERE referral_code = ?",
     referralCode
   );
 
