@@ -44,11 +44,17 @@ export default function ControlCenter() {
   const [autoCashoutAmount, setAutoCashoutAmount] = useState("");
   const [hasBet, setHasBet] = useState(false);
   const [hasCashOut, setHasCashOut] = useState(false);
+  const [betPlacedThisRound, setBetPlacedThisRound] = useState(false);
 
   useEffect(() => {
     console.log("Game Status:", gameStatus);
     console.log("Has Bet:", hasBet);
     console.log("Has Cash Out:", hasCashOut);
+    console.log("Bet Placed This Round:", betPlacedThisRound);
+
+    if (gameStatus?.status === "COUNTDOWN") {
+      setBetPlacedThisRound(false);
+    }
 
     if (account) {
       hasUserBet(account.public_address).then((bet) => {
@@ -153,6 +159,7 @@ export default function ControlCenter() {
         description: <Link href={`https://explorer.aptoslabs.com/txn/${blockchainRes.txnHash}/?network=testnet`} target="_blank" className="underline">View transaction</Link>
       })
       setHasBet(true);
+      setBetPlacedThisRound(true);
     } catch (error) {
       console.error('Error placing bet:', error);
       toast({
@@ -238,22 +245,22 @@ export default function ControlCenter() {
               <button
                 className={cn(
                   "border border-green-700 px-6 py-1 border-yellow-700 text-yellow-500 bg-neutral-950 w-full",
-                  !hasBet
+                  !betPlacedThisRound
                     ? "cursor-not-allowed"
                     : "bg-[#264234]/40 hover:cursor-pointer border-green-700 text-green-500",
-                  (parseFloat(betAmount) > 0) && !hasBet && "bg-[#404226]/40 active:scale-95 active:opacity-80 transition-transform",
+                  (parseFloat(betAmount) > 0) && !betPlacedThisRound && "bg-[#404226]/40 active:scale-95 active:opacity-80 transition-transform",
                 )}
                 onClick={onSetBet}
-                disabled={!(parseFloat(betAmount) > 0) || hasBet}
+                disabled={!(parseFloat(betAmount) > 0) || betPlacedThisRound}
               >
                 {
-                  hasBet ? "Bet placed" : (parseFloat(betAmount) > 0) ? "Place bet" : "Enter bet amount"
+                  betPlacedThisRound ? "Bet placed" : (parseFloat(betAmount) > 0) ? "Place bet" : "Enter bet amount"
                 }
               </button>
             )
           }
           {
-            account && gameStatus?.status === "IN_PROGRESS" && hasBet && (
+            account && gameStatus?.status === "IN_PROGRESS" && betPlacedThisRound && (
               <button
                 className={cn(
                   "border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 w-full",
@@ -272,7 +279,7 @@ export default function ControlCenter() {
             )
           }
           {
-            account && gameStatus?.status === "IN_PROGRESS" && !hasBet && (
+            account && gameStatus?.status === "IN_PROGRESS" && !betPlacedThisRound && (
               <button
                 className="border px-6 py-1 border-yellow-700 text-yellow-500 bg-neutral-950 cursor-not-allowed w-full"
                 disabled
