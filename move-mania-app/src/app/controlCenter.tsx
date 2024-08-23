@@ -46,12 +46,18 @@ export default function ControlCenter() {
   const [hasCashOut, setHasCashOut] = useState(false);
 
   useEffect(() => {
+    console.log("Game Status:", gameStatus);
+    console.log("Has Bet:", hasBet);
+    console.log("Has Cash Out:", hasCashOut);
+
     if (account) {
       hasUserBet(account.public_address).then((bet) => {
+        console.log("API Has Bet:", bet);
         setHasBet(bet);
       });
 
       hasUserCashOut(account.public_address).then((cashout) => {
+        console.log("API Has Cash Out:", cashout);
         setHasCashOut(cashout);
       });
     }
