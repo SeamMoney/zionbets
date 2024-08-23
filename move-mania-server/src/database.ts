@@ -139,12 +139,14 @@ export async function updateUser(email: string, user: User) {
   });
 
   await db.run(
-    "UPDATE users SET image = ?, username = ?, public_address = ?, private_key = ?, balance = ? WHERE email = ?",
+    "UPDATE users SET image = ?, username = ?, public_address = ?, private_key = ?, balance = ?, referral_code = ?, referred_by = ? WHERE email = ?",
     user.image,
     user.username,
     user.public_address,
     user.private_key,
     user.balance,
+    user.referral_code,
+    user.referred_by,
     email
   );
 
@@ -321,17 +323,15 @@ export async function clearGames() {
  * @returns A list of all the players in the player list
  */
 export async function getPlayerList() {
-  await initializeAllTables(); // initialize tables if not yet initialized
+  await initializeAllTables();
 
-  // Open the database
   const db = await open({
     filename: "./games.db",
     driver: require("sqlite3").Database,
   });
 
-  // Get all the players in the player list and get their corresponding usernames from the users table
   const players = await db.all(
-    "SELECT user_id, username, bet_type, bet_amount, crash_point FROM player_list JOIN users ON player_list.user_id = users.address"
+    "SELECT user_id, username, bet_type, bet_amount, crash_point FROM player_list JOIN users ON player_list.user_id = users.email"
   );
 
   await db.close();
