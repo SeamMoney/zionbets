@@ -61,14 +61,14 @@ export default function NavbarDropdown() {
           <DropdownMenuSeparator />
           <Link href="https://twitter.com/zionbets" target="_blank"><DropdownMenuItem>Twitter</DropdownMenuItem></Link>
           <Link href="https://t.me/zion_bets" target="_blank"><DropdownMenuItem>Telegram</DropdownMenuItem></Link>
+          {session && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onSelect={() => signOut()}>Log out</DropdownMenuItem>
+            </>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
-      {session && (
-        <>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onSelect={() => signOut()}>Log out</DropdownMenuItem>
-        </>
-      )}
     </div>
   )
 }
