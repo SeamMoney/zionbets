@@ -468,17 +468,15 @@ export async function addChatMessage(chatMessage: ChatMessage) {
  * @returns A list of all the chat messages in chronological order
  */
 export async function getChatMessages() {
-  await initializeAllTables(); // initialize tables if not yet initialized
+  await initializeAllTables();
 
-  // Open the database
   const db = await open({
     filename: "./games.db",
     driver: require("sqlite3").Database,
   });
 
-  // Get all the chat messages and get the corresponding usernames from the users table
   const chatMessages = await db.all(
-    "SELECT user_id, username, message FROM chat_messages JOIN users ON chat_messages.user_id = users.address"
+    "SELECT chat_messages.user_id, users.username, chat_messages.message FROM chat_messages JOIN users ON chat_messages.user_id = users.email"
   );
 
   await db.close();
