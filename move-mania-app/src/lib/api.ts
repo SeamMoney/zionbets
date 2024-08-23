@@ -133,6 +133,8 @@ export async function setUpAndGetUser(userToSetup: Omit<User, "public_address" |
         referral_code: keyPair.public_address.slice(2, 8),
       };
 
+      console.log('Attempting to create user with data:', JSON.stringify(newUser));
+
       const response = await fetch(`${API_URL}/users`, {
         method: "POST",
         headers: {
@@ -143,7 +145,9 @@ export async function setUpAndGetUser(userToSetup: Omit<User, "public_address" |
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to create user: ${response.statusText}`);
+        const errorText = await response.text();
+        console.error('Failed to create user. Status:', response.status, 'Response:', errorText);
+        throw new Error(`Failed to create user: ${response.statusText}. Details: ${errorText}`);
       }
 
       console.log('User created successfully');
@@ -154,7 +158,7 @@ export async function setUpAndGetUser(userToSetup: Omit<User, "public_address" |
     }
   } catch (error) {
     console.error('Error in setUpAndGetUser:', error);
-    throw error; // Re-throw the error instead of returning null
+    throw error;
   }
 }
 
