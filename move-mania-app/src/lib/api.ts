@@ -117,24 +117,44 @@ export async function setUpAndGetUser(userToSetup: Omit<User, "public_address" |
 
     if (!userExists) {
       console.log('Setting up new user');
-      const res = await setUpUser(userToSetup, referrer);
-      console.log('setUpUser result:', res);
-      if (res) {
-        const user = await getUser(userToSetup.email);
-        console.log('New user retrieved:', user);
-        return user;
-      } else {
-        console.error('Failed to set up user');
-        return null;
+      const keyPair = await createAptosKeyPair();
+      if (!keyPair) {
+        throw new Error('Failed to create Aptos key pair');
       }
+
+      await fundAccountWithGas(keyPair.public_address);
+      await mintZAPT(keyPair.public_address, 1000);
+
+      const newUser = {
+        ...userToSetup,
+        public_address: keyPair.public_address,
+        private_key: keyPair.private_key,
+        balance: 1000,
+        referral_code: keyPair.public_address.slice(2, 8),
+      };
+
+      const response = await fetch(`${API_URL}/users`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "api-key": process.env.ZION_API_KEY || "",
+        },
+        body: JSON.stringify(newUser),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to create user: ${response.statusText}`);
+      }
+
+      console.log('User created successfully');
+      return await getUser(userToSetup.email);
     } else {
-      const user = await getUser(userToSetup.email);
-      console.log('Existing user retrieved:', user);
-      return user;
+      console.log('User already exists, retrieving user data');
+      return await getUser(userToSetup.email);
     }
   } catch (error) {
     console.error('Error in setUpAndGetUser:', error);
-    return null;
+    throw error; // Re-throw the error instead of returning null
   }
 }
 
