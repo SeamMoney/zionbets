@@ -21,11 +21,11 @@ const handler = NextAuth({
 
       try {
         console.log("Attempting to set up user", user.email);
+
         const newUser = await setUpAndGetUser({
-          username: user.name || "",
-          image: user.image || "",
           email: user.email,
-          referral_code: "",
+          username: user.name || '',
+          image: user.image || '',
           referred_by: null,
         })
 
