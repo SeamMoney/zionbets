@@ -93,72 +93,71 @@ export async function getUsers() {
 }
 
 export async function createUser(user: User) {
-  await initializeAllTables(); // initialize tables if not yet initialized
+  await initializeAllTables();
 
-  // Open the database
   const db = await open({
     filename: "games.db",
     driver: require("sqlite3").Database,
   });
 
   await db.run(
-    "INSERT INTO users (address, username, referral_code, referred_by) VALUES (?, ?, ?, ?)",
-    user.address,
+    "INSERT INTO users (username, image, email, public_address, private_key, balance) VALUES (?, ?, ?, ?, ?, ?)",
     user.username,
-    user.referral_code,
-    user.referred_by
+    user.image,
+    user.email,
+    user.public_address,
+    user.private_key,
+    STARTING_BALANCE
   );
 
   await db.close();
 }
 
-export async function getUser(address: string) {
-  await initializeAllTables(); // initialize tables if not yet initialized
+export async function getUser(email: string) {
+  await initializeAllTables();
 
-  // Open the database
   const db = await open({
     filename: "games.db",
     driver: require("sqlite3").Database,
   });
 
-  // Get the user with the given address
-  const user = (await db.get("SELECT * FROM users WHERE address = ?", address)) as
-    | User
-    | undefined;
+  const user = await db.get("SELECT * FROM users WHERE email = ?", email) as User | undefined;
 
   await db.close();
 
   return user;
 }
 
-export async function updateUser(address: string, user: User) {
-  await initializeAllTables(); // initialize tables if not yet initialized
+export async function updateUser(email: string, user: User) {
+  await initializeAllTables();
 
-  // Open the database
   const db = await open({
     filename: "games.db",
     driver: require("sqlite3").Database,
   });
 
   await db.run(
-    "UPDATE users SET username = ? WHERE address = ?",
+    "UPDATE users SET image = ?, username = ?, public_address = ?, private_key = ?, balance = ? WHERE email = ?",
+    user.image,
     user.username,
-    address
+    user.public_address,
+    user.private_key,
+    user.balance,
+    email
   );
 
   await db.close();
 }
 
-export async function deleteUser(address: string) {
-  await initializeAllTables(); // initialize tables if not yet initialized
+export async function deleteUser(email: string) {
+  await initializeAllTables();
 
-  // Open the database
   const db = await open({
     filename: "games.db",
     driver: require("sqlite3").Database,
   });
 
-  await db.run("DELETE FROM users WHERE address = ?", address);
+  await db.run("DELETE FROM users WHERE email = ?", email);
 
   await db.close();
 }

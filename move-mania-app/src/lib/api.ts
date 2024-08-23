@@ -147,6 +147,13 @@ export async function setUpAndGetUser(userToSetup: Omit<User, "public_address" |
       if (!response.ok) {
         const errorText = await response.text();
         console.error('Failed to create user. Status:', response.status, 'Response:', errorText);
+
+        // If user already exists, try to fetch the user data
+        if (response.status === 400 && errorText.includes("User already exists")) {
+          console.log('User creation failed due to existing user. Attempting to fetch user data.');
+          return await getUser(userToSetup.email);
+        }
+
         throw new Error(`Failed to create user: ${response.statusText}. Details: ${errorText}`);
       }
 
