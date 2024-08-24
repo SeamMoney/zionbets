@@ -56,11 +56,18 @@ export default function ControlCenter() {
         setHasCashOut(cashout);
       });
     }
+
+    if (gameStatus?.status === "COUNTDOWN") {
+      setHasBet(false);
+      setHasCashOut(false);
+    }
   }, [gameStatus, account, latestAction]);
 
   const checkAutoCashout = useCallback(() => {
-    const timeUntilCrash = gameStatus?.startTime! + log(EXPONENTIAL_FACTOR, gameStatus?.crashPoint!) * 1000 - Date.now();
-    const timeUntilCashout = gameStatus?.startTime! + log(EXPONENTIAL_FACTOR, parseFloat(autoCashoutAmount)!) * 1000 - Date.now();
+    if (!gameStatus || !gameStatus.startTime || !gameStatus.crashPoint) return;
+
+    const timeUntilCrash = gameStatus.startTime + log(EXPONENTIAL_FACTOR, gameStatus.crashPoint) * 1000 - Date.now();
+    const timeUntilCashout = gameStatus.startTime + log(EXPONENTIAL_FACTOR, parseFloat(autoCashoutAmount) || 0) * 1000 - Date.now();
     if (hasBet && autoCashout && timeUntilCashout < timeUntilCrash && timeUntilCashout > 0) {
       setTimeout(() => {
         onCashOut();
@@ -176,42 +183,18 @@ export default function ControlCenter() {
             </span>
           </div>
           <div className="flex flex-row items-center text-xs w-full">
-            <div
-              className={`border px-2 py-1 cursor-pointer grow text-center ${parseFloat(betAmount) === 1
-                ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
-                : "opacity-50 border-neutral-700"
-                }`}
-              onClick={() => setBetAmount("1")}
-            >
-              1 APT
-            </div>
-            <div
-              className={`border px-2 py-1 cursor-pointer grow text-center ${parseFloat(betAmount) === 5
-                ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
-                : "opacity-50 border-neutral-700"
-                }`}
-              onClick={() => setBetAmount("5")}
-            >
-              5 APT
-            </div>
-            <div
-              className={`border px-2 py-1 cursor-pointer grow text-center ${parseFloat(betAmount) === 10
-                ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
-                : "opacity-50 border-neutral-700"
-                }`}
-              onClick={() => setBetAmount("10")}
-            >
-              10 APT
-            </div>
-            <div
-              className={`border px-2 py-1 cursor-pointer grow text-center ${parseFloat(betAmount) === 25
-                ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
-                : "opacity-50 border-neutral-700"
-                }`}
-              onClick={() => setBetAmount("25")}
-            >
-              25 APT
-            </div>
+            {[1, 5, 10, 25].map((amount) => (
+              <div
+                key={amount}
+                className={`border px-2 py-1 cursor-pointer grow text-center ${parseFloat(betAmount) === amount
+                  ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
+                  : "opacity-50 border-neutral-700"
+                  }`}
+                onClick={() => setBetAmount(amount.toString())}
+              >
+                {amount} APT
+              </div>
+            ))}
           </div>
         </div>
         <div className="flex flex-row items-baseline gap-2 w-full text-lg">
@@ -244,40 +227,22 @@ export default function ControlCenter() {
             )
           }
           {
-            account && (gameStatus?.status === "IN_PROGRESS" || gameStatus?.status === "END") && hasBet && (
+            account && gameStatus?.status === "IN_PROGRESS" && hasBet && !hasCashOut && (
               <button
-                className={cn(
-                  "border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 w-full",
-                  hasCashOut || gameStatus?.status === "END"
-                    ? "cursor-not-allowed bg-[#264234]/40"
-                    : "hover:bg-[#404226]/40 hover:cursor-pointer bg-[#404226]/40 border-yellow-700 text-yellow-500  active:scale-95 active:opacity-80 transition-transform",
-                )}
+                className="border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 w-full hover:bg-[#404226]/40 hover:cursor-pointer bg-[#404226]/40 border-yellow-700 text-yellow-500 active:scale-95 active:opacity-80 transition-transform"
                 onClick={onCashOut}
-                disabled={hasCashOut || gameStatus?.status === "END"}
               >
-                {
-                  hasCashOut ? "Cashed out" : gameStatus?.status === "END" ? "Game ended" : "Cash out"
-                }
+                Cash out
               </button>
             )
           }
           {
-            account && (gameStatus?.status === "IN_PROGRESS" || gameStatus?.status === "END") && !hasBet && (
+            account && gameStatus?.status === "IN_PROGRESS" && (!hasBet || hasCashOut) && (
               <button
                 className="border px-6 py-1 border-yellow-700 text-yellow-500 bg-neutral-950 cursor-not-allowed w-full"
                 disabled
               >
-                {gameStatus?.status === "IN_PROGRESS" ? "Game in progress" : "Game ended"}
-              </button>
-            )
-          }
-          {
-            account && gameStatus?.status === "END" && (
-              <button
-                className="border border-yellow-700 px-6 py-1 text-yellow-500 bg-neutral-950 cursor-not-allowed w-full"
-                disabled
-              >
-                Game ended
+                {hasCashOut ? "Cashed out" : "Game in progress"}
               </button>
             )
           }
@@ -306,54 +271,21 @@ export default function ControlCenter() {
                   </span>
                 </div>
                 <div className="flex flex-row items-center text-xs">
-                  <div
-                    className={`text-center border px-2 py-1 cursor-pointer grow ${parseFloat(autoCashoutAmount) === 1.01
-                      ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
-                      : "opacity-50 border-neutral-700"
-                      }`}
-                    onClick={() => {
-                      setAutoCashout(false);
-                      setAutoCashoutAmount("1.01");
-                    }}
-                  >
-                    1.01x
-                  </div>
-                  <div
-                    className={`text-center border px-2 py-1 cursor-pointer grow ${parseFloat(autoCashoutAmount) === 1.5
-                      ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
-                      : "opacity-50 border-neutral-700"
-                      }`}
-                    onClick={() => {
-                      setAutoCashout(false);
-                      setAutoCashoutAmount("1.5");
-                    }}
-                  >
-                    1.5x
-                  </div>
-                  <div
-                    className={`text-center border px-2 py-1 cursor-pointer grow ${parseFloat(autoCashoutAmount) === 2
-                      ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
-                      : "opacity-50 border-neutral-700"
-                      }`}
-                    onClick={() => {
-                      setAutoCashout(false);
-                      setAutoCashoutAmount("2");
-                    }}
-                  >
-                    2x
-                  </div>
-                  <div
-                    className={`text-center border px-2 py-1 cursor-pointer grow ${parseFloat(autoCashoutAmount) === 5
-                      ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
-                      : "opacity-50 border-neutral-700"
-                      }`}
-                    onClick={() => {
-                      setAutoCashout(false);
-                      setAutoCashoutAmount("5");
-                    }}
-                  >
-                    5x
-                  </div>
+                  {[1.01, 1.5, 2, 5].map((amount) => (
+                    <div
+                      key={amount}
+                      className={`text-center border px-2 py-1 cursor-pointer grow ${parseFloat(autoCashoutAmount) === amount
+                        ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
+                        : "opacity-50 border-neutral-700"
+                        }`}
+                      onClick={() => {
+                        setAutoCashout(false);
+                        setAutoCashoutAmount(amount.toString());
+                      }}
+                    >
+                      {amount}x
+                    </div>
+                  ))}
                 </div>
               </div>
               <div className="flex flex-row items-baseline gap-2 w-full text-lg">
