@@ -319,6 +319,7 @@ export async function placeBet(userPrivateKey: string, betData: BetData) {
 }
 
 export async function cashOut(userPrivateKey: string, cashOutData: CashOutData) {
+  console.log("cashOut function called with:", { userPrivateKey, cashOutData });
   const userAccount = new AptosAccount(new HexString(userPrivateKey).toUint8Array());
 
   const cashOutTxn = await provider.generateTransaction(

@@ -139,6 +139,14 @@ export default function ControlCenter() {
     });
 
     try {
+
+      console.log("Attempting to cash out with:", {
+        privateKey: account.private_key,
+        roundId: parseInt(gameStatus.roundId),
+        playerEmail: account.email,
+        cashOutMultiplier: cashoutMultiplier,
+      });
+
       const blockchainRes = await cashOut(account.private_key, {
         roundId: parseInt(gameStatus.roundId),
         playerEmail: account.email,
@@ -158,7 +166,7 @@ export default function ControlCenter() {
 
       toast({
         title: `Cashed out at ${cashoutMultiplier}x`,
-        description: <Link href={`https://explorer.aptoslabs.com/txn/${blockchainRes.version}/?network=testnet`} target="_blank" className="underline">View transaction</Link>
+        description: <Link href={`https://explorer.aptoslabs.com/txn/${blockchainRes.txnHash}/?network=testnet`} target="_blank" className="underline">View transaction</Link>
       });
       setHasCashOut(true);
     } catch (error) {
