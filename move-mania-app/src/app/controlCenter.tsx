@@ -47,19 +47,25 @@ export default function ControlCenter() {
   const [hasCashOut, setHasCashOut] = useState(false);
 
   useEffect(() => {
+    console.log("Game Status:", gameStatus);
+    console.log("Has Bet:", hasBet);
+    console.log("Has Cash Out:", hasCashOut);
+
     if (account && gameStatus?.status === "COUNTDOWN") {
       hasUserBet(account.email).then((bet) => {
+        console.log("API Has Bet:", bet);
         setHasBet(bet);
       });
 
       hasUserCashOut(account.email).then((cashout) => {
+        console.log("API Has Cash Out:", cashout);
         setHasCashOut(cashout);
       });
     } else if (gameStatus?.status === "COUNTDOWN") {
       setHasBet(false);
       setHasCashOut(false);
     }
-  }, [gameStatus?.status, account]);
+  }, [gameStatus?.status, account, latestAction]);
 
   const checkAutoCashout = useCallback(() => {
     if (!gameStatus || !gameStatus.startTime || !gameStatus.crashPoint) return;
@@ -121,7 +127,10 @@ export default function ControlCenter() {
   }, [account, gameStatus, betAmount, toast]);
 
   const onCashOut = useCallback(async () => {
-    if (!socket || !account || !gameStatus?.startTime) return;
+    if (!socket || !account || !gameStatus?.startTime) {
+      console.error('Missing required data for cash out:', { socket, account, gameStatus });
+      return;
+    }
 
     const cashoutMultiplier = Number(calculateCurrentCrashPoint((Date.now() - gameStatus.startTime) / 1000).toFixed(2));
 
@@ -130,14 +139,22 @@ export default function ControlCenter() {
     });
 
     try {
+      console.log('Cashing out with data:', {
+        roundId: parseInt(gameStatus.roundId),
+        playerEmail: account.email,
+        cashOutMultiplier: cashoutMultiplier,
+      });
+
       const blockchainRes = await cashOut(account.private_key, {
         roundId: parseInt(gameStatus.roundId),
         playerEmail: account.email,
         cashOutMultiplier: cashoutMultiplier,
       });
 
+      console.log('Blockchain response:', blockchainRes);
+
       if (!blockchainRes) {
-        throw new Error('Error cashing out');
+        throw new Error('No response from blockchain');
       }
 
       await cashOutBet({
@@ -159,7 +176,7 @@ export default function ControlCenter() {
         description: "Please try again"
       });
     }
-  }, [account, gameStatus, toast]);
+  }, [account, gameStatus, toast, socket]);
 
   return (
     <div className="w-full h-full flex flex-col gap-4 items-start p-2">
