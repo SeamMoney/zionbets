@@ -48,64 +48,15 @@ export default function ControlCenter() {
 
   useEffect(() => {
     if (account) {
-      hasUserBet(account.public_address).then((bet) => {
+      hasUserBet(account.email).then((bet) => {
         setHasBet(bet);
       });
 
-      hasUserCashOut(account.public_address).then((cashout) => {
+      hasUserCashOut(account.email).then((cashout) => {
         setHasCashOut(cashout);
       });
     }
-  }, [gameStatus, account, latestAction, hasBet, hasCashOut]);
-
-  useEffect(() => {
-    if (gameStatus?.status === "IN_PROGRESS") {
-      checkAutoCashout();
-    }
-  }, [gameStatus]);
-
-  const onCashOut = useCallback(async () => {
-    if (!socket || !account || !gameStatus?.startTime) return;
-
-    const cashoutMultipler = Number(calculateCurrentCrashPoint((Date.now() - gameStatus.startTime) / 1000).toFixed(2));
-
-    toast({
-      title: "Cashing out at " + cashoutMultipler + "x...",
-    })
-
-    try {
-      const blockchainRes = await cashOut(account.private_key, {
-        roundId: parseInt(gameStatus.roundId),
-        playerEmail: account.email,
-        cashOutMultiplier: cashoutMultipler,
-      });
-
-      if (!blockchainRes) {
-        throw new Error('Error cashing out');
-      }
-
-      const data = {
-        roundId: parseInt(gameStatus.roundId),
-        playerEmail: account.email,
-        cashOutMultiplier: cashoutMultipler,
-      };
-      await cashOutBet(data);
-
-      setHasCashOut(true);
-
-      toast({
-        title: "Cashed out at " + cashoutMultipler + "x",
-        description: <Link href={`https://explorer.aptoslabs.com/txn/${blockchainRes.txnHash}/?network=testnet`} target="_blank" className="underline">View transaction</Link>
-      })
-    } catch (error) {
-      console.error('Error cashing out:', error);
-      toast({
-        title: "Error cashing out",
-        description: "Please try again"
-      })
-    }
-  }, [account, gameStatus, toast]);
-
+  }, [gameStatus, account, latestAction]);
 
   const checkAutoCashout = useCallback(() => {
     const timeUntilCrash = gameStatus?.startTime! + log(EXPONENTIAL_FACTOR, gameStatus?.crashPoint!) * 1000 - Date.now();
@@ -115,7 +66,7 @@ export default function ControlCenter() {
         onCashOut();
       }, timeUntilCashout);
     }
-  }, [gameStatus, autoCashout, autoCashoutAmount, hasBet, onCashOut]);
+  }, [gameStatus, autoCashout, autoCashoutAmount, hasBet]);
 
   useEffect(() => {
     if (gameStatus?.status === "IN_PROGRESS") {
@@ -127,8 +78,8 @@ export default function ControlCenter() {
     if (!socket || !account || !gameStatus) return;
 
     toast({
-      title: "Placing bet at " + betAmount + " APT...",
-    })
+      title: `Placing bet at ${betAmount} APT...`,
+    });
 
     try {
       const blockchainRes = await placeBet(account.private_key, {
@@ -142,30 +93,68 @@ export default function ControlCenter() {
         throw new Error('Error placing bet');
       }
 
-      const data = {
+      await setNewBet({
         roundId: parseInt(gameStatus.roundId),
         playerEmail: account.email,
         betAmount: parseFloat(betAmount),
         coinType: "APT",
-      };
-      await setNewBet(data);
+      });
 
       setHasBet(true);
 
       toast({
-        title: "Bet placed at " + betAmount + " APT",
+        title: `Bet placed at ${betAmount} APT`,
         description: <Link href={`https://explorer.aptoslabs.com/txn/${blockchainRes.txnHash}/?network=testnet`} target="_blank" className="underline">View transaction</Link>
-      })
+      });
     } catch (error) {
       console.error('Error placing bet:', error);
       toast({
         title: "Error placing bet",
         description: "Please try again"
-      })
+      });
     }
-  }, [account, gameStatus, betAmount, toast, setNewBet, setHasBet]);
+  }, [account, gameStatus, betAmount, toast]);
 
+  const onCashOut = useCallback(async () => {
+    if (!socket || !account || !gameStatus?.startTime) return;
 
+    const cashoutMultiplier = Number(calculateCurrentCrashPoint((Date.now() - gameStatus.startTime) / 1000).toFixed(2));
+
+    toast({
+      title: `Cashing out at ${cashoutMultiplier}x...`,
+    });
+
+    try {
+      const blockchainRes = await cashOut(account.private_key, {
+        roundId: parseInt(gameStatus.roundId),
+        playerEmail: account.email,
+        cashOutMultiplier: cashoutMultiplier,
+      });
+
+      if (!blockchainRes) {
+        throw new Error('Error cashing out');
+      }
+
+      await cashOutBet({
+        roundId: parseInt(gameStatus.roundId),
+        playerEmail: account.email,
+        cashOutMultiplier: cashoutMultiplier,
+      });
+
+      setHasCashOut(true);
+
+      toast({
+        title: `Cashed out at ${cashoutMultiplier}x`,
+        description: <Link href={`https://explorer.aptoslabs.com/txn/${blockchainRes.txnHash}/?network=testnet`} target="_blank" className="underline">View transaction</Link>
+      });
+    } catch (error) {
+      console.error('Error cashing out:', error);
+      toast({
+        title: "Error cashing out",
+        description: "Please try again"
+      });
+    }
+  }, [account, gameStatus, toast]);
 
   return (
     <div className="w-full h-full flex flex-col gap-4 items-start p-2">
@@ -382,21 +371,14 @@ export default function ControlCenter() {
                   account && (
                     <button
                       className={cn(
-                        "border bg-[#404226]/40 border-yellow-700 text-yellow-500 px-6 py-1 w-full",
-                        autoCashout && autoCashoutAmount && "bg-[#264234]/40 border-green-700 text-green-500 ",
-                        !(parseFloat(autoCashoutAmount) > 0) && "bg-neutral-950",
-                        (parseFloat(autoCashoutAmount) > 0) && " active:scale-95 active:opacity-80 transition-transform",
+                        "border px-6 py-1 bg-neutral-950 w-full",
+                        autoCashout
+                          ? "border-green-700 text-green-500"
+                          : "border-neutral-700 text-neutral-500"
                       )}
-                      onClick={() => {
-                        if (!autoCashoutAmount || parseFloat(autoCashoutAmount) <= 0) {
-                          return
-                        }
-                        setAutoCashout(!autoCashout);
-                      }}
+                      onClick={() => setAutoCashout(!autoCashout)}
                     >
-                      {
-                        autoCashout ? "Turn off auto cashout" : parseFloat(autoCashoutAmount) > 0 ? "Turn on auto cashout" : "Enter auto cashout amount"
-                      }
+                      {autoCashout ? "Auto Cash Out On" : "Auto Cash Out Off"}
                     </button>
                   )
                 }
