@@ -47,7 +47,7 @@ export default function ControlCenter() {
   const [hasCashOut, setHasCashOut] = useState(false);
 
   useEffect(() => {
-    if (account) {
+    if (account && gameStatus?.status === "COUNTDOWN") {
       hasUserBet(account.email).then((bet) => {
         setHasBet(bet);
       });
@@ -55,13 +55,11 @@ export default function ControlCenter() {
       hasUserCashOut(account.email).then((cashout) => {
         setHasCashOut(cashout);
       });
-    }
-
-    if (gameStatus?.status === "COUNTDOWN") {
+    } else if (gameStatus?.status === "COUNTDOWN") {
       setHasBet(false);
       setHasCashOut(false);
     }
-  }, [gameStatus, account, latestAction]);
+  }, [gameStatus?.status, account]);
 
   const checkAutoCashout = useCallback(() => {
     if (!gameStatus || !gameStatus.startTime || !gameStatus.crashPoint) return;
