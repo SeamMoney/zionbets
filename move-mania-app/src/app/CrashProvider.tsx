@@ -80,22 +80,46 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    console.log("CrashProvider useEffect running");
     getSession().then((session) => {
-      console.log("Session retrieved:", session);
       if (session && session.user && session.user.email) {
         setUpAndGetUser({
           email: session.user.email,
           username: session.user.name || "",
           image: session.user.image || "",
-          referred_by: null, // This can be null initially
+          referred_by: null,
         }).then((user) => {
           if (user) {
             setAccount(user);
           }
         });
       }
-    },);
+    });
+
+    function onConnect() {
+      setIsConnected(true);
+    }
+
+    function onDisconnect() {
+      setIsConnected(false);
+    }
+
+    function onRoundStart() {
+      setUpdate(true);
+      setLatestAction(Date.now());
+    }
+
+    function onRoundResult() {
+      setUpdate(true);
+      setLatestAction(Date.now());
+    }
+
+    function onBetConfirmed() {
+      setLatestAction(Date.now());
+    }
+
+    function onCashOutConfirmed() {
+      setLatestAction(Date.now());
+    }
 
     socket.on('connect', onConnect);
     socket.on('disconnect', onDisconnect);
@@ -112,7 +136,7 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
       socket.off(SOCKET_EVENTS.CASH_OUT_CONFIRMED, onCashOutConfirmed);
       socket.off(SOCKET_EVENTS.ROUND_RESULT, onRoundResult);
     };
-  }, [onConnect, onDisconnect, onRoundStart, onRoundResult, onBetConfirmed, onCashOutConfirmed]);
+  }, []);
 
   useEffect(() => {
     if (account && latestAction) {
@@ -125,7 +149,6 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
   }, [latestAction, account]);
 
   useEffect(() => {
-
     if (update) {
       getCurrentGame().then((game) => {
         if (game == null) {
@@ -164,8 +187,7 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
 
       setUpdate(false);
     }
-
-  }, [update, latestAction]);
+  }, [update]);
 
   /**
    * Is the page currently in standalone display mode (used by PWA)?

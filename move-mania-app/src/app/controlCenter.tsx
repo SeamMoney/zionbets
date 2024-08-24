@@ -65,7 +65,7 @@ export default function ControlCenter() {
       setHasBet(false);
       setHasCashOut(false);
     }
-  }, [gameStatus?.status, account, latestAction]);
+  }, [gameStatus?.status, account]);
 
   const checkAutoCashout = useCallback(() => {
     if (!gameStatus || !gameStatus.startTime || !gameStatus.crashPoint) return;
@@ -139,36 +139,28 @@ export default function ControlCenter() {
     });
 
     try {
-      console.log('Cashing out with data:', {
-        roundId: parseInt(gameStatus.roundId),
-        playerEmail: account.email,
-        cashOutMultiplier: cashoutMultiplier,
-      });
-
       const blockchainRes = await cashOut(account.private_key, {
         roundId: parseInt(gameStatus.roundId),
         playerEmail: account.email,
         cashOutMultiplier: cashoutMultiplier,
       });
 
-      console.log('Blockchain response:', blockchainRes);
-
       if (!blockchainRes) {
-        throw new Error('No response from blockchain');
+        throw new Error('Error cashing out');
       }
 
-      await cashOutBet({
+      const data = {
         roundId: parseInt(gameStatus.roundId),
         playerEmail: account.email,
         cashOutMultiplier: cashoutMultiplier,
-      });
-
-      setHasCashOut(true);
+      };
+      cashOutBet(data);
 
       toast({
         title: `Cashed out at ${cashoutMultiplier}x`,
-        description: <Link href={`https://explorer.aptoslabs.com/txn/${blockchainRes.txnHash}/?network=testnet`} target="_blank" className="underline">View transaction</Link>
+        description: <Link href={`https://explorer.aptoslabs.com/txn/${blockchainRes.version}/?network=testnet`} target="_blank" className="underline">View transaction</Link>
       });
+      setHasCashOut(true);
     } catch (error) {
       console.error('Error cashing out:', error);
       toast({
