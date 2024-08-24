@@ -60,6 +60,9 @@ export default function ControlCenter() {
       hasUserBet(account.public_address).then((bet) => {
         console.log("API Has Bet:", bet);
         setHasBet(bet);
+        if (bet) {
+          setBetPlacedThisRound(true);
+        }
       });
 
       hasUserCashOut(account.public_address).then((cashout) => {
