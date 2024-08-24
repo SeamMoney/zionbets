@@ -5,6 +5,7 @@ import {
   getUserBalance,
   hasUserBet,
   hasUserCashOut,
+  setUpAndGetUser,
 } from "@/lib/api";
 import {
   Accordion,
@@ -44,35 +45,24 @@ export default function ControlCenter() {
   const [autoCashoutAmount, setAutoCashoutAmount] = useState("");
   const [hasBet, setHasBet] = useState(false);
   const [hasCashOut, setHasCashOut] = useState(false);
-  const [betPlacedThisRound, setBetPlacedThisRound] = useState(false);
 
   useEffect(() => {
-    console.log("Game Status:", gameStatus);
-    console.log("Has Bet:", hasBet);
-    console.log("Has Cash Out:", hasCashOut);
-    console.log("Bet Placed This Round:", betPlacedThisRound);
-
-    if (gameStatus?.status === "COUNTDOWN") {
-      setBetPlacedThisRound(false);
-      setHasBet(false);
-      setHasCashOut(false);
-    }
-
     if (account) {
       hasUserBet(account.public_address).then((bet) => {
-        console.log("API Has Bet:", bet);
         setHasBet(bet);
-        if (bet) {
-          setBetPlacedThisRound(true);
-        }
       });
 
       hasUserCashOut(account.public_address).then((cashout) => {
-        console.log("API Has Cash Out:", cashout);
         setHasCashOut(cashout);
       });
     }
-  }, [gameStatus, account, latestAction]);
+  }, [gameStatus, account, latestAction, hasBet, hasCashOut]);
+
+  useEffect(() => {
+    if (gameStatus?.status === "IN_PROGRESS") {
+      checkAutoCashout();
+    }
+  }, [gameStatus]);
 
   const onCashOut = useCallback(async () => {
     if (!socket || !account || !gameStatus?.startTime) return;
@@ -99,13 +89,14 @@ export default function ControlCenter() {
         playerEmail: account.email,
         cashOutMultiplier: cashoutMultipler,
       };
-      cashOutBet(data);
+      await cashOutBet(data);
+
+      setHasCashOut(true);
 
       toast({
         title: "Cashed out at " + cashoutMultipler + "x",
         description: <Link href={`https://explorer.aptoslabs.com/txn/${blockchainRes.txnHash}/?network=testnet`} target="_blank" className="underline">View transaction</Link>
       })
-      setHasCashOut(true);
     } catch (error) {
       console.error('Error cashing out:', error);
       toast({
@@ -136,7 +127,7 @@ export default function ControlCenter() {
     if (!socket || !account || !gameStatus) return;
 
     toast({
-      title: "Placing bet at " + betAmount + " ZAPT...",
+      title: "Placing bet at " + betAmount + " APT...",
     })
 
     try {
@@ -144,7 +135,7 @@ export default function ControlCenter() {
         roundId: parseInt(gameStatus.roundId),
         playerEmail: account.email,
         betAmount: parseFloat(betAmount),
-        coinType: "ZAPT",
+        coinType: "APT",
       });
 
       if (!blockchainRes) {
@@ -155,16 +146,16 @@ export default function ControlCenter() {
         roundId: parseInt(gameStatus.roundId),
         playerEmail: account.email,
         betAmount: parseFloat(betAmount),
-        coinType: "ZAPT",
+        coinType: "APT",
       };
-      setNewBet(data);
+      await setNewBet(data);
+
+      setHasBet(true);
 
       toast({
-        title: "Bet placed at " + betAmount + " ZAPT",
+        title: "Bet placed at " + betAmount + " APT",
         description: <Link href={`https://explorer.aptoslabs.com/txn/${blockchainRes.txnHash}/?network=testnet`} target="_blank" className="underline">View transaction</Link>
       })
-      setHasBet(true);
-      setBetPlacedThisRound(true);
     } catch (error) {
       console.error('Error placing bet:', error);
       toast({
@@ -192,7 +183,7 @@ export default function ControlCenter() {
                 placeholder="2.50"
                 disabled={!(gameStatus?.startTime !== undefined && gameStatus.startTime > Date.now())}
               ></input>
-              <span>ZAPT</span>
+              <span>APT</span>
             </span>
           </div>
           <div className="flex flex-row items-center text-xs w-full">
@@ -203,7 +194,7 @@ export default function ControlCenter() {
                 }`}
               onClick={() => setBetAmount("1")}
             >
-              1 ZAPT
+              1 APT
             </div>
             <div
               className={`border px-2 py-1 cursor-pointer grow text-center ${parseFloat(betAmount) === 5
@@ -212,7 +203,7 @@ export default function ControlCenter() {
                 }`}
               onClick={() => setBetAmount("5")}
             >
-              5 ZAPT
+              5 APT
             </div>
             <div
               className={`border px-2 py-1 cursor-pointer grow text-center ${parseFloat(betAmount) === 10
@@ -221,7 +212,7 @@ export default function ControlCenter() {
                 }`}
               onClick={() => setBetAmount("10")}
             >
-              10 ZAPT
+              10 APT
             </div>
             <div
               className={`border px-2 py-1 cursor-pointer grow text-center ${parseFloat(betAmount) === 25
@@ -230,7 +221,7 @@ export default function ControlCenter() {
                 }`}
               onClick={() => setBetAmount("25")}
             >
-              25 ZAPT
+              25 APT
             </div>
           </div>
         </div>
@@ -250,21 +241,21 @@ export default function ControlCenter() {
               <button
                 className={cn(
                   "border border-green-700 px-6 py-1 border-yellow-700 text-yellow-500 bg-neutral-950 w-full",
-                  betPlacedThisRound
+                  hasBet
                     ? "bg-[#264234]/40 cursor-not-allowed border-green-700 text-green-500"
                     : "bg-[#404226]/40 active:scale-95 active:opacity-80 transition-transform",
                 )}
                 onClick={onSetBet}
-                disabled={!(parseFloat(betAmount) > 0) || betPlacedThisRound}
+                disabled={!(parseFloat(betAmount) > 0) || hasBet}
               >
                 {
-                  betPlacedThisRound ? "Bet placed" : (parseFloat(betAmount) > 0) ? "Place bet" : "Enter bet amount"
+                  hasBet ? "Bet placed" : (parseFloat(betAmount) > 0) ? "Place bet" : "Enter bet amount"
                 }
               </button>
             )
           }
           {
-            account && (gameStatus?.status === "IN_PROGRESS" || gameStatus?.status === "END") && betPlacedThisRound && (
+            account && (gameStatus?.status === "IN_PROGRESS" || gameStatus?.status === "END") && hasBet && (
               <button
                 className={cn(
                   "border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 w-full",
@@ -282,7 +273,7 @@ export default function ControlCenter() {
             )
           }
           {
-            account && (gameStatus?.status === "IN_PROGRESS" || gameStatus?.status === "END") && !betPlacedThisRound && (
+            account && (gameStatus?.status === "IN_PROGRESS" || gameStatus?.status === "END") && !hasBet && (
               <button
                 className="border px-6 py-1 border-yellow-700 text-yellow-500 bg-neutral-950 cursor-not-allowed w-full"
                 disabled

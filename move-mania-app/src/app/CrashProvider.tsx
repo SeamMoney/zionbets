@@ -8,6 +8,7 @@ import { getSession } from "next-auth/react";
 import { getCurrentGame, getUser, setUpAndGetUser } from "@/lib/api";
 import { SOCKET_EVENTS } from "@/lib/types";
 import { EXPONENTIAL_FACTOR, log } from "@/lib/utils";
+import { useCallback } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -42,6 +43,42 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
 
   const [showPWAInstall, setShowPWAInstall] = useState(false);
 
+  const onConnect = useCallback(() => {
+    setIsConnected(true);
+  }, []);
+
+  const onDisconnect = useCallback(() => {
+    setIsConnected(false);
+  }, []);
+
+  const onRoundStart = useCallback((data: any) => {
+    setGameStatus({
+      status: "COUNTDOWN",
+      roundId: data.gameId,
+      startTime: data.startTime,
+      crashPoint: data.crashPoint,
+    });
+    setLatestAction(Date.now());
+  }, []);
+
+  const onRoundResult = useCallback((data: any) => {
+    setGameStatus({
+      status: "END",
+      roundId: data.gameId,
+      startTime: data.startTime,
+      crashPoint: data.crashPoint,
+    });
+    setLatestAction(Date.now());
+  }, []);
+
+  const onBetConfirmed = useCallback(() => {
+    setLatestAction(Date.now());
+  }, []);
+
+  const onCashOutConfirmed = useCallback(() => {
+    setLatestAction(Date.now());
+  }, []);
+
   useEffect(() => {
     console.log("CrashProvider useEffect running");
     getSession().then((session) => {
@@ -58,37 +95,7 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
           }
         });
       }
-    });
-
-    function onConnect() {
-      setIsConnected(true);
-    }
-
-    function onDisconnect() {
-      setIsConnected(false);
-    }
-
-    function onRoundStart() {
-      setUpdate(true);
-      setLatestAction(Date.now());
-    }
-
-    function onRoundResult() {
-      setUpdate(true);
-      setLatestAction(Date.now());
-    }
-
-    function onBetConfirmed() {
-      setLatestAction(Date.now());
-    }
-
-    function onCashOutConfirmed() {
-      setLatestAction(Date.now());
-    }
-
-    // function onFooEvent(value) {
-    //   // setFooEvents(previous => [...previous, value]);
-    // }
+    },);
 
     socket.on('connect', onConnect);
     socket.on('disconnect', onDisconnect);
@@ -105,7 +112,17 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
       socket.off(SOCKET_EVENTS.CASH_OUT_CONFIRMED, onCashOutConfirmed);
       socket.off(SOCKET_EVENTS.ROUND_RESULT, onRoundResult);
     };
-  }, []);
+  }, [onConnect, onDisconnect, onRoundStart, onRoundResult, onBetConfirmed, onCashOutConfirmed]);
+
+  useEffect(() => {
+    if (account && latestAction) {
+      getUser(account.email).then((updatedUser) => {
+        if (updatedUser) {
+          setAccount(updatedUser);
+        }
+      });
+    }
+  }, [latestAction, account]);
 
   useEffect(() => {
 
@@ -148,7 +165,7 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
       setUpdate(false);
     }
 
-  }, [update]);
+  }, [update, latestAction]);
 
   /**
    * Is the page currently in standalone display mode (used by PWA)?
