@@ -54,6 +54,8 @@ export default function ControlCenter() {
 
     if (gameStatus?.status === "COUNTDOWN") {
       setBetPlacedThisRound(false);
+      setHasBet(false);
+      setHasCashOut(false);
     }
 
     if (account) {
@@ -248,10 +250,9 @@ export default function ControlCenter() {
               <button
                 className={cn(
                   "border border-green-700 px-6 py-1 border-yellow-700 text-yellow-500 bg-neutral-950 w-full",
-                  !betPlacedThisRound
-                    ? "cursor-not-allowed"
-                    : "bg-[#264234]/40 hover:cursor-pointer border-green-700 text-green-500",
-                  (parseFloat(betAmount) > 0) && !betPlacedThisRound && "bg-[#404226]/40 active:scale-95 active:opacity-80 transition-transform",
+                  betPlacedThisRound
+                    ? "bg-[#264234]/40 cursor-not-allowed border-green-700 text-green-500"
+                    : "bg-[#404226]/40 active:scale-95 active:opacity-80 transition-transform",
                 )}
                 onClick={onSetBet}
                 disabled={!(parseFloat(betAmount) > 0) || betPlacedThisRound}
@@ -263,31 +264,30 @@ export default function ControlCenter() {
             )
           }
           {
-            account && gameStatus?.status === "IN_PROGRESS" && betPlacedThisRound && (
+            account && (gameStatus?.status === "IN_PROGRESS" || gameStatus?.status === "END") && betPlacedThisRound && (
               <button
                 className={cn(
                   "border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 w-full",
-                  hasCashOut
+                  hasCashOut || gameStatus?.status === "END"
                     ? "cursor-not-allowed bg-[#264234]/40"
                     : "hover:bg-[#404226]/40 hover:cursor-pointer bg-[#404226]/40 border-yellow-700 text-yellow-500  active:scale-95 active:opacity-80 transition-transform",
-                  hasCashOut && "bg-[#264234]/40"
                 )}
                 onClick={onCashOut}
-                disabled={hasCashOut}
+                disabled={hasCashOut || gameStatus?.status === "END"}
               >
                 {
-                  hasCashOut ? "Cashed out" : "Cash out"
+                  hasCashOut ? "Cashed out" : gameStatus?.status === "END" ? "Game ended" : "Cash out"
                 }
               </button>
             )
           }
           {
-            account && gameStatus?.status === "IN_PROGRESS" && !betPlacedThisRound && (
+            account && (gameStatus?.status === "IN_PROGRESS" || gameStatus?.status === "END") && !betPlacedThisRound && (
               <button
                 className="border px-6 py-1 border-yellow-700 text-yellow-500 bg-neutral-950 cursor-not-allowed w-full"
                 disabled
               >
-                Game in progress
+                {gameStatus?.status === "IN_PROGRESS" ? "Game in progress" : "Game ended"}
               </button>
             )
           }
