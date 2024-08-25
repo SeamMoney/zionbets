@@ -65,7 +65,7 @@ export default function ControlCenter() {
       setHasBet(false);
       setHasCashOut(false);
     }
-  }, [gameStatus?.status, account]);
+  }, [gameStatus?.status, account, hasBet, hasCashOut]);
 
   const checkAutoCashout = useCallback(() => {
     if (!gameStatus || !gameStatus.startTime || !gameStatus.crashPoint) return;

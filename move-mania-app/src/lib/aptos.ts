@@ -328,7 +328,9 @@ export async function cashOut(userPrivateKey: string, cashOutData: CashOutData) 
       function: `${MODULE_ADDRESS}::${MODULE_NAME}::cash_out`,
       type_arguments: [],
       arguments: [
-        Math.floor(cashOutData.cashOutMultiplier * 100)
+        cashOutData.roundId.toString(),
+        cashOutData.playerEmail,
+        Math.floor(cashOutData.cashOutMultiplier * 100).toString()
       ]
     },
     TRANSACTION_OPTIONS
