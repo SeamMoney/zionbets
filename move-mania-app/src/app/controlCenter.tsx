@@ -67,65 +67,6 @@ export default function ControlCenter() {
     }
   }, [gameStatus?.status, account, hasBet, hasCashOut]);
 
-  const checkAutoCashout = useCallback(() => {
-    if (!gameStatus || !gameStatus.startTime || !gameStatus.crashPoint) return;
-
-    const timeUntilCrash = gameStatus.startTime + log(EXPONENTIAL_FACTOR, gameStatus.crashPoint) * 1000 - Date.now();
-    const timeUntilCashout = gameStatus.startTime + log(EXPONENTIAL_FACTOR, parseFloat(autoCashoutAmount) || 0) * 1000 - Date.now();
-    if (hasBet && autoCashout && timeUntilCashout < timeUntilCrash && timeUntilCashout > 0) {
-      setTimeout(() => {
-        onCashOut();
-      }, timeUntilCashout);
-    }
-  }, [gameStatus, autoCashout, autoCashoutAmount, hasBet]);
-
-  useEffect(() => {
-    if (gameStatus?.status === "IN_PROGRESS") {
-      checkAutoCashout();
-    }
-  }, [gameStatus, checkAutoCashout]);
-
-  const onSetBet = useCallback(async () => {
-    if (!socket || !account || !gameStatus) return;
-
-    toast({
-      title: `Placing bet at ${betAmount} APT...`,
-    });
-
-    try {
-      const blockchainRes = await placeBet(account.private_key, {
-        roundId: parseInt(gameStatus.roundId),
-        playerEmail: account.email,
-        betAmount: parseFloat(betAmount),
-        coinType: "APT",
-      });
-
-      if (!blockchainRes) {
-        throw new Error('Error placing bet');
-      }
-
-      await setNewBet({
-        roundId: parseInt(gameStatus.roundId),
-        playerEmail: account.email,
-        betAmount: parseFloat(betAmount),
-        coinType: "APT",
-      });
-
-      setHasBet(true);
-
-      toast({
-        title: `Bet placed at ${betAmount} APT`,
-        description: <Link href={`https://explorer.aptoslabs.com/txn/${blockchainRes.txnHash}/?network=testnet`} target="_blank" className="underline">View transaction</Link>
-      });
-    } catch (error) {
-      console.error('Error placing bet:', error);
-      toast({
-        title: "Error placing bet",
-        description: "Please try again"
-      });
-    }
-  }, [account, gameStatus, betAmount, toast]);
-
   const onCashOut = useCallback(async () => {
     if (!socket || !account || !gameStatus?.startTime) {
       console.log('Missing required data for cash out:', { socket, account, gameStatus });
@@ -175,6 +116,80 @@ export default function ControlCenter() {
       });
     }
   }, [account, gameStatus, toast, socket]);
+
+  const checkAutoCashout = useCallback(() => {
+    if (!gameStatus || !gameStatus.startTime || !gameStatus.crashPoint) {
+      console.log("Auto cashout check skipped: missing game status data");
+      return;
+    }
+
+    const timeUntilCrash = gameStatus.startTime + log(EXPONENTIAL_FACTOR, gameStatus.crashPoint) * 1000 - Date.now();
+    const timeUntilCashout = gameStatus.startTime + log(EXPONENTIAL_FACTOR, parseFloat(autoCashoutAmount) || 0) * 1000 - Date.now();
+
+    console.log("Auto cashout check:", {
+      hasBet,
+      autoCashout,
+      timeUntilCashout,
+      timeUntilCrash,
+      autoCashoutAmount
+    });
+
+    if (hasBet && autoCashout && timeUntilCashout < timeUntilCrash && timeUntilCashout > 0) {
+      console.log("Scheduling auto cashout");
+      setTimeout(() => {
+        console.log("Executing auto cashout");
+        onCashOut();
+      }, timeUntilCashout);
+    }
+  }, [gameStatus, autoCashout, autoCashoutAmount, hasBet, onCashOut]);
+
+  useEffect(() => {
+    if (gameStatus?.status === "IN_PROGRESS") {
+      checkAutoCashout();
+    }
+  }, [gameStatus, checkAutoCashout]);
+
+  const onSetBet = useCallback(async () => {
+    if (!socket || !account || !gameStatus) return;
+
+    toast({
+      title: `Placing bet at ${betAmount} APT...`,
+    });
+
+    try {
+      const blockchainRes = await placeBet(account.private_key, {
+        roundId: parseInt(gameStatus.roundId),
+        playerEmail: account.email,
+        betAmount: parseFloat(betAmount),
+        coinType: "APT",
+      });
+
+      if (!blockchainRes) {
+        throw new Error('Error placing bet');
+      }
+
+      await setNewBet({
+        roundId: parseInt(gameStatus.roundId),
+        playerEmail: account.email,
+        betAmount: parseFloat(betAmount),
+        coinType: "APT",
+      });
+
+      setHasBet(true);
+
+      toast({
+        title: `Bet placed at ${betAmount} APT`,
+        description: <Link href={`https://explorer.aptoslabs.com/txn/${blockchainRes.txnHash}/?network=testnet`} target="_blank" className="underline">View transaction</Link>
+      });
+    } catch (error) {
+      console.error('Error placing bet:', error);
+      toast({
+        title: "Error placing bet",
+        description: "Please try again"
+      });
+    }
+  }, [account, gameStatus, betAmount, toast]);
+
 
   return (
     <div className="w-full h-full flex flex-col gap-4 items-start p-2">
