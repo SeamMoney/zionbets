@@ -128,20 +128,19 @@ export default function ControlCenter() {
 
   const onCashOut = useCallback(async () => {
     if (!socket || !account || !gameStatus?.startTime) {
-      console.error('Missing required data for cash out:', { socket, account, gameStatus });
+      console.log('Missing required data for cash out:', { socket, account, gameStatus });
       return;
     }
 
     const cashoutMultiplier = Number(calculateCurrentCrashPoint((Date.now() - gameStatus.startTime) / 1000).toFixed(2));
 
     toast({
-      title: `Cashing out at ${cashoutMultiplier}x...`,
+      title: `Attempting to cash out at ${cashoutMultiplier}x...`,
     });
 
     try {
-
       console.log("Attempting to cash out with:", {
-        privateKey: account.private_key,
+        privateKey: account.private_key.slice(0, 5) + '...',
         roundId: parseInt(gameStatus.roundId),
         playerEmail: account.email,
         cashOutMultiplier: cashoutMultiplier,
@@ -154,15 +153,14 @@ export default function ControlCenter() {
       });
 
       if (!blockchainRes) {
-        throw new Error('Error cashing out');
+        throw new Error('Error cashing out on blockchain');
       }
 
-      const data = {
+      await cashOutBet({
         roundId: parseInt(gameStatus.roundId),
         playerEmail: account.email,
         cashOutMultiplier: cashoutMultiplier,
-      };
-      cashOutBet(data);
+      });
 
       toast({
         title: `Cashed out at ${cashoutMultiplier}x`,
@@ -173,7 +171,7 @@ export default function ControlCenter() {
       console.error('Error cashing out:', error);
       toast({
         title: "Error cashing out",
-        description: "Please try again"
+        description: "Please try again or contact support if the issue persists"
       });
     }
   }, [account, gameStatus, toast, socket]);

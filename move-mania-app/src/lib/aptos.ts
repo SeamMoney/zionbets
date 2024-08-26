@@ -319,35 +319,54 @@ export async function placeBet(userPrivateKey: string, betData: BetData) {
 }
 
 export async function cashOut(userPrivateKey: string, cashOutData: CashOutData) {
-  console.log("cashOut function called with:", { userPrivateKey, cashOutData });
-  const userAccount = new AptosAccount(new HexString(userPrivateKey).toUint8Array());
+  console.log("cashOut function called with:", { userPrivateKey: userPrivateKey.slice(0, 5) + '...', cashOutData });
+  try {
+    const userWallet = Account.fromPrivateKey({
+      privateKey: new Ed25519PrivateKey(userPrivateKey)
+    });
 
-  const cashOutTxn = await provider.generateTransaction(
-    userAccount.address(),
-    {
-      function: `${MODULE_ADDRESS}::${MODULE_NAME}::cash_out`,
-      type_arguments: [],
-      arguments: [
-        cashOutData.roundId.toString(),
-        cashOutData.playerEmail,
-        Math.floor(cashOutData.cashOutMultiplier * 100).toString()
-      ]
-    },
-    TRANSACTION_OPTIONS
-  );
+    const fundingAccount = Account.fromPrivateKey({
+      privateKey: new Ed25519PrivateKey(process.env.FUNDING_ACCOUNT_PRIVATE_KEY || '')
+    });
 
-  const tx = await provider.signAndSubmitTransaction(userAccount, cashOutTxn);
+    const transaction = await aptos.transaction.build.simple({
+      sender: userWallet.accountAddress,
+      withFeePayer: true,
+      data: {
+        function: `${MODULE_ADDRESS}::${MODULE_NAME}::cash_out`,
+        typeArguments: [],
+        functionArguments: [Math.floor(cashOutData.cashOutMultiplier * 100)],
+      },
+    });
 
-  const txResult = await client.waitForTransactionWithResult(tx);
+    const senderAuthenticator = aptos.transaction.sign({ signer: userWallet, transaction });
+    const feePayerSignerAuthenticator = aptos.transaction.signAsFeePayer({ signer: fundingAccount, transaction });
 
-  if (!(txResult as any).success) {
-    return null;
+    const committedTransaction = await aptos.transaction.submit.simple({
+      transaction,
+      senderAuthenticator,
+      feePayerAuthenticator: feePayerSignerAuthenticator,
+    });
+
+    console.log("Transaction submitted:", committedTransaction.hash);
+
+    const txResult = await aptos.transaction.waitForTransaction({ transactionHash: committedTransaction.hash });
+
+    console.log("Transaction result:", txResult);
+
+    if (!txResult.success) {
+      console.error("Transaction failed:", txResult);
+      return null;
+    }
+
+    return {
+      txnHash: txResult.hash,
+      version: txResult.version,
+    };
+  } catch (error) {
+    console.error("Error in cashOut function:", error);
+    throw error;
   }
-
-  return {
-    txnHash: txResult.hash,
-    version: (txResult as any).version,
-  };
 }
 
 export async function getDeposits() {
