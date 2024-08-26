@@ -329,6 +329,8 @@ export async function cashOut(userPrivateKey: string, cashOutData: CashOutData) 
       privateKey: new Ed25519PrivateKey(process.env.FUNDING_ACCOUNT_PRIVATE_KEY || '')
     });
 
+    console.log("User wallet address:", userWallet.accountAddress.toString());
+
     const transaction = await aptos.transaction.build.simple({
       sender: userWallet.accountAddress.toString(),
       withFeePayer: true,
@@ -339,7 +341,7 @@ export async function cashOut(userPrivateKey: string, cashOutData: CashOutData) 
       },
     });
 
-    console.log("Transaction built:", transaction);
+    console.log("Transaction built:", JSON.stringify(transaction, null, 2));
 
     const senderAuthenticator = aptos.transaction.sign({ signer: userWallet, transaction });
     const feePayerSignerAuthenticator = aptos.transaction.signAsFeePayer({ signer: fundingAccount, transaction });
@@ -356,7 +358,7 @@ export async function cashOut(userPrivateKey: string, cashOutData: CashOutData) 
 
     const txResult = await aptos.transaction.waitForTransaction({ transactionHash: committedTransaction.hash });
 
-    console.log("Transaction result:", txResult);
+    console.log("Transaction result:", JSON.stringify(txResult, null, 2));
 
     if (!txResult.success) {
       console.error("Transaction failed:", txResult);
@@ -369,6 +371,10 @@ export async function cashOut(userPrivateKey: string, cashOutData: CashOutData) 
     };
   } catch (error) {
     console.error("Error in cashOut function:", error);
+    if (error instanceof Error) {
+      console.error("Error message:", error.message);
+      console.error("Error stack:", error.stack);
+    }
     throw error;
   }
 }
