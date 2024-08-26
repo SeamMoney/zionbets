@@ -344,42 +344,47 @@ export async function cashOut(userPrivateKey: string, cashOutData: CashOutData) 
       },
     });
 
-    // Convert BigInt values to strings for logging
-    const safeLogTransaction = JSON.parse(JSON.stringify(transaction, (key, value) =>
+    console.log("Transaction built:", JSON.stringify(transaction, (key, value) =>
       typeof value === 'bigint' ? value.toString() : value
-    ));
-    console.log("Transaction built:", JSON.stringify(safeLogTransaction, null, 2));
+      , 2));
 
     const senderAuthenticator = aptos.transaction.sign({ signer: userWallet, transaction });
     const feePayerSignerAuthenticator = aptos.transaction.signAsFeePayer({ signer: fundingAccount, transaction });
 
     console.log("Transaction signed");
 
-    const committedTransaction = await aptos.transaction.submit.simple({
-      transaction,
-      senderAuthenticator,
-      feePayerAuthenticator: feePayerSignerAuthenticator,
-    });
+    try {
+      const committedTransaction = await aptos.transaction.submit.simple({
+        transaction,
+        senderAuthenticator,
+        feePayerAuthenticator: feePayerSignerAuthenticator,
+      });
 
-    console.log("Transaction submitted:", committedTransaction.hash);
+      console.log("Transaction submitted:", committedTransaction.hash);
 
-    const txResult = await aptos.transaction.waitForTransaction({ transactionHash: committedTransaction.hash });
+      const txResult = await aptos.transaction.waitForTransaction({ transactionHash: committedTransaction.hash });
 
-    // Convert BigInt values to strings for logging
-    const safeLogTxResult = JSON.parse(JSON.stringify(txResult, (key, value) =>
-      typeof value === 'bigint' ? value.toString() : value
-    ));
-    console.log("Transaction result:", JSON.stringify(safeLogTxResult, null, 2));
+      console.log("Transaction result:", JSON.stringify(txResult, (key, value) =>
+        typeof value === 'bigint' ? value.toString() : value
+        , 2));
 
-    if (!txResult.success) {
-      console.error("Transaction failed:", safeLogTxResult);
-      return null;
+      if (!txResult.success) {
+        console.error("Transaction failed:", txResult);
+        return null;
+      }
+
+      return {
+        txnHash: txResult.hash,
+        version: txResult.version.toString(),
+      };
+    } catch (submitError) {
+      console.error("Error submitting or executing transaction:", submitError);
+      if (submitError instanceof Error) {
+        console.error("Error message:", submitError.message);
+        console.error("Error stack:", submitError.stack);
+      }
+      throw submitError;
     }
-
-    return {
-      txnHash: txResult.hash,
-      version: txResult.version.toString(), // Convert BigInt to string
-    };
   } catch (error) {
     console.error("Error in cashOut function:", error);
     if (error instanceof Error) {
