@@ -330,7 +330,7 @@ export async function cashOut(userPrivateKey: string, cashOutData: CashOutData) 
     });
 
     const transaction = await aptos.transaction.build.simple({
-      sender: userWallet.accountAddress,
+      sender: userWallet.accountAddress.toString(),
       withFeePayer: true,
       data: {
         function: `${MODULE_ADDRESS}::${MODULE_NAME}::cash_out`,
@@ -339,8 +339,12 @@ export async function cashOut(userPrivateKey: string, cashOutData: CashOutData) 
       },
     });
 
+    console.log("Transaction built:", transaction);
+
     const senderAuthenticator = aptos.transaction.sign({ signer: userWallet, transaction });
     const feePayerSignerAuthenticator = aptos.transaction.signAsFeePayer({ signer: fundingAccount, transaction });
+
+    console.log("Transaction signed");
 
     const committedTransaction = await aptos.transaction.submit.simple({
       transaction,
