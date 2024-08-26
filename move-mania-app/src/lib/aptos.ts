@@ -330,7 +330,7 @@ export async function cashOut(userPrivateKey: string, cashOutData: CashOutData) 
     });
 
     const transaction = await aptos.transaction.build.simple({
-      sender: userWallet.accountAddress.toString(), // Convert to string
+      sender: userWallet.accountAddress,
       withFeePayer: true,
       data: {
         function: `${MODULE_ADDRESS}::${MODULE_NAME}::cash_out`,
