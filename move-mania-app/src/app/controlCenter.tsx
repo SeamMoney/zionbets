@@ -93,6 +93,8 @@ export default function ControlCenter() {
         cashOutMultiplier: cashoutMultiplier,
       });
 
+      console.log("Blockchain response:", blockchainRes);
+
       if (!blockchainRes) {
         throw new Error('Error cashing out on blockchain');
       }
@@ -110,6 +112,10 @@ export default function ControlCenter() {
       setHasCashOut(true);
     } catch (error) {
       console.error('Error cashing out:', error);
+      if (error instanceof Error) {
+        console.error('Error message:', error.message);
+        console.error('Error stack:', error.stack);
+      }
       toast({
         title: "Error cashing out",
         description: "Please try again or contact support if the issue persists"
