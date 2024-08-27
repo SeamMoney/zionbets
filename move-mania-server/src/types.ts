@@ -8,6 +8,7 @@ export const SOCKET_EVENTS = {
   ROUND_START: "round-start",
   CHAT_MESSAGE: "chat-message",
   CHAT_NOTIFICATION: "chat-notification",
+  CASH_OUT_RESULT: "cash-out-result",
 };
 
 export type BetData = {
