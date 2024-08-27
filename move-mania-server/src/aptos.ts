@@ -43,6 +43,31 @@ function getAdminAccount() {
   );
 }
 
+export async function handleCashOut(playerAddress: string, cashOutAmount: number) {
+  const adminAccount = getAdminAccount();
+
+  const transaction = await provider.generateTransaction(
+    adminAccount.address(),
+    {
+      function: `${MODULE_ADDRESS}::crash::cash_out`,
+      type_arguments: [],
+      arguments: [playerAddress, cashOutAmount],
+    },
+    TRANSACTION_OPTIONS
+  );
+
+  const signedTx = await provider.signTransaction(adminAccount, transaction);
+  const pendingTx = await provider.submitTransaction(signedTx);
+
+  const txResult = await client.waitForTransactionWithResult(pendingTx.hash);
+
+  if ((txResult as any).success === false) {
+    return null;
+  }
+
+  return { txnHash: txResult.hash };
+}
+
 export async function createNewGame(house_secret: string, salt: string): Promise<{ txnHash: string, startTime: number, randomNumber: string } | null> {
   const adminAccount = getAdminAccount();
 
