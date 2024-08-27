@@ -45,6 +45,7 @@ const options = {
 const httpsServer = https.createServer(options, app);
 httpsServer.listen(portHttps, () => {
   console.log('HTTPs Server running on port ', portHttps);
+  cycleRounds();
 });
 
 const io = new Server(httpsServer, {
