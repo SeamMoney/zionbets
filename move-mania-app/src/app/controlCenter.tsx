@@ -159,7 +159,7 @@ export default function ControlCenter() {
     if (!socket || !account || !gameStatus) return;
 
     toast({
-      title: `Placing bet at ${betAmount} APT...`,
+      title: `Placing bet at ${betAmount} CASH...`,
     });
 
     try {

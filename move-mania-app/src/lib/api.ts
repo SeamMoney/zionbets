@@ -1,5 +1,5 @@
 import { PlayerState } from "@/app/playerList";
-import { fundAccountWithGas, mintZAPT, registerForZAPT, createAptosKeyPair } from "./aptos";
+import { fundAccountWithGas, mintCASH, registerForCASH, createAptosKeyPair } from "./aptos";
 import { User } from "./schema";
 import { ChatMessage } from "./types";
 import { MagicAptosWallet } from "@magic-ext/aptos";
@@ -42,7 +42,7 @@ export async function setUpUser(
 ) {
   if (referrer) {
     const referrerUser = await getUserFromReferralCode(referrer);
-    await mintZAPT(referrerUser.public_address, 100);
+    await mintCASH(referrerUser.public_address, 100);
   }
 
   const keyPair = await createAptosKeyPair();
@@ -52,7 +52,7 @@ export async function setUpUser(
   }
 
   await fundAccountWithGas(keyPair.public_address);
-  await mintZAPT(keyPair.public_address, 1000);
+  await mintCASH(keyPair.public_address, 1000);
 
   const newUser = {
     ...userToSetup,
@@ -123,7 +123,7 @@ export async function setUpAndGetUser(userToSetup: Omit<User, "public_address" |
       }
 
       await fundAccountWithGas(keyPair.public_address);
-      await mintZAPT(keyPair.public_address, 1000);
+      await mintCASH(keyPair.public_address, 1000);
 
       const newUser = {
         ...userToSetup,

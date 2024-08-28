@@ -5,10 +5,10 @@ authors = []
 upgrade_policy = "compatible"
 
 [addresses]
-zion = "718f425ed1d75d876bdf0f316ab9f59624b38bccd4241405c114b9cd174d1e83"
-z_apt = "6fc171eb36807e956b56a5c8c7157968f8aee43299e35e6e45f477719c8acd4d"
-liquidity_pool = "bdd5fb2899ba75294df3b6735b11a9565160e0d0b2327e9ec84979224cf31aa1"
-crash = "44d6cd854567d0bb4fc23ee3df1cb7eec15fea87c8cb844713c6166982826715"
+zion = "0x61ed8b048636516b4eaf4c74250fa4f9440d9c3e163d96aeb863fe658a4bdc67"
+crash = "7e37543a6d9474eee8419b500668e1d460f2f46f82b0ff74031a460e470f5def"
+liquidity_pool = "1db4b146eca34c7a6289d59782141a23bfef9ca5781c0042c9fb8670c8f786b3"
+cash = "3746efc2ee6385f2ee106f5f6da9784d414eb70d69d30a52ad8b09a00b06d870"
 std = "0x1"
 aptos_std = "0x1"
 aptos_framework = "0x1"
