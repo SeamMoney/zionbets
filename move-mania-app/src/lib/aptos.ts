@@ -339,7 +339,7 @@ export async function cashOut(userPrivateKey: string, cashOutData: CashOutData) 
         function: `${MODULE_ADDRESS}::${MODULE_NAME}::cash_out`,
         typeArguments: [],
         functionArguments: [
-          userWallet.accountAddress,
+          userWallet.accountAddress.toString(),
           Math.floor(cashOutData.cashOutMultiplier * 100),
         ],
       },
