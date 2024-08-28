@@ -12,6 +12,7 @@ const CRASH_RESOURCE_ACCOUNT_ADDRESS = process.env.CRASH_RESOURCE_ACCOUNT_ADDRES
 const LP_RESOURCE_ACCOUNT_ADDRESS = process.env.LP_RESOURCE_ACCOUNT_ADDRESS as string;
 const CASH_RESOURCE_ACCOUNT_ADDRESS = process.env.CASH_RESOURCE_ACCOUNT_ADDRESS as string;
 
+
 export const RPC_URL = 'https://fullnode.testnet.aptoslabs.com';
 const FAUCET_URL = 'https://faucet.testnet.aptoslabs.com';
 
