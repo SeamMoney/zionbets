@@ -328,11 +328,24 @@ export async function cashOut(userPrivateKey: string, cashOutData: CashOutData) 
 
     console.log("User wallet address:", userWallet.accountAddress.toString());
 
+<<<<<<< HEAD
     // Call the server endpoint instead of directly interacting with the blockchain
     const response = await fetch('/api/cash-out', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+=======
+    const transaction = await aptos.transaction.build.simple({
+      sender: userWallet.accountAddress.toString(),
+      withFeePayer: true,
+      data: {
+        function: `${MODULE_ADDRESS}::${MODULE_NAME}::cash_out`,
+        typeArguments: [],
+        functionArguments: [
+          userWallet.accountAddress.toString(),
+          Math.floor(cashOutData.cashOutMultiplier * 100),
+        ],
+>>>>>>> 7c64e686660d7cb5e47511047882401793948f2c
       },
       body: JSON.stringify({
         playerAddress: userWallet.accountAddress.toString(),
