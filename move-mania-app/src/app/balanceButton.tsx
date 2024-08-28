@@ -28,7 +28,7 @@ export default function BalanceButton() {
 
   useEffect(() => {
     if (account) {
-      getBalance(account.public_address, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`).then((balance) => {
+      getBalance(account.public_address, `${process.env.MODULE_ADDRESS}::cash::CASH`).then((balance) => {
         setBalance(balance);
       });
     }
@@ -37,7 +37,7 @@ export default function BalanceButton() {
   useEffect(() => {
     if (account) {
       const interval = setInterval(() => {
-        getBalance(account.public_address, `${process.env.MODULE_ADDRESS}::z_apt::ZAPT`).then((balance) => {
+        getBalance(account.public_address, `${process.env.MODULE_ADDRESS}::cash::CASH`).then((balance) => {
           setBalance(balance);
         });
       }, 1000);

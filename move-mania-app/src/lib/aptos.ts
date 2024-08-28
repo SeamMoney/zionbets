@@ -10,7 +10,7 @@ const MODULE_NAME = 'crash';
 const MODULE_ADDRESS = process.env.MODULE_ADDRESS
 const CRASH_RESOURCE_ACCOUNT_ADDRESS = process.env.CRASH_RESOURCE_ACCOUNT_ADDRESS as string;
 const LP_RESOURCE_ACCOUNT_ADDRESS = process.env.LP_RESOURCE_ACCOUNT_ADDRESS as string;
-const Z_APT_RESOURCE_ACCOUNT_ADDRESS = process.env.Z_APT_RESOURCE_ACCOUNT_ADDRESS as string;
+const CASH_RESOURCE_ACCOUNT_ADDRESS = process.env.CASH_RESOURCE_ACCOUNT_ADDRESS as string;
 
 export const RPC_URL = 'https://fullnode.testnet.aptoslabs.com';
 const FAUCET_URL = 'https://faucet.testnet.aptoslabs.com';
@@ -114,7 +114,7 @@ export async function registerForAPT(userAccount: AptosAccount) {
   };
 }
 
-export async function registerForZAPT(userWallet: Account) {
+export async function registerForCASH(userWallet: Account) {
   const fundingAccount = Account.fromPrivateKey({
     privateKey: new Ed25519PrivateKey(process.env.FUNDING_ACCOUNT_PRIVATE_KEY || '')
   });
@@ -123,7 +123,7 @@ export async function registerForZAPT(userWallet: Account) {
     sender: userWallet.accountAddress,
     withFeePayer: true,
     data: {
-      function: `${MODULE_ADDRESS}::z_apt::register`,
+      function: `${MODULE_ADDRESS}::cash::register`,
       typeArguments: [],
       functionArguments: [],
     },
@@ -208,7 +208,7 @@ export async function createAptosKeyPair(): Promise<{
 
     await aptos.transaction.waitForTransaction({ transactionHash: fundCommittedTransaction.hash });
 
-    await registerForZAPT(account);
+    await registerForCASH(account);
 
     return {
       account,
@@ -250,13 +250,13 @@ export async function fundAccountWithGas(userAddress: string) {
   console.log('fund', fundTx);
 }
 
-export async function mintZAPT(userAddress: string, amount: number) {
+export async function mintCASH(userAddress: string, amount: number) {
   const adminAccount = await getUserAccount(process.env.ADMIN_ACCOUNT_PRIVATE_KEY || '');
 
   const txn = await provider.generateTransaction(
     adminAccount.address(),
     {
-      function: `${MODULE_ADDRESS}::z_apt::mint`,
+      function: `${MODULE_ADDRESS}::cash::mint`,
       type_arguments: [],
       arguments: [
         Math.floor(amount * APT),

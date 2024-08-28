@@ -1,32 +1,32 @@
-module zion::z_apt {
+module zion::cash {
     
   use std::signer;
   use std::string;
   use aptos_framework::coin;
   use aptos_framework::account;
 
-  const SEED: vector<u8> = b"zion-apt";
+  const SEED: vector<u8> = b"zion-cash";
   const COIN_DECIMALS: u8 = 8;
 
   const EUserIsNotModuleOwner: u64 = 101;
 
-  struct ZAPT {}
+  struct CASH {}
 
   struct AdminCap has key {}
 
   struct State has key {
     signer_cap: account::SignerCapability,
-    aptos_coin_mint_cap: coin::MintCapability<ZAPT>,
-    aptos_coin_burn_cap: coin::BurnCapability<ZAPT>
+    aptos_coin_mint_cap: coin::MintCapability<CASH>,
+    aptos_coin_burn_cap: coin::BurnCapability<CASH>
   }
 
   fun init_module(admin: &signer) {
     let (resource_account_signer, signer_cap) = account::create_resource_account(admin, SEED);
 
-    let (burn_cap, freeze_cap, mint_cap) = coin::initialize<ZAPT>(
+    let (burn_cap, freeze_cap, mint_cap) = coin::initialize<CASH>(
       admin, 
-      string::utf8(b"Zion Aptos Coin"),
-      string::utf8(b"zAPT"),
+      string::utf8(b"Zion Cash"),
+      string::utf8(b"CASH"),
       COIN_DECIMALS,
       true
     );
@@ -41,7 +41,7 @@ module zion::z_apt {
       }
     );
 
-    coin::register<ZAPT>(&resource_account_signer);
+    coin::register<CASH>(&resource_account_signer);
   }
 
   public entry fun mint(
@@ -56,7 +56,7 @@ module zion::z_apt {
   }
 
   public entry fun register(recipient: &signer) {
-    coin::register<ZAPT>(recipient);
+    coin::register<CASH>(recipient);
   }
 
   public entry fun burn(
