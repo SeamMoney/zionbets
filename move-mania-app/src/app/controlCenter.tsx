@@ -167,7 +167,7 @@ export default function ControlCenter() {
         roundId: parseInt(gameStatus.roundId),
         playerEmail: account.email,
         betAmount: parseFloat(betAmount),
-        coinType: "APT",
+        coinType: "CASH",
       });
 
       if (!blockchainRes) {
@@ -178,13 +178,13 @@ export default function ControlCenter() {
         roundId: parseInt(gameStatus.roundId),
         playerEmail: account.email,
         betAmount: parseFloat(betAmount),
-        coinType: "APT",
+        coinType: "CASH",
       });
 
       setHasBet(true);
 
       toast({
-        title: `Bet placed at ${betAmount} APT`,
+        title: `Bet placed at ${betAmount} CASH`,
         description: <Link href={`https://explorer.aptoslabs.com/txn/${blockchainRes.txnHash}/?network=testnet`} target="_blank" className="underline">View transaction</Link>
       });
     } catch (error) {
@@ -213,7 +213,7 @@ export default function ControlCenter() {
                 placeholder="2.50"
                 disabled={!(gameStatus?.startTime !== undefined && gameStatus.startTime > Date.now())}
               ></input>
-              <span>APT</span>
+              <span>CASH</span>
             </span>
           </div>
           <div className="flex flex-row items-center text-xs w-full">
@@ -226,7 +226,7 @@ export default function ControlCenter() {
                   }`}
                 onClick={() => setBetAmount(amount.toString())}
               >
-                {amount} APT
+                {amount} CASH
               </div>
             ))}
           </div>

@@ -45,7 +45,7 @@ export default function PlayerList() {
             </th>
             <th className="w-[100px] text-right pr-4">
               Bet{" "}
-              <span className="text-neutral-500  text-xs">apt</span>
+              <span className="text-neutral-500  text-xs">cash</span>
             </th>
           </tr>
         </thead>
