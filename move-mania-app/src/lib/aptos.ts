@@ -545,7 +545,7 @@ export async function withdrawPool(user: User, amount: number) {
 
 export async function getCrashCalculationEvents() {
   try {
-    const response = await fetch(`${RPC_URL}/accounts/44d6cd854567d0bb4fc23ee3df1cb7eec15fea87c8cb844713c6166982826715/events/5?limit=100`);
+    const response = await fetch(`${RPC_URL}/accounts/7e37543a6d9474eee8419b500668e1d460f2f46f82b0ff74031a460e470f5def/events/5?limit=100`);
     const data = await response.json();
     return data;
   } catch (e) {

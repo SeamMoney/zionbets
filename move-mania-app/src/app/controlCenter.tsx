@@ -65,7 +65,7 @@ export default function ControlCenter() {
       setHasBet(false);
       setHasCashOut(false);
     }
-  }, [gameStatus?.status, account, hasBet, hasCashOut]);
+  }, [gameStatus?.status, account]);
 
   const onCashOut = useCallback(async () => {
     if (!socket || !account || !gameStatus?.startTime) {
