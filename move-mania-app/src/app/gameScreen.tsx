@@ -93,7 +93,7 @@ export default function GameScreen() {
       <div className=" w-full -mt-10">
         <div>
           <CountUp
-          className="relative z-10 top-12 left-5 text-green-500 text-4xl"
+            className="relative z-10 top-12 left-5 text-green-500 text-4xl"
             start={gameStatus.crashPoint!}
             end={gameStatus.crashPoint!}
             duration={0}
