@@ -398,9 +398,15 @@ export async function cashOut(userPrivateKey: string, cashOutData: CashOutData) 
 
 export async function getDeposits() {
   try {
-    const response = await fetch(`${RPC_URL}/accounts/${LP_RESOURCE_ACCOUNT_ADDRESS}/events/${MODULE_ADDRESS}::liquidity_pool::State/deposit_events?limit=100`);
-    const data = await response.json();
-    return data;
+    const response = await provider.getEventsByEventHandle(
+      LP_RESOURCE_ACCOUNT_ADDRESS,
+      `${MODULE_ADDRESS}::liquidity_pool::State`,
+      'deposit_events',
+      {
+        limit: 100,
+      }
+    );
+    return response;
   } catch (e) {
     console.error(e);
   }
@@ -408,9 +414,15 @@ export async function getDeposits() {
 
 export async function getWithdrawals() {
   try {
-    const response = await fetch(`${RPC_URL}/accounts/${LP_RESOURCE_ACCOUNT_ADDRESS}/events/${MODULE_ADDRESS}::liquidity_pool::State/withdraw_events?limit=100`);
-    const data = await response.json();
-    return data;
+    const response = await provider.getEventsByEventHandle(
+      LP_RESOURCE_ACCOUNT_ADDRESS,
+      `${MODULE_ADDRESS}::liquidity_pool::State`,
+      'withdraw_events',
+      {
+        limit: 100,
+      }
+    );
+    return response;
   } catch (e) {
     console.error(e);
   }
@@ -418,9 +430,15 @@ export async function getWithdrawals() {
 
 export async function getExtracts() {
   try {
-    const response = await fetch(`${RPC_URL}/accounts/${LP_RESOURCE_ACCOUNT_ADDRESS}/events/${MODULE_ADDRESS}::liquidity_pool::State/extract_events?limit=100`);
-    const data = await response.json();
-    return data;
+    const response = await provider.getEventsByEventHandle(
+      LP_RESOURCE_ACCOUNT_ADDRESS,
+      `${MODULE_ADDRESS}::liquidity_pool::State`,
+      'extract_events',
+      {
+        limit: 100,
+      }
+    );
+    return response;
   } catch (e) {
     console.error(e);
   }
@@ -428,9 +446,15 @@ export async function getExtracts() {
 
 export async function getPuts() {
   try {
-    const response = await fetch(`${RPC_URL}/accounts/${LP_RESOURCE_ACCOUNT_ADDRESS}/events/${MODULE_ADDRESS}::liquidity_pool::State/put_events?limit=100`);
-    const data = await response.json();
-    return data;
+    const response = await provider.getEventsByEventHandle(
+      LP_RESOURCE_ACCOUNT_ADDRESS,
+      `${MODULE_ADDRESS}::liquidity_pool::State`,
+      'put_events',
+      {
+        limit: 100,
+      }
+    );
+    return response;
   } catch (e) {
     console.error(e);
   }
@@ -438,9 +462,15 @@ export async function getPuts() {
 
 export async function getLocks() {
   try {
-    const response = await fetch(`${RPC_URL}/accounts/${LP_RESOURCE_ACCOUNT_ADDRESS}/events/${MODULE_ADDRESS}::liquidity_pool::State/lock_events?limit=100`);
-    const data = await response.json();
-    return data;
+    const response = await provider.getEventsByEventHandle(
+      LP_RESOURCE_ACCOUNT_ADDRESS,
+      `${MODULE_ADDRESS}::liquidity_pool::State`,
+      'lock_events',
+      {
+        limit: 100,
+      }
+    );
+    return response;
   } catch (e) {
     console.error(e);
   }
@@ -544,11 +574,9 @@ export async function withdrawPool(user: User, amount: number) {
 }
 
 export async function getCrashCalculationEvents() {
-  try {
-    const response = await fetch(`${RPC_URL}/accounts/7e37543a6d9474eee8419b500668e1d460f2f46f82b0ff74031a460e470f5def/events/5?limit=100`);
-    const data = await response.json();
-    return data;
-  } catch (e) {
-    console.error(e);
-  }
+  const res = await provider.getEventsByCreationNumber(
+    '0x7e37543a6d9474eee8419b500668e1d460f2f46f82b0ff74031a460e470f5def',
+    "5"
+  );
+  return res;
 }
