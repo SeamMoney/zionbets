@@ -352,47 +352,36 @@ export async function cashOut(userPrivateKey: string, cashOutData: CashOutData) 
     const senderAuthenticator = aptos.transaction.sign({ signer: userWallet, transaction });
     const feePayerSignerAuthenticator = aptos.transaction.signAsFeePayer({ signer: fundingAccount, transaction });
 
-    console.log("Transaction signed");
+    const committedTransaction = await aptos.transaction.submit.simple({
+      transaction,
+      senderAuthenticator,
+      feePayerAuthenticator: feePayerSignerAuthenticator,
+    });
 
-    try {
-      const committedTransaction = await aptos.transaction.submit.simple({
-        transaction,
-        senderAuthenticator,
-        feePayerAuthenticator: feePayerSignerAuthenticator,
-      });
+    console.log("Transaction submitted:", committedTransaction.hash);
 
-      console.log("Transaction submitted:", committedTransaction.hash);
+    const txResult = await aptos.transaction.waitForTransaction({ transactionHash: committedTransaction.hash });
 
-      const txResult = await aptos.transaction.waitForTransaction({ transactionHash: committedTransaction.hash });
+    console.log("Transaction result:", JSON.stringify(txResult, (key, value) =>
+      typeof value === 'bigint' ? value.toString() : value
+      , 2));
 
-      console.log("Transaction result:", JSON.stringify(txResult, (key, value) =>
-        typeof value === 'bigint' ? value.toString() : value
-        , 2));
-
-      if (!txResult.success) {
-        console.error("Transaction failed:", txResult);
-        return null;
-      }
-
-      return {
-        txnHash: txResult.hash,
-        version: txResult.version.toString(),
-      };
-    } catch (submitError) {
-      console.error("Error submitting or executing transaction:", submitError);
-      if (submitError instanceof Error) {
-        console.error("Error message:", submitError.message);
-        console.error("Error stack:", submitError.stack);
-      }
-      throw submitError;
+    if (!txResult.success) {
+      console.error("Transaction failed:", txResult);
+      throw new Error('Transaction failed on blockchain');
     }
+
+    return {
+      txnHash: txResult.hash,
+      version: txResult.version.toString(),
+    };
   } catch (error) {
     console.error("Error in cashOut function:", error);
     if (error instanceof Error) {
       console.error("Error message:", error.message);
       console.error("Error stack:", error.stack);
     }
-    throw error;
+    throw error; // Re-throw the error to be handled by the caller
   }
 }
 

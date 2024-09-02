@@ -48,17 +48,15 @@ export default function ControlCenter() {
 
   useEffect(() => {
     console.log("Game Status:", gameStatus);
-    console.log("Has Bet:", hasBet);
-    console.log("Has Cash Out:", hasCashOut);
 
     if (account && gameStatus?.status === "COUNTDOWN") {
-      hasUserBet(account.email).then((bet) => {
+      Promise.all([
+        hasUserBet(account.email),
+        hasUserCashOut(account.email)
+      ]).then(([bet, cashout]) => {
         console.log("API Has Bet:", bet);
-        setHasBet(bet);
-      });
-
-      hasUserCashOut(account.email).then((cashout) => {
         console.log("API Has Cash Out:", cashout);
+        setHasBet(bet);
         setHasCashOut(cashout);
       });
     } else if (gameStatus?.status === "COUNTDOWN") {
@@ -99,17 +97,22 @@ export default function ControlCenter() {
         throw new Error('Error cashing out on blockchain');
       }
 
-      await cashOutBet({
-        roundId: parseInt(gameStatus.roundId),
-        playerEmail: account.email,
-        cashOutMultiplier: cashoutMultiplier,
-      });
+      setHasCashOut(true);
+
+      try {
+        await cashOutBet({
+          roundId: parseInt(gameStatus.roundId),
+          playerEmail: account.email,
+          cashOutMultiplier: cashoutMultiplier,
+        });
+      } catch (cashOutBetError) {
+        console.error('Error updating cash out on server:', cashOutBetError);
+      }
 
       toast({
         title: `Cashed out at ${cashoutMultiplier}x`,
         description: <Link href={`https://explorer.aptoslabs.com/txn/${blockchainRes.txnHash}/?network=testnet`} target="_blank" className="underline">View transaction</Link>
       });
-      setHasCashOut(true);
     } catch (error) {
       console.error('Error cashing out:', error);
       if (error instanceof Error) {
@@ -120,6 +123,8 @@ export default function ControlCenter() {
         title: "Error cashing out",
         description: "Please try again or contact support if the issue persists"
       });
+
+      setHasCashOut(false);
     }
   }, [account, gameStatus, toast, socket]);
 
