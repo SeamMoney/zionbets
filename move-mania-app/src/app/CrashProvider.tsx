@@ -2,31 +2,28 @@
 
 import { User } from "@/lib/schema";
 import { GameStatus } from "./controlCenter";
-import { ReactNode, createContext, useEffect, useState } from "react";
+import { ReactNode, createContext, useEffect, useState, useCallback } from "react";
 import { socket } from "@/lib/socket";
 import { getSession } from "next-auth/react";
 import { getCurrentGame, getUser, setUpAndGetUser } from "@/lib/api";
 import { SOCKET_EVENTS } from "@/lib/types";
 import { EXPONENTIAL_FACTOR, log } from "@/lib/utils";
-import { useCallback } from 'react';
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
+  AlertDialogCancel,
 } from "@/components/ui/alert-dialog"
-
 
 interface CrashPageProps {
   gameStatus: GameStatus | null;
   account: User | null;
   latestAction: number | null;
 }
+
 export const gameStatusContext = createContext<CrashPageProps>({
   gameStatus: null,
   account: null,
@@ -34,13 +31,10 @@ export const gameStatusContext = createContext<CrashPageProps>({
 });
 
 export default function CrashProvider({ children }: { children: ReactNode }) {
-
   const [isConnected, setIsConnected] = useState(socket.connected);
   const [gameStatus, setGameStatus] = useState<GameStatus | null>(null);
   const [account, setAccount] = useState<User | null>(null);
-  const [update, setUpdate] = useState(true);
   const [latestAction, setLatestAction] = useState<number | null>(null);
-
   const [showPWAInstall, setShowPWAInstall] = useState(false);
 
   const onConnect = useCallback(() => {
@@ -95,32 +89,6 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
       }
     });
 
-    function onConnect() {
-      setIsConnected(true);
-    }
-
-    function onDisconnect() {
-      setIsConnected(false);
-    }
-
-    function onRoundStart() {
-      setUpdate(true);
-      setLatestAction(Date.now());
-    }
-
-    function onRoundResult() {
-      setUpdate(true);
-      setLatestAction(Date.now());
-    }
-
-    function onBetConfirmed() {
-      setLatestAction(Date.now());
-    }
-
-    function onCashOutConfirmed() {
-      setLatestAction(Date.now());
-    }
-
     socket.on('connect', onConnect);
     socket.on('disconnect', onDisconnect);
     socket.on(SOCKET_EVENTS.ROUND_START, onRoundStart);
@@ -136,63 +104,62 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
       socket.off(SOCKET_EVENTS.CASH_OUT_CONFIRMED, onCashOutConfirmed);
       socket.off(SOCKET_EVENTS.ROUND_RESULT, onRoundResult);
     };
-  }, []);
+  }, [onConnect, onDisconnect, onRoundStart, onBetConfirmed, onCashOutConfirmed, onRoundResult]);
 
   useEffect(() => {
     if (account && latestAction) {
-      getUser(account.email).then((updatedUser) => {
-        if (updatedUser) {
-          setAccount(updatedUser);
-        }
-      });
+      const timeoutId = setTimeout(() => {
+        getUser(account.email).then((updatedUser) => {
+          if (updatedUser) {
+            setAccount(updatedUser);
+          }
+        });
+      }, 1000); // Delay API call by 1 second
+
+      return () => clearTimeout(timeoutId);
     }
   }, [latestAction, account]);
 
   useEffect(() => {
-    if (update) {
-      getCurrentGame().then((game) => {
-        if (game == null) {
-          setGameStatus(null);
+    const fetchGameStatus = async () => {
+      const game = await getCurrentGame();
+      if (game == null) {
+        setGameStatus(null);
+      } else {
+        const now = Date.now();
+        const gameEndTime = game.start_time + (game.secret_crash_point == 0 ? 0 : log(EXPONENTIAL_FACTOR, game.secret_crash_point)) * 1000;
+
+        if (game.start_time > now) {
+          setGameStatus({
+            status: "COUNTDOWN",
+            roundId: game.game_id,
+            startTime: game.start_time,
+            crashPoint: game.secret_crash_point,
+          });
+        } else if (now < gameEndTime) {
+          setGameStatus({
+            status: "IN_PROGRESS",
+            roundId: game.game_id,
+            startTime: game.start_time,
+            crashPoint: game.secret_crash_point,
+          });
         } else {
-          if (game.start_time > Date.now()) {
-            setGameStatus({
-              status: "COUNTDOWN",
-              roundId: game.game_id,
-              startTime: game.start_time,
-              crashPoint: game.secret_crash_point,
-            });
-            setTimeout(() => {
-              setUpdate(true);
-            }, game.start_time - Date.now());
-          } else if (game.start_time + (game.secret_crash_point == 0 ? 0 : log(EXPONENTIAL_FACTOR, game.secret_crash_point)) * 1000 > Date.now()) {
-            setGameStatus({
-              status: "IN_PROGRESS",
-              roundId: game.game_id,
-              startTime: game.start_time,
-              crashPoint: game.secret_crash_point,
-            });
-            setTimeout(() => {
-              setUpdate(true);
-            }, game.start_time + (game.secret_crash_point == 0 ? 0 : log(EXPONENTIAL_FACTOR, game.secret_crash_point)) * 1000 - Date.now());
-          } else {
-            setGameStatus({
-              status: "END",
-              roundId: game.game_id,
-              startTime: game.start_time,
-              crashPoint: game.secret_crash_point,
-            });
-          }
+          setGameStatus({
+            status: "END",
+            roundId: game.game_id,
+            startTime: game.start_time,
+            crashPoint: game.secret_crash_point,
+          });
         }
-      });
+      }
+    };
 
-      setUpdate(false);
-    }
-  }, [update]);
+    fetchGameStatus();
+    const intervalId = setInterval(fetchGameStatus, 5000); // Update every 5 seconds
 
-  /**
-   * Is the page currently in standalone display mode (used by PWA)?
-   * @return {boolean}
-   */
+    return () => clearInterval(intervalId);
+  }, []);
+
   function isInStandaloneMode() {
     return Boolean(
       (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)
