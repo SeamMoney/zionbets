@@ -568,4 +568,3 @@ export async function getCrashCalculationEvents() {
   );
   return res;
 }
-

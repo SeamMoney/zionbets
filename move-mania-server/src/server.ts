@@ -15,7 +15,7 @@ import express from "express";
 
 import crypto from 'crypto';
 import { calculateCrashPoint } from "./crashPoint";
-import { createNewGame, endGame as endGameAptos } from "./aptos";
+import { createNewGame, endGame as endGameAptos, handleCashOut } from "./aptos";
 
 require('dotenv').config();
 
@@ -45,6 +45,7 @@ const options = {
 const httpsServer = https.createServer(options, app);
 httpsServer.listen(portHttps, () => {
   console.log('HTTPs Server running on port ', portHttps);
+  cycleRounds();
 });
 
 const io = new Server(httpsServer, {
@@ -71,9 +72,23 @@ io.on("connection", (socket) => {
     io.emit(SOCKET_EVENTS.BET_CONFIRMED, betData);
   });
 
-  socket.on(SOCKET_EVENTS.CASH_OUT, async (cashOutData) => {
-    await addCashOutToPlayerList(cashOutData);
-    io.emit(SOCKET_EVENTS.CASH_OUT_CONFIRMED, cashOutData);
+  socket.on(SOCKET_EVENTS.CASH_OUT, async (data) => {
+    try {
+      const result = await handleCashOut(data.playerAddress, data.cashOutAmount);
+      if (result) {
+        await addCashOutToPlayerList({
+          playerEmail: data.playerAddress,
+          cashOutMultiplier: data.cashOutAmount / 100,
+          roundId: 1
+        });
+        socket.emit(SOCKET_EVENTS.CASH_OUT_RESULT, { success: true, txnHash: result.txnHash });
+      } else {
+        socket.emit(SOCKET_EVENTS.CASH_OUT_RESULT, { success: false, error: 'Cash out failed' });
+      }
+    } catch (error) {
+      console.error('Error in cash out:', error);
+      socket.emit(SOCKET_EVENTS.CASH_OUT_RESULT, { success: false, error: 'Internal server error' });
+    }
   });
 
   socket.on(SOCKET_EVENTS.START_ROUND, async () => {
