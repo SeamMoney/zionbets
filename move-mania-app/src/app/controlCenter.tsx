@@ -99,15 +99,11 @@ export default function ControlCenter() {
 
       setHasCashOut(true);
 
-      try {
-        await cashOutBet({
-          roundId: parseInt(gameStatus.roundId),
-          playerEmail: account.email,
-          cashOutMultiplier: cashoutMultiplier,
-        });
-      } catch (cashOutBetError) {
-        console.error('Error updating cash out on server:', cashOutBetError);
-      }
+      await cashOutBet({
+        roundId: parseInt(gameStatus.roundId),
+        playerEmail: account.email,
+        cashOutMultiplier: cashoutMultiplier,
+      });
 
       toast({
         title: `Cashed out at ${cashoutMultiplier}x`,
@@ -115,10 +111,6 @@ export default function ControlCenter() {
       });
     } catch (error) {
       console.error('Error cashing out:', error);
-      if (error instanceof Error) {
-        console.error('Error message:', error.message);
-        console.error('Error stack:', error.stack);
-      }
       toast({
         title: "Error cashing out",
         description: "Please try again or contact support if the issue persists"

@@ -56,14 +56,18 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const onRoundResult = useCallback((data: any) => {
-    setGameStatus({
-      status: "END",
-      roundId: data.gameId,
-      startTime: data.startTime,
-      crashPoint: data.crashPoint,
-    });
-    setLatestAction(Date.now());
-  }, []);
+    if (data && data.roundId && data.crashPoint) {
+      setGameStatus({
+        status: "END",
+        roundId: data.gameId,
+        startTime: data.startTime,
+        crashPoint: data.crashPoint,
+      });
+      setLatestAction(Date.now());
+    } else {
+      console.error("Invalid data received in onRoundResult:", data);
+    }
+  }, [gameStatus]);
 
   const onBetConfirmed = useCallback(() => {
     setLatestAction(Date.now());
@@ -122,40 +126,44 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const fetchGameStatus = async () => {
-      const game = await getCurrentGame();
-      if (game == null) {
-        setGameStatus(null);
-      } else {
-        const now = Date.now();
-        const gameEndTime = game.start_time + (game.secret_crash_point == 0 ? 0 : log(EXPONENTIAL_FACTOR, game.secret_crash_point)) * 1000;
-
-        if (game.start_time > now) {
-          setGameStatus({
-            status: "COUNTDOWN",
-            roundId: game.game_id,
-            startTime: game.start_time,
-            crashPoint: game.secret_crash_point,
-          });
-        } else if (now < gameEndTime) {
-          setGameStatus({
-            status: "IN_PROGRESS",
-            roundId: game.game_id,
-            startTime: game.start_time,
-            crashPoint: game.secret_crash_point,
-          });
+      try {
+        const game = await getCurrentGame();
+        if (game == null) {
+          setGameStatus(null);
         } else {
-          setGameStatus({
-            status: "END",
-            roundId: game.game_id,
-            startTime: game.start_time,
-            crashPoint: game.secret_crash_point,
-          });
+          const now = Date.now();
+          const gameEndTime = game.start_time + (game.secret_crash_point == 0 ? 0 : log(EXPONENTIAL_FACTOR, game.secret_crash_point)) * 1000;
+
+          if (game.start_time > now) {
+            setGameStatus({
+              status: "COUNTDOWN",
+              roundId: game.game_id,
+              startTime: game.start_time,
+              crashPoint: game.secret_crash_point,
+            });
+          } else if (now < gameEndTime) {
+            setGameStatus({
+              status: "IN_PROGRESS",
+              roundId: game.game_id,
+              startTime: game.start_time,
+              crashPoint: game.secret_crash_point,
+            });
+          } else {
+            setGameStatus({
+              status: "END",
+              roundId: game.game_id,
+              startTime: game.start_time,
+              crashPoint: game.secret_crash_point,
+            });
+          }
         }
+      } catch (error) {
+        console.error("Error fetching game status:", error);
       }
     };
 
     fetchGameStatus();
-    const intervalId = setInterval(fetchGameStatus, 5000); // Update every 5 seconds
+    const intervalId = setInterval(fetchGameStatus, 1000);
 
     return () => clearInterval(intervalId);
   }, []);
