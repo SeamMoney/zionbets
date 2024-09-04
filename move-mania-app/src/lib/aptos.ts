@@ -333,19 +333,22 @@ export async function cashOut(userPrivateKey: string, cashOutData: CashOutData) 
     console.log("User wallet address:", userWallet.accountAddress.toString());
 
     const transaction = await aptos.transaction.build.simple({
-      sender: userWallet.accountAddress.toString(),
+      sender: userWallet.accountAddress,
       withFeePayer: true,
       data: {
         function: `${MODULE_ADDRESS}::${MODULE_NAME}::cash_out`,
         typeArguments: [],
         functionArguments: [
-          userWallet.accountAddress.toString(),
           Math.floor(cashOutData.cashOutMultiplier * 100),
         ],
       },
     });
 
-    console.log("Transaction built:", JSON.stringify(transaction, null, 2));
+    // Use a custom replacer function to handle BigInt
+    const replacer = (key: string, value: any) =>
+      typeof value === 'bigint' ? value.toString() : value;
+
+    console.log("Transaction built:", JSON.stringify(transaction, replacer));
 
     const senderAuthenticator = aptos.transaction.sign({ signer: userWallet, transaction });
     const feePayerSignerAuthenticator = aptos.transaction.signAsFeePayer({ signer: fundingAccount, transaction });
@@ -360,7 +363,7 @@ export async function cashOut(userPrivateKey: string, cashOutData: CashOutData) 
 
     const txResult = await aptos.transaction.waitForTransaction({ transactionHash: committedTransaction.hash });
 
-    console.log("Transaction result:", JSON.stringify(txResult, null, 2));
+    console.log("Transaction result:", JSON.stringify(txResult, replacer));
 
     if (!txResult.success) {
       console.error("Transaction failed:", txResult);
@@ -377,7 +380,7 @@ export async function cashOut(userPrivateKey: string, cashOutData: CashOutData) 
       console.error("Error message:", error.message);
       console.error("Error stack:", error.stack);
     }
-    throw error; // Re-throw the error to be handled by the caller
+    throw error;
   }
 }
 

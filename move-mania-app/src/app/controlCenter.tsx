@@ -80,7 +80,7 @@ export default function ControlCenter() {
     try {
       console.log("Attempting to cash out with:", {
         privateKey: account.private_key.slice(0, 5) + '...',
-        roundId: parseInt(gameStatus.roundId),
+        roundId: gameStatus.roundId,
         playerEmail: account.email,
         cashOutMultiplier: cashoutMultiplier,
       });
