@@ -26,9 +26,28 @@ export default function PlayerList() {
   const [players, setPlayers] = useState<PlayerState[]>([]);
 
   useEffect(() => {
-    getPlayerList().then((players) => {
-      setPlayers(players);
-    });
+    const fetchPlayers = async () => {
+      const fetchedPlayers = await getPlayerList();
+      setPlayers(fetchedPlayers);
+    };
+
+    fetchPlayers();
+
+    const handleCashOut = (data: CashOutData) => {
+      setPlayers(prevPlayers =>
+        prevPlayers.map(player =>
+          player.username === data.playerEmail
+            ? { ...player, cashOutMultiplier: data.cashOutMultiplier }
+            : player
+        )
+      );
+    };
+
+    socket.on(SOCKET_EVENTS.CASH_OUT_CONFIRMED, handleCashOut);
+
+    return () => {
+      socket.off(SOCKET_EVENTS.CASH_OUT_CONFIRMED, handleCashOut);
+    };
   }, [latestAction]);
 
 
