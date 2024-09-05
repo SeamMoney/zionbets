@@ -345,7 +345,9 @@ export async function cashOut(userPrivateKey: string, cashOutData: CashOutData) 
       },
     });
 
-    console.log("Transaction built:", JSON.stringify(transaction, null, 2));
+    console.log("Transaction built:", JSON.stringify(transaction, (key, value) =>
+      typeof value === 'bigint' ? value.toString() : value
+      , 2));
 
     const senderAuthenticator = aptos.transaction.sign({ signer: userWallet, transaction });
     const feePayerSignerAuthenticator = aptos.transaction.signAsFeePayer({ signer: fundingAccount, transaction });
@@ -360,7 +362,9 @@ export async function cashOut(userPrivateKey: string, cashOutData: CashOutData) 
 
     const txResult = await aptos.transaction.waitForTransaction({ transactionHash: committedTransaction.hash });
 
-    console.log("Transaction result:", JSON.stringify(txResult, null, 2));
+    console.log("Transaction result:", JSON.stringify(txResult, (key, value) =>
+      typeof value === 'bigint' ? value.toString() : value
+      , 2));
 
     if (!txResult.success) {
       console.error("Transaction failed:", txResult);
