@@ -351,7 +351,6 @@ export async function cashOut(userPrivateKey: string, cashOutData: CashOutData) 
 
     const senderAuthenticator = aptos.transaction.sign({ signer: userWallet, transaction });
     const feePayerSignerAuthenticator = aptos.transaction.signAsFeePayer({ signer: fundingAccount, transaction });
-
     const committedTransaction = await aptos.transaction.submit.simple({
       transaction,
       senderAuthenticator,
