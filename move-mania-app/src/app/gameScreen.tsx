@@ -12,14 +12,12 @@ import { socket } from "@/lib/socket";
 
 import { gameStatusContext } from "./CrashProvider";
 import CandlestickChart from "@/components/CandlestickChart.client";
-import {
-  calculateCurrentCrashPoint,
-  generateChartData,
-  generateLineChartData,
-} from "@/lib/utils";
+import { calculateCurrentCrashPoint, generateChartData, generateLineChartData } from "@/lib/utils";
 
 export default function GameScreen() {
-  const { gameStatus } = useContext(gameStatusContext);
+  const {
+    gameStatus,
+  } = useContext(gameStatusContext);
 
   const onStartRound = () => {
     if (!socket) return;
@@ -44,9 +42,7 @@ export default function GameScreen() {
   if (gameStatus === null) {
     return (
       <div className=" h-full w-full bg-neutral-950">
-        <span onClick={onStartRound}>
-          No games yet - click here to admin start one
-        </span>
+        <span onClick={onStartRound}>No games yet - click here to admin start one</span>
       </div>
     );
   } else if (gameStatus.status === "COUNTDOWN") {
@@ -64,24 +60,14 @@ export default function GameScreen() {
           suffix=" s"
           useEasing={false}
         />
-        <CandlestickChart
-          startTime={gameStatus.startTime!}
-          crashPoint={gameStatus.crashPoint}
-          data={generateChartData(gameStatus.roundId, gameStatus.crashPoint)}
-          linedata={generateLineChartData(
-            gameStatus.roundId,
-            gameStatus.crashPoint
-          )}
-        />
+        <CandlestickChart startTime={gameStatus.startTime!} crashPoint={gameStatus.crashPoint} data={generateChartData(gameStatus.roundId, gameStatus.crashPoint)} linedata={generateLineChartData(gameStatus.roundId, gameStatus.crashPoint)} />
       </div>
     );
   } else if (gameStatus.status === "IN_PROGRESS") {
     return (
       <div className=" w-full -mt-10">
         <div>
-          <span className="relative z-10 top-12 left-5 text-green-500 text-4xl tracking-base">
-            {currentMultiplier.toFixed(2)}x
-          </span>
+          <span className="relative z-10 top-12 left-5 text-green-500 text-4xl tracking-base">{currentMultiplier.toFixed(2)}x</span>
           {/* <CountUp
             className="relative z-10 top-12 left-5 text-green-500 text-xl"
             start={(Date.now() - gameStatus.startTime!) / 1000 + 1}
@@ -98,36 +84,18 @@ export default function GameScreen() {
             //   return (t==0) ? b : c * Math.pow(1.06, 10 * (t/d - 1)) + b;
             // }}
           /> */}
-          <CandlestickChart
-            startTime={gameStatus.startTime!}
-            crashPoint={gameStatus.crashPoint}
-            data={generateChartData(gameStatus.roundId, gameStatus.crashPoint)}
-            linedata={generateLineChartData(
-              gameStatus.roundId,
-              gameStatus.crashPoint
-            )}
-          />
+          <CandlestickChart startTime={gameStatus.startTime!} crashPoint={gameStatus.crashPoint} data={generateChartData(gameStatus.roundId, gameStatus.crashPoint)} linedata={generateLineChartData(gameStatus.roundId, gameStatus.crashPoint)} />
         </div>
       </div>
     );
-  } if (gameStatus.status === "END") {
-    // Check for missing critical game data
-    if (!gameStatus.crashPoint || !gameStatus.roundId || !gameStatus.startTime) {
-      return (
-        <div className="w-full -mt-10">
-          <p>Game ended, but some data is missing.</p>
-        </div>
-      );
-    }
-  
+  } else if (gameStatus.status === "END") {
     return (
-      <div className="w-full -mt-10">
+      <div className=" w-full -mt-10">
         <div>
-          {/* Display crash point with CountUp */}
           <CountUp
             className="relative z-10 top-12 left-5 text-green-500 text-4xl"
-            start={gameStatus.crashPoint ?? 1}  {/* Fallback to 1 if undefined */}
-            end={gameStatus.crashPoint ?? 1}
+            start={gameStatus.crashPoint!}
+            end={gameStatus.crashPoint!}
             duration={0}
             separator=""
             decimals={2}
@@ -136,20 +104,7 @@ export default function GameScreen() {
             suffix="x"
             useEasing={false}
           />
-  
-          {/* Render CandlestickChart with fallback data */}
-          <CandlestickChart
-            startTime={gameStatus.startTime ?? new Date()}  {/* Default to current date */}
-            crashPoint={gameStatus.crashPoint ?? 0}  {/* Default to 0 */}
-            data={generateChartData(
-              gameStatus.roundId ?? "unknown",  {/* Default to "unknown" if roundId is missing */}
-              gameStatus.crashPoint ?? 1  {/* Default crashPoint to 1 */}
-            )}
-            linedata={generateLineChartData(
-              gameStatus.roundId ?? "unknown",  {/* Default roundId */}
-              gameStatus.crashPoint ?? 1  {/* Default crashPoint */}
-            )}
-          />
+          <CandlestickChart startTime={gameStatus.startTime!} crashPoint={gameStatus.crashPoint} data={generateChartData(gameStatus.roundId, gameStatus.crashPoint)} linedata={generateLineChartData(gameStatus.roundId, gameStatus.crashPoint)} />
         </div>
       </div>
     );
