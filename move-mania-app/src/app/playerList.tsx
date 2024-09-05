@@ -22,7 +22,6 @@ export default function PlayerList() {
     gameStatus,
     latestAction
   } = useContext(gameStatusContext);
-  // const [updateList, setUpdateList] = useState(true);
   const [players, setPlayers] = useState<PlayerState[]>([]);
 
   useEffect(() => {
@@ -34,6 +33,7 @@ export default function PlayerList() {
     fetchPlayers();
 
     const handleCashOut = (data: CashOutData) => {
+      console.log("Cash out data:", data);
       setPlayers(prevPlayers =>
         prevPlayers.map(player =>
           player.username === data.playerEmail
@@ -49,7 +49,6 @@ export default function PlayerList() {
       socket.off(SOCKET_EVENTS.CASH_OUT_CONFIRMED, handleCashOut);
     };
   }, [latestAction]);
-
 
   return (
     <div className="border border-neutral-700 h-full flex flex-col items-left gap-2 w-full min-h-[200px] max-h-[700px]">

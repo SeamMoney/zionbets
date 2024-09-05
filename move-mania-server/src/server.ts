@@ -150,52 +150,67 @@ io.on("connection", (socket) => {
   });
 });
 
+
 async function cycleRounds() {
-  await clearPlayerList();
-  const now = await getDateNow();
-  let blockchainTxn = await createNewGame('house_secret', 'salt')
-  console.log("blockchainTxn", blockchainTxn)
-
-  if (blockchainTxn === null) {
-    console.error("Error creating new game")
-    return
-  }
-
-  const crashPoint = calculateCrashPoint(blockchainTxn.randomNumber, 'house_secretsalt');
-
-  const startTime = Math.floor(blockchainTxn.startTime / 1000);
-  const gameId = Math.random().toString(36).substring(7);
-  await createGame({
-    game_id: gameId,
-    start_time: startTime,
-    secret_crash_point: crashPoint,
-    status: "IN_PROGRESS",
-  });
-  console.log("start rounded")
-  io.emit(SOCKET_EVENTS.ROUND_START, {
-    roundId: 1,
-    startTime: startTime,
-    crashPoint,
-  });
-
-  console.log(startTime + ((crashPoint == 0 ? 0 : log(EXPONENTIAL_FACTOR, crashPoint)) * 1000) - now)
-
-  setTimeout(async () => {
-    const blockchainTxn = await endGameAptos('house_secret', 'salt', startTime + ((crashPoint == 0 ? 0 : log(EXPONENTIAL_FACTOR, crashPoint)) * 1000))
+  try {
+    await clearPlayerList();
+    const now = await getDateNow();
+    let blockchainTxn = await createNewGame('house_secret', 'salt')
     console.log("blockchainTxn", blockchainTxn)
 
     if (blockchainTxn === null) {
-      console.error("Error ending game")
+      console.error("Error creating new game")
       return
     }
 
-    await endGame(gameId);
-    console.log("end rounded")
-    io.emit(SOCKET_EVENTS.ROUND_RESULT, { roundId: gameId, crashPoint });
+    const crashPoint = calculateCrashPoint(blockchainTxn.randomNumber, 'house_secretsalt');
+
+    const startTime = Math.floor(blockchainTxn.startTime / 1000);
+    const gameId = Math.random().toString(36).substring(7);
+    await createGame({
+      game_id: gameId,
+      start_time: startTime,
+      secret_crash_point: crashPoint,
+      status: "IN_PROGRESS",
+    });
+    console.log("start rounded")
+    io.emit(SOCKET_EVENTS.ROUND_START, {
+      roundId: gameId,
+      startTime: startTime,
+      crashPoint,
+    });
+
+    console.log(startTime + ((crashPoint == 0 ? 0 : log(EXPONENTIAL_FACTOR, crashPoint)) * 1000) - now)
+
+    setTimeout(async () => {
+      try {
+        const blockchainTxn = await endGameAptos('house_secret', 'salt', startTime + ((crashPoint == 0 ? 0 : log(EXPONENTIAL_FACTOR, crashPoint)) * 1000))
+        console.log("blockchainTxn", blockchainTxn)
+
+        if (blockchainTxn === null) {
+          console.error("Error ending game")
+          return
+        }
+
+        await endGame(gameId);
+        console.log("end rounded")
+        io.emit(SOCKET_EVENTS.ROUND_RESULT, { roundId: gameId, crashPoint });
+        setTimeout(async () => {
+          await cycleRounds();
+        }, SUMMARY);
+      } catch (error) {
+        console.error("Error ending game:", error);
+        setTimeout(async () => {
+          await cycleRounds();
+        }, SUMMARY);
+      }
+    }, startTime + ((crashPoint == 0 ? 0 : log(EXPONENTIAL_FACTOR, crashPoint)) * 1000) - now + 100);
+  } catch (error) {
+    console.error("Error in cycleRounds:", error);
     setTimeout(async () => {
       await cycleRounds();
     }, SUMMARY);
-  }, startTime + ((crashPoint == 0 ? 0 : log(EXPONENTIAL_FACTOR, crashPoint)) * 1000) - now + 100);
+  }
 }
 
 
