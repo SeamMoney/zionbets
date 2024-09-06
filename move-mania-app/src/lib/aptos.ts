@@ -333,12 +333,13 @@ export async function cashOut(userPrivateKey: string, cashOutData: CashOutData) 
     console.log("User wallet address:", userWallet.accountAddress.toString());
 
     const transaction = await aptos.transaction.build.simple({
-      sender: userWallet.accountAddress,
+      sender: userWallet.accountAddress.toString(),
       withFeePayer: true,
       data: {
         function: `${MODULE_ADDRESS}::${MODULE_NAME}::cash_out`,
         typeArguments: [],
         functionArguments: [
+          userWallet.accountAddress.toString(),
           Math.floor(cashOutData.cashOutMultiplier * 100),
         ],
       },
