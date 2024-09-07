@@ -78,6 +78,7 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
+    console.log("CrashProvider updating game status:", gameStatus);
     getSession().then((session) => {
       if (session && session.user && session.user.email) {
         setUpAndGetUser({
@@ -111,6 +112,7 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
   }, [onConnect, onDisconnect, onRoundStart, onBetConfirmed, onCashOutConfirmed, onRoundResult]);
 
   useEffect(() => {
+    console.log("CrashProvider updating game status:", gameStatus);
     if (account && latestAction) {
       const timeoutId = setTimeout(() => {
         getUser(account.email).then((updatedUser) => {
@@ -125,6 +127,7 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
   }, [latestAction, account]);
 
   useEffect(() => {
+    console.log("CrashProvider updating game status:", gameStatus);
     const fetchGameStatus = async () => {
       try {
         const game = await getCurrentGame();
@@ -183,6 +186,7 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
       setShowPWAInstall(true);
     }
   }, []);
+
 
   return (
     <gameStatusContext.Provider

@@ -27,28 +27,35 @@ export default function PlayerList() {
   useEffect(() => {
     const fetchPlayers = async () => {
       const fetchedPlayers = await getPlayerList();
+      console.log("Fetched players:", fetchedPlayers);
       setPlayers(fetchedPlayers);
     };
 
     fetchPlayers();
 
     const handleCashOut = (data: CashOutData) => {
-      console.log("Cash out data:", data);
-      setPlayers(prevPlayers =>
-        prevPlayers.map(player =>
+      console.log("Cash out data received:", data);
+      setPlayers(prevPlayers => {
+        const updatedPlayers = prevPlayers.map(player =>
           player.username === data.playerEmail
             ? { ...player, cashOutMultiplier: data.cashOutMultiplier }
             : player
-        )
-      );
+        );
+        console.log("Updated players after cash out:", updatedPlayers);
+        return updatedPlayers;
+      });
     };
 
     socket.on(SOCKET_EVENTS.CASH_OUT_CONFIRMED, handleCashOut);
+    console.log("Listening for cash out events");
 
     return () => {
       socket.off(SOCKET_EVENTS.CASH_OUT_CONFIRMED, handleCashOut);
+      console.log("Stopped listening for cash out events");
     };
   }, [latestAction]);
+
+  console.log("PlayerList rendering, players:", players);
 
   return (
     <div className="border border-neutral-700 h-full flex flex-col items-left gap-2 w-full min-h-[200px] max-h-[700px]">

@@ -39,6 +39,8 @@ export default function GameScreen() {
     }
   }, [gameStatus]);
 
+  console.log("GameScreen rendering, gameStatus:", gameStatus);
+
   if (gameStatus === null) {
     return (
       <div className=" h-full w-full bg-neutral-950">
@@ -104,7 +106,14 @@ export default function GameScreen() {
             suffix="x"
             useEasing={false}
           />
-          <CandlestickChart startTime={gameStatus.startTime!} crashPoint={gameStatus.crashPoint} data={generateChartData(gameStatus.roundId, gameStatus.crashPoint)} linedata={generateLineChartData(gameStatus.roundId, gameStatus.crashPoint)} />
+          {gameStatus.startTime && gameStatus.crashPoint && (
+            <CandlestickChart
+              startTime={gameStatus.startTime}
+              crashPoint={gameStatus.crashPoint}
+              data={generateChartData(gameStatus.roundId, gameStatus.crashPoint)}
+              linedata={generateLineChartData(gameStatus.roundId, gameStatus.crashPoint)}
+            />
+          )}
         </div>
       </div>
     );

@@ -65,6 +65,8 @@ export default function ControlCenter() {
     }
   }, [gameStatus?.status, account]);
 
+  console.log("ControlCenter rendering, gameStatus:", gameStatus);
+
   const onCashOut = useCallback(async () => {
     if (!socket || !account || !gameStatus?.startTime) {
       console.log('Missing required data for cash out:', { socket, account, gameStatus });
