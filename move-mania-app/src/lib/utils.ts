@@ -61,7 +61,7 @@ export function generateChartData(
   if (hasher === undefined) {
     return [];
   }
-  let gameRoundHash = hasher.update(roundId).digest("hex");
+  let gameRoundHash = hasher.update('fckyhcc').digest("hex");
   while (gameRoundHash.length < gameTicks) {
     gameRoundHash += hasher.update(gameRoundHash).digest("hex");
   }
