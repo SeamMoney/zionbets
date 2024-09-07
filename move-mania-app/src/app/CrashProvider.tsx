@@ -36,7 +36,6 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
   const [account, setAccount] = useState<User | null>(null);
   const [latestAction, setLatestAction] = useState<number | null>(null);
   const [showPWAInstall, setShowPWAInstall] = useState(false);
-  const [update, setUpdate] = useState(false);
 
   const onConnect = useCallback(() => {
     setIsConnected(true);
@@ -54,7 +53,6 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
       crashPoint: data.crashPoint,
     });
     setLatestAction(Date.now());
-    setUpdate(true);
   }, []);
 
   const onRoundResult = useCallback((data: any) => {
@@ -66,7 +64,6 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
         crashPoint: data.crashPoint,
       });
       setLatestAction(Date.now());
-      setUpdate(true);
     } else {
       console.error("Invalid data received in onRoundResult:", data);
     }
@@ -166,13 +163,13 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
       } catch (error) {
         console.error("Error fetching game status:", error);
       }
-      setUpdate(false);
     };
 
-    if (update) {
-      fetchGameStatus();
-    }
-  }, [update]);
+    fetchGameStatus();
+    const intervalId = setInterval(fetchGameStatus, 1000);
+
+    return () => clearInterval(intervalId);
+  }, []);
 
   function isInStandaloneMode() {
     return Boolean(
