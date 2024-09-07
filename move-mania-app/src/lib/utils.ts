@@ -12,10 +12,6 @@ export function generateLineChartData(
   gameRoundId: string,
   crashPoint: number
 ): any[] {
-  if (crashPoint <= 0) {
-    throw new Error("Invalid crash point value");
-  }
-
   const exponentialBase = EXPONENTIAL_FACTOR;
   const tickMs = 100;
   const gameLengthMs = log(exponentialBase, crashPoint) * 1000;
@@ -46,11 +42,14 @@ export function generateLineChartData(
 
   return dataPoints;
 }
-
+let roundId;
 export function generateChartData(
   gameRoundId: string,
   crashPoint: number
 ): any[] {
+  roundId =
+    gameRoundId !== null && gameRoundId !== undefined ? gameRoundId : roundId;
+
   const startingPrice = 50;
   const exponentialBase = EXPONENTIAL_FACTOR;
   const tickMs = 100;
@@ -58,17 +57,15 @@ export function generateChartData(
   const gameLengthMs = log(exponentialBase, crashPoint) * 1000;
   const gameEndMs = 5 * 1000;
   const gameTicks = (countdownMs + gameLengthMs + gameEndMs) / tickMs;
-
   const hasher = crypto.createHash("sha256");
   if (hasher === undefined) {
     return [];
   }
-  let gameRoundHash = hasher.update(gameRoundId).digest("hex");
-  if (gameRoundHash.length < gameTicks) {
-    while (gameRoundHash.length < gameTicks) {
-      gameRoundHash += hasher.update(gameRoundHash).digest("hex");
-    }
+  let gameRoundHash = hasher.update(roundId).digest("hex");
+  while (gameRoundHash.length < gameTicks) {
+    gameRoundHash += hasher.update(gameRoundHash).digest("hex");
   }
+
   let currentElapsedTimeMs = 0;
   const dataPoints: any[] = [];
   let currentDate = new Date("2021-01-01T00:00:00Z");
@@ -97,13 +94,10 @@ export function generateChartData(
     const candleStickValue = sineValue * hexValue;
     // console.log("candleStickValue:", candleStickValue);
 
-    const previousDataPoint = dataPoints[currentElapsedTimeMs / tickMs - 1];
     const open: number =
-      currentElapsedTimeMs === 0 || !previousDataPoint
+      currentElapsedTimeMs === 0
         ? startingPrice
-        : previousDataPoint.dataPoint.close;
-
-    // const open: number = currentElapsedTimeMs === 0 ? startingPrice : dataPoints[currentElapsedTimeMs / tickMs - 1].dataPoint.close ;
+        : dataPoints[currentElapsedTimeMs / tickMs - 1].dataPoint.close;
     const close = open + candleStickValue;
     const high = close + Math.random() * 5 * sineValue;
     const low = open - Math.random() * 5 * sineValue;
@@ -136,13 +130,10 @@ export function generateChartData(
     const candleStickValue = sineValue * hexValue * currentCrashPoint * 5;
     // console.log("candleStickValue:", candleStickValue);
 
-    const previousDataPoint = dataPoints[currentElapsedTimeMs / tickMs - 1];
     const open: number =
-      currentElapsedTimeMs === 0 || !previousDataPoint
+      currentElapsedTimeMs === 0
         ? startingPrice
-        : previousDataPoint.dataPoint.close;
-
-    // const open: number = currentElapsedTimeMs === 0 ? startingPrice : dataPoints[currentElapsedTimeMs / tickMs - 1].dataPoint.close ;
+        : dataPoints[currentElapsedTimeMs / tickMs - 1].dataPoint.close;
     const close = open + candleStickValue;
     const high = close + Math.random() * 5 * sineValue * currentCrashPoint * 5;
     const low = open - Math.random() * 5 * sineValue * currentCrashPoint * 5;
@@ -155,13 +146,10 @@ export function generateChartData(
   }
 
   // for (currentElapsedTimeMs; currentElapsedTimeMs < gameEndMs + gameLengthMs + countdownMs ; currentElapsedTimeMs += tickMs) {
-  const previousDataPoint = dataPoints[currentElapsedTimeMs / tickMs - 1];
   const open: number =
-    currentElapsedTimeMs === 0 || !previousDataPoint
+    currentElapsedTimeMs === 0
       ? startingPrice
-      : previousDataPoint.dataPoint.close;
-
-  // const open: number = currentElapsedTimeMs === 0 ? startingPrice : dataPoints[currentElapsedTimeMs / tickMs - 1].dataPoint.close ;
+      : dataPoints[currentElapsedTimeMs / tickMs - 1].dataPoint.close;
   const close = 0;
   const high = open;
   const low = 0;
