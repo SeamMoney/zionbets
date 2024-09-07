@@ -47,8 +47,7 @@ export function generateChartData(
   gameRoundId: string,
   crashPoint: number
 ): any[] {
-  roundId =
-    gameRoundId !== null && gameRoundId !== undefined ? gameRoundId : roundId;
+  roundId = gameRoundId !== null && gameRoundId !== undefined ? gameRoundId : roundId;
 
   const startingPrice = 50;
   const exponentialBase = EXPONENTIAL_FACTOR;
@@ -61,7 +60,7 @@ export function generateChartData(
   if (hasher === undefined) {
     return [];
   }
-  let gameRoundHash = hasher.update('fckyhcc').digest("hex");
+  let gameRoundHash = hasher.update(roundId).digest("hex");
   while (gameRoundHash.length < gameTicks) {
     gameRoundHash += hasher.update(gameRoundHash).digest("hex");
   }
