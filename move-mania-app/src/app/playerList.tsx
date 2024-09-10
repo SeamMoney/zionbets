@@ -20,35 +20,39 @@ export type PlayerState = {
 export default function PlayerList() {
   const {
     gameStatus,
-    latestAction
+    latestAction,
+    playerList,
+    setPlayerList,
   } = useContext(gameStatusContext);
+
   const [players, setPlayers] = useState<PlayerState[]>([]);
 
   useEffect(() => {
     const fetchPlayers = async () => {
       const fetchedPlayers = await getPlayerList();
       setPlayers(fetchedPlayers);
+      setPlayerList(fetchedPlayers);
     };
 
     fetchPlayers();
 
-    const handleCashOut = (data: CashOutData) => {
-      console.log("Cash out data:", data);
-      setPlayers(prevPlayers =>
-        prevPlayers.map(player =>
-          player.username === data.playerEmail
-            ? { ...player, cashOutMultiplier: data.cashOutMultiplier }
-            : player
-        )
-      );
-    };
+    // const handleCashOut = (data: CashOutData) => {
+    //   console.log("Cash out data:", data);
+    //   setPlayers(prevPlayers =>
+    //     prevPlayers.map(player =>
+    //       player.username === data.playerEmail
+    //         ? { ...player, cashOutMultiplier: data.cashOutMultiplier }
+    //         : player
+    //     )
+    //   );
+    // };
 
-    socket.on(SOCKET_EVENTS.CASH_OUT_CONFIRMED, handleCashOut);
+    // socket.on(SOCKET_EVENTS.CASH_OUT_CONFIRMED, handleCashOut);
 
-    return () => {
-      socket.off(SOCKET_EVENTS.CASH_OUT_CONFIRMED, handleCashOut);
-    };
-  }, [latestAction]);
+    // return () => {
+    //   socket.off(SOCKET_EVENTS.CASH_OUT_CONFIRMED, handleCashOut);
+    // };
+  }, [latestAction, setPlayerList]);
 
   return (
     <div className="border border-neutral-700 h-full flex flex-col items-left gap-2 w-full min-h-[200px] max-h-[700px]">

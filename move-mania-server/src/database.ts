@@ -376,21 +376,25 @@ export async function addBetToPlayerList(bet: BetData) {
  * @param cashOut The cash out to be added to the player list
  */
 export async function addCashOutToPlayerList(cashOut: CashOutData) {
-  await initializeAllTables(); // initialize tables if not yet initialized
+  await initializeAllTables();
 
-  // Open the database
   const db = await open({
     filename: "./games.db",
     driver: require("sqlite3").Database,
   });
 
-  await db.run(
-    "UPDATE player_list SET crash_point = ? WHERE user_id = ?",
-    cashOut.cashOutMultiplier,
-    cashOut.playerEmail
-  );
-
-  await db.close();
+  try {
+    const result = await db.run(
+      "UPDATE player_list SET crash_point = ? WHERE user_id = ?",
+      cashOut.cashOutMultiplier,
+      cashOut.playerEmail
+    );
+    console.log("Cash out update result:", result);
+  } catch (error) {
+    console.error("Error updating player list with cash out:", error);
+  } finally {
+    await db.close();
+  }
 }
 
 export async function getUserByReferralCode(referralCode: string) {

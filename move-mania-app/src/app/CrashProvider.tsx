@@ -7,6 +7,8 @@ import { socket } from "@/lib/socket";
 import { getSession } from "next-auth/react";
 import { getCurrentGame, getUser, setUpAndGetUser } from "@/lib/api";
 import { SOCKET_EVENTS } from "@/lib/types";
+import { CashOutData } from "@/lib/types";
+import { PlayerState } from "./playerList";
 import { EXPONENTIAL_FACTOR, log } from "@/lib/utils";
 import {
   AlertDialog,
@@ -22,12 +24,16 @@ interface CrashPageProps {
   gameStatus: GameStatus | null;
   account: User | null;
   latestAction: number | null;
+  playerList: PlayerState[];
+  setPlayerList: React.Dispatch<React.SetStateAction<PlayerState[]>>;
 }
 
 export const gameStatusContext = createContext<CrashPageProps>({
   gameStatus: null,
   account: null,
   latestAction: null,
+  playerList: [],
+  setPlayerList: () => { },
 });
 
 export default function CrashProvider({ children }: { children: ReactNode }) {
@@ -36,7 +42,7 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
   const [account, setAccount] = useState<User | null>(null);
   const [latestAction, setLatestAction] = useState<number | null>(null);
   const [showPWAInstall, setShowPWAInstall] = useState(false);
-
+  const [playerList, setPlayerList] = useState<PlayerState[]>([]);
   const onConnect = useCallback(() => {
     setIsConnected(true);
   }, []);
@@ -73,8 +79,15 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
     setLatestAction(Date.now());
   }, []);
 
-  const onCashOutConfirmed = useCallback(() => {
+  const onCashOutConfirmed = useCallback((cashOutData: CashOutData) => {
     setLatestAction(Date.now());
+    setPlayerList((prevList) =>
+      prevList.map((player) =>
+        player.username === cashOutData.playerEmail
+          ? { ...player, cashOutMultiplier: cashOutData.cashOutMultiplier }
+          : player
+      )
+    );
   }, []);
 
   useEffect(() => {
@@ -194,6 +207,8 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
         gameStatus,
         account,
         latestAction,
+        playerList,
+        setPlayerList,
       }}
     >
       {children}

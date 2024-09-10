@@ -99,13 +99,13 @@ export default function ControlCenter() {
         throw new Error('Error cashing out on blockchain');
       }
 
-      setHasCashOut(true);
-
       await cashOutBet({
         roundId: parseInt(gameStatus.roundId),
         playerEmail: account.email,
         cashOutMultiplier: cashoutMultiplier,
       });
+
+      setHasCashOut(true);
 
       toast({
         title: `Cashed out at ${cashoutMultiplier}x`,
@@ -260,6 +260,32 @@ export default function ControlCenter() {
             )
           }
           {
+            account && gameStatus?.status === "IN_PROGRESS" && hasBet && (
+              <button
+                className={cn(
+                  "border px-6 py-1 w-full",
+                  hasCashOut
+                    ? "border-green-700 text-green-500 bg-[#264234]/40 cursor-not-allowed"
+                    : "hover:bg-[#404226]/40 hover:cursor-pointer bg-[#404226]/40 border-yellow-700 text-yellow-500 active:scale-95 active:opacity-80 transition-transform"
+                )}
+                onClick={onCashOut}
+                disabled={hasCashOut}
+              >
+                {hasCashOut ? "Cashed out" : "Cash out"}
+              </button>
+            )
+          }
+          {
+            account && gameStatus?.status === "IN_PROGRESS" && !hasBet && (
+              <button
+                className="border px-6 py-1 border-yellow-700 text-yellow-500 bg-neutral-950 cursor-not-allowed w-full"
+                disabled
+              >
+                Game in progress
+              </button>
+            )
+          }
+          {/* {
             account && gameStatus?.status === "IN_PROGRESS" && hasBet && !hasCashOut && (
               <button
                 className="border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 w-full hover:bg-[#404226]/40 hover:cursor-pointer bg-[#404226]/40 border-yellow-700 text-yellow-500 active:scale-95 active:opacity-80 transition-transform"
@@ -278,7 +304,7 @@ export default function ControlCenter() {
                 {hasCashOut ? "Cashed out" : "Game in progress"}
               </button>
             )
-          }
+          } */}
         </div>
       </div>
 
