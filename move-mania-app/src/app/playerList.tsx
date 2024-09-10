@@ -42,6 +42,7 @@ export default function PlayerList() {
       const fetchedPlayers = await getPlayerList();
       console.log("Fetched players:", fetchedPlayers);
       setPlayerList(fetchedPlayers);
+      setLocalPlayerList(fetchedPlayers);
     };
 
     fetchPlayers();
@@ -65,7 +66,7 @@ export default function PlayerList() {
       console.log("PlayerList useEffect cleanup");
       socket.off(SOCKET_EVENTS.CASH_OUT_CONFIRMED, handleCashOut);
     };
-  }, [latestAction]);
+  }, [latestAction, setPlayerList]);
 
   return (
     <div className="border border-neutral-700 h-full flex flex-col items-left gap-2 w-full min-h-[200px] max-h-[700px]">
