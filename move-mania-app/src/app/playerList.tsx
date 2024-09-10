@@ -14,7 +14,7 @@ export type PlayerState = {
   username: string;
   betAmount: number;
   coinType: string;
-  cashOutMultiplier: number; //not done with this line number||null
+  cashOutMultiplier: number | null;
 };
 
 export default function PlayerList() {
@@ -25,33 +25,30 @@ export default function PlayerList() {
     setPlayerList,
   } = useContext(gameStatusContext);
 
-  const [players, setPlayers] = useState<PlayerState[]>([]);
-
   useEffect(() => {
     const fetchPlayers = async () => {
       const fetchedPlayers = await getPlayerList();
-      setPlayers(fetchedPlayers);
       setPlayerList(fetchedPlayers);
     };
 
     fetchPlayers();
 
-    // const handleCashOut = (data: CashOutData) => {
-    //   console.log("Cash out data:", data);
-    //   setPlayers(prevPlayers =>
-    //     prevPlayers.map(player =>
-    //       player.username === data.playerEmail
-    //         ? { ...player, cashOutMultiplier: data.cashOutMultiplier }
-    //         : player
-    //     )
-    //   );
-    // };
+    const handleCashOut = (data: CashOutData) => {
+      console.log("Cash out data:", data);
+      setPlayerList(prevPlayers =>
+        prevPlayers.map(player =>
+          player.username === data.playerEmail
+            ? { ...player, cashOutMultiplier: data.cashOutMultiplier }
+            : player
+        )
+      );
+    };
 
-    // socket.on(SOCKET_EVENTS.CASH_OUT_CONFIRMED, handleCashOut);
+    socket.on(SOCKET_EVENTS.CASH_OUT_CONFIRMED, handleCashOut);
 
-    // return () => {
-    //   socket.off(SOCKET_EVENTS.CASH_OUT_CONFIRMED, handleCashOut);
-    // };
+    return () => {
+      socket.off(SOCKET_EVENTS.CASH_OUT_CONFIRMED, handleCashOut);
+    };
   }, [latestAction, setPlayerList]);
 
   return (

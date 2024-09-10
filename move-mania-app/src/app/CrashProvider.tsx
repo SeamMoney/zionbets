@@ -88,6 +88,8 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
           : player
       )
     );
+    socket.emit(SOCKET_EVENTS.CASH_OUT_CONFIRMED, cashOutData);
+    console.log("JUST EMITTED CASH OUT CONFIRMED:", cashOutData);
   }, []);
 
   useEffect(() => {
