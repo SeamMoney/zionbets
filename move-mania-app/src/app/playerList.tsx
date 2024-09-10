@@ -18,6 +18,7 @@ export type PlayerState = {
 };
 
 export default function PlayerList() {
+  console.log("PlayerList component rendered");
   const {
     gameStatus,
     latestAction,
@@ -26,9 +27,13 @@ export default function PlayerList() {
   } = useContext(gameStatusContext);
 
   useEffect(() => {
-    console.log("PlayerList mounted");
+    console.log("PlayerList useEffect running");
+    console.log("Current playerList:", playerList);
+
     const fetchPlayers = async () => {
+      console.log("Fetching players");
       const fetchedPlayers = await getPlayerList();
+      console.log("Fetched players:", fetchedPlayers);
       setPlayerList(fetchedPlayers);
     };
 
@@ -50,6 +55,7 @@ export default function PlayerList() {
     socket.on(SOCKET_EVENTS.CASH_OUT_CONFIRMED, handleCashOut);
 
     return () => {
+      console.log("PlayerList useEffect cleanup");
       socket.off(SOCKET_EVENTS.CASH_OUT_CONFIRMED, handleCashOut);
     };
   }, [latestAction, setPlayerList]);
