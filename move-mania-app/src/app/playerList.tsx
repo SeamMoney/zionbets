@@ -26,6 +26,7 @@ export default function PlayerList() {
   } = useContext(gameStatusContext);
 
   useEffect(() => {
+    console.log("PlayerList mounted");
     const fetchPlayers = async () => {
       const fetchedPlayers = await getPlayerList();
       setPlayerList(fetchedPlayers);
@@ -34,14 +35,16 @@ export default function PlayerList() {
     fetchPlayers();
 
     const handleCashOut = (data: CashOutData) => {
-      console.log("Cash out data:", data);
-      setPlayerList(prevPlayers =>
-        prevPlayers.map(player =>
+      console.log("PlayerList received cash out event:", data);
+      setPlayerList(prevPlayers => {
+        const updatedPlayers = prevPlayers.map(player =>
           player.username === data.playerEmail
             ? { ...player, cashOutMultiplier: data.cashOutMultiplier }
             : player
-        )
-      );
+        );
+        console.log("Updated player list:", updatedPlayers);
+        return updatedPlayers;
+      });
     };
 
     socket.on(SOCKET_EVENTS.CASH_OUT_CONFIRMED, handleCashOut);
@@ -50,6 +53,11 @@ export default function PlayerList() {
       socket.off(SOCKET_EVENTS.CASH_OUT_CONFIRMED, handleCashOut);
     };
   }, [latestAction, setPlayerList]);
+
+  // useEffect to log playerList changes
+  useEffect(() => {
+    console.log("Rendering player list:", playerList);
+  }, [playerList]);
 
   return (
     <div className="border border-neutral-700 h-full flex flex-col items-left gap-2 w-full min-h-[200px] max-h-[700px]">
