@@ -67,7 +67,7 @@ export default function PlayerList() {
           </tr>
         </thead>
         <tbody>
-          {players
+          {playerList
             .sort((a, b) => {
               if (gameStatus?.status == "COUNTDOWN") {
                 return b.betAmount - a.betAmount;
