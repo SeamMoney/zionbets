@@ -47,6 +47,11 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
     setIsConnected(true);
   }, []);
 
+  const updatePlayerList = useCallback((newPlayerList: React.SetStateAction<PlayerState[]>) => {
+    console.log("Updating playerList:", newPlayerList);
+    setPlayerList(newPlayerList);
+  }, []);
+
   const onDisconnect = useCallback(() => {
     setIsConnected(false);
   }, []);
@@ -81,13 +86,16 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
 
   const onCashOutConfirmed = useCallback((cashOutData: CashOutData) => {
     setLatestAction(Date.now());
-    setPlayerList((prevList) =>
-      prevList.map((player) =>
+    console.log("Before updating playerList:", playerList);
+    setPlayerList((prevList) => {
+      const updatedList = prevList.map((player) =>
         player.username === cashOutData.playerEmail
           ? { ...player, cashOutMultiplier: cashOutData.cashOutMultiplier }
           : player
-      )
-    );
+      );
+      console.log("After updating playerList:", updatedList);
+      return updatedList;
+    });
     socket.emit(SOCKET_EVENTS.CASH_OUT_CONFIRMED, cashOutData);
     console.log("JUST EMITTED CASH OUT CONFIRMED:", cashOutData);
   }, []);
@@ -210,7 +218,7 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
         account,
         latestAction,
         playerList,
-        setPlayerList,
+        setPlayerList: updatePlayerList,
       }}
     >
       {children}

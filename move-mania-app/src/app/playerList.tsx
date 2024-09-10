@@ -22,13 +22,20 @@ export default function PlayerList() {
   const {
     gameStatus,
     latestAction,
-    playerList,
+    playerList: globalPlayerList,
     setPlayerList,
   } = useContext(gameStatusContext);
 
+  const [localPlayerList, setLocalPlayerList] = useState(globalPlayerList);
+
+  console.log("PlayerList render - Current localPlayerList:", localPlayerList);
+
   useEffect(() => {
-    console.log("PlayerList useEffect running");
-    console.log("Current playerList:", playerList);
+    setLocalPlayerList(globalPlayerList);
+  }, [globalPlayerList]);
+
+  useEffect(() => {
+    console.log("PlayerList useEffect called, latestAction:", latestAction);
 
     const fetchPlayers = async () => {
       console.log("Fetching players");
@@ -58,12 +65,7 @@ export default function PlayerList() {
       console.log("PlayerList useEffect cleanup");
       socket.off(SOCKET_EVENTS.CASH_OUT_CONFIRMED, handleCashOut);
     };
-  }, [latestAction, setPlayerList]);
-
-  // useEffect to log playerList changes
-  useEffect(() => {
-    console.log("Rendering player list:", playerList);
-  }, [playerList]);
+  }, [latestAction]);
 
   return (
     <div className="border border-neutral-700 h-full flex flex-col items-left gap-2 w-full min-h-[200px] max-h-[700px]">
@@ -81,7 +83,7 @@ export default function PlayerList() {
           </tr>
         </thead>
         <tbody>
-          {playerList
+          {localPlayerList
             .sort((a, b) => {
               if (gameStatus?.status == "COUNTDOWN") {
                 return b.betAmount - a.betAmount;
