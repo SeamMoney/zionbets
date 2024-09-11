@@ -43,7 +43,9 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
   const [latestAction, setLatestAction] = useState<number | null>(null);
   const [showPWAInstall, setShowPWAInstall] = useState(false);
   const [playerList, setPlayerList] = useState<PlayerState[]>([]);
+
   const onConnect = useCallback(() => {
+    console.log("socket connected");
     setIsConnected(true);
   }, []);
 
@@ -85,8 +87,9 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const onCashOutConfirmed = useCallback((cashOutData: CashOutData) => {
-    setLatestAction(Date.now());
+    console.log("onCashOutConfirmed called with data:", cashOutData);
     console.log("Before updating playerList:", playerList);
+    setLatestAction(Date.now());
     setPlayerList((prevList) => {
       const updatedList = prevList.map((player) =>
         player.username === cashOutData.playerEmail
@@ -117,6 +120,11 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
       }
     });
 
+    const logAllEvents = (eventName: string, ...args: any[]) => {
+      console.log(`Received ${eventName} event:`, ...args);
+    };
+
+    socket.onAny(logAllEvents);
     socket.on('connect', onConnect);
     socket.on('disconnect', onDisconnect);
     socket.on(SOCKET_EVENTS.ROUND_START, onRoundStart);
@@ -131,6 +139,7 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
       socket.off(SOCKET_EVENTS.BET_CONFIRMED, onBetConfirmed);
       socket.off(SOCKET_EVENTS.CASH_OUT_CONFIRMED, onCashOutConfirmed);
       socket.off(SOCKET_EVENTS.ROUND_RESULT, onRoundResult);
+      socket.offAny(logAllEvents);
     };
   }, [onConnect, onDisconnect, onRoundStart, onBetConfirmed, onCashOutConfirmed, onRoundResult]);
 

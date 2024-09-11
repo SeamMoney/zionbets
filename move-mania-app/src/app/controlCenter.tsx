@@ -69,6 +69,12 @@ export default function ControlCenter() {
   console.log("ControlCenter rendering, gameStatus:", gameStatus);
 
   const onCashOut = useCallback(async () => {
+    console.log("onCashOut called with:", {
+      socket,
+      account,
+      gameStatus,
+    });
+
     if (!socket || !account || !gameStatus?.startTime) {
       console.log("Missing required data for cash out:", {
         socket,
@@ -261,8 +267,8 @@ export default function ControlCenter() {
               <div
                 key={amount}
                 className={`border px-2 py-1 cursor-pointer grow text-center ${parseFloat(betAmount) === amount
-                    ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
-                    : "opacity-50 border-neutral-700"
+                  ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
+                  : "opacity-50 border-neutral-700"
                   }`}
                 onClick={() => setBetAmount(amount.toString())}
               >
@@ -377,8 +383,8 @@ export default function ControlCenter() {
                     <div
                       key={amount}
                       className={`text-center border px-2 py-1 cursor-pointer grow ${parseFloat(autoCashoutAmount) === amount
-                          ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
-                          : "opacity-50 border-neutral-700"
+                        ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
+                        : "opacity-50 border-neutral-700"
                         }`}
                       onClick={() => {
                         setAutoCashout(false);
