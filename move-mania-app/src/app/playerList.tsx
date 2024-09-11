@@ -22,7 +22,10 @@ export default function PlayerList() {
   const [players, setPlayers] = useState<PlayerState[]>([]);
 
   useEffect(() => {
+    console.log("PlayerList useEffect called, latestAction:", latestAction);
+
     const fetchPlayers = async () => {
+      console.log("Fetching players");
       const fetchedPlayers = await getPlayerList();
       setPlayers(fetchedPlayers);
       console.log("player list:", fetchedPlayers);
@@ -37,16 +40,19 @@ export default function PlayerList() {
           player.username === data.playerEmail
             ? { ...player, cashOutMultiplier: data.cashOutMultiplier }
             : player
-        )
-      );
+        );
+        console.log("Updated player list:", updatedPlayers);
+        return updatedPlayers;
+      });
     };
 
     socket.on(SOCKET_EVENTS.CASH_OUT_CONFIRMED, handleCashOut);
 
     return () => {
+      console.log("PlayerList useEffect cleanup");
       socket.off(SOCKET_EVENTS.CASH_OUT_CONFIRMED, handleCashOut);
     };
-  }, [latestAction]);
+  }, [latestAction, setPlayerList]);
 
   return (
     <div className="border border-neutral-700 h-full flex flex-col items-left gap-2 w-full min-h-[200px] max-h-[700px]">
@@ -57,15 +63,18 @@ export default function PlayerList() {
             <th className="w-[200px] text-left ps-4">Username</th>
             <th className="w-[100px] text-center">
               Multiplier <span className="text-neutral-500  text-xs">x</span>
+              Multiplier <span className="text-neutral-500  text-xs">x</span>
             </th>
             <th className="w-[100px] text-right pr-4">
+              Bet <span className="text-neutral-500  text-xs">cash</span>
               Bet <span className="text-neutral-500  text-xs">cash</span>
             </th>
           </tr>
         </thead>
         <tbody>
-          {players
+          {localPlayerList
             .sort((a, b) => {
+              if (gameStatus?.status == "COUNTDOWN") {
               if (gameStatus?.status == "COUNTDOWN") {
                 return b.betAmount - a.betAmount;
               } else {
@@ -100,9 +109,17 @@ export default function PlayerList() {
                   <td className="w-[200px] text-left ps-4 bg-neutral-800/40 bg-[#264234]/40 border-b border-neutral-800">
                     {player.username}
                   </td>
+                  <td className="w-[200px] text-left ps-4 bg-neutral-800/40 bg-[#264234]/40 border-b border-neutral-800">
+                    {player.username}
+                  </td>
                 )}
                 {gameStatus?.status == "IN_PROGRESS" ? (
                   player.cashOutMultiplier ? (
+                    <td
+                      className={cn(
+                        "w-[100px] text-center text-green-500 bg-[#264234]/40 border-b border-neutral-800"
+                      )}
+                    >
                     <td
                       className={cn(
                         "w-[100px] text-center text-green-500 bg-[#264234]/40 border-b border-neutral-800"
@@ -114,8 +131,16 @@ export default function PlayerList() {
                     <td className="w-[100px] text-center text-red-500 bg-[#3F221E]/40 border-b border-neutral-800">
                       0.00
                     </td>
+                    <td className="w-[100px] text-center text-red-500 bg-[#3F221E]/40 border-b border-neutral-800">
+                      0.00
+                    </td>
                   )
                 ) : player.cashOutMultiplier ? (
+                  <td
+                    className={cn(
+                      "w-[100px] text-center text-green-500 bg-[#264234]/40 border-b border-neutral-800"
+                    )}
+                  >
                   <td
                     className={cn(
                       "w-[100px] text-center text-green-500 bg-[#264234]/40 border-b border-neutral-800"
@@ -127,10 +152,15 @@ export default function PlayerList() {
                   <td className="w-[100px] text-center bg-neutral-800/40 bg-[#264234]/40 border-b border-neutral-800">
                     --
                   </td>
+                  <td className="w-[100px] text-center bg-neutral-800/40 bg-[#264234]/40 border-b border-neutral-800">
+                    --
+                  </td>
                 )}
                 {gameStatus?.status == "IN_PROGRESS" ? ( // IF the game has ended
                   player.cashOutMultiplier ? (
                     <td className="w-[100px] text-right pr-4  text-green-500 bg-[#264234]/40 border-b border-neutral-800">
+                      +
+                      {(player.betAmount * player.cashOutMultiplier).toFixed(2)}
                       +
                       {(player.betAmount * player.cashOutMultiplier).toFixed(2)}
                     </td>

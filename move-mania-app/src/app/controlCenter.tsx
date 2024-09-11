@@ -12,11 +12,16 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion"
+} from "@/components/ui/accordion";
 import { User } from "@/lib/schema";
 import { cashOutBet, setNewBet } from "@/lib/socket";
 import { SOCKET_EVENTS } from "@/lib/types";
-import { EXPONENTIAL_FACTOR, calculateCurrentCrashPoint, cn, log } from "@/lib/utils";
+import {
+  EXPONENTIAL_FACTOR,
+  calculateCurrentCrashPoint,
+  cn,
+  log,
+} from "@/lib/utils";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { socket } from "@/lib/socket";
 import { gameStatusContext } from "./CrashProvider";
@@ -32,13 +37,9 @@ export type GameStatus = {
 };
 
 export default function ControlCenter() {
-  const {
-    gameStatus,
-    account,
-    latestAction
-  } = useContext(gameStatusContext);
+  const { gameStatus, account, latestAction } = useContext(gameStatusContext);
 
-  const { toast } = useToast()
+  const { toast } = useToast();
 
   const [betAmount, setBetAmount] = useState("");
   const [autoCashout, setAutoCashout] = useState(false);
@@ -52,7 +53,7 @@ export default function ControlCenter() {
     if (account && gameStatus?.status === "COUNTDOWN") {
       Promise.all([
         hasUserBet(account.email),
-        hasUserCashOut(account.email)
+        hasUserCashOut(account.email),
       ]).then(([bet, cashout]) => {
         console.log("API Has Bet:", bet);
         console.log("API Has Cash Out:", cashout);
@@ -65,13 +66,29 @@ export default function ControlCenter() {
     }
   }, [gameStatus?.status, account]);
 
+  console.log("ControlCenter rendering, gameStatus:", gameStatus);
+
   const onCashOut = useCallback(async () => {
+    console.log("onCashOut called with:", {
+      socket,
+      account,
+      gameStatus,
+    });
+
     if (!socket || !account || !gameStatus?.startTime) {
-      console.log('Missing required data for cash out:', { socket, account, gameStatus });
+      console.log("Missing required data for cash out:", {
+        socket,
+        account,
+        gameStatus,
+      });
       return;
     }
 
-    const cashoutMultiplier = Number(calculateCurrentCrashPoint((Date.now() - gameStatus.startTime) / 1000).toFixed(2));
+    const cashoutMultiplier = Number(
+      calculateCurrentCrashPoint(
+        (Date.now() - gameStatus.startTime) / 1000
+      ).toFixed(2)
+    );
 
     toast({
       title: `Attempting to cash out at ${cashoutMultiplier}x...`,
@@ -79,7 +96,7 @@ export default function ControlCenter() {
 
     try {
       console.log("Attempting to cash out with:", {
-        privateKey: account.private_key.slice(0, 5) + '...',
+        privateKey: account.private_key.slice(0, 5) + "...",
         roundId: gameStatus.roundId,
         playerEmail: account.email,
         cashOutMultiplier: cashoutMultiplier,
@@ -94,10 +111,8 @@ export default function ControlCenter() {
       console.log("Blockchain response:", blockchainRes);
 
       if (!blockchainRes) {
-        throw new Error('Error cashing out on blockchain');
+        throw new Error("Error cashing out on blockchain");
       }
-
-      setHasCashOut(true);
 
       await cashOutBet({
         roundId: parseInt(gameStatus.roundId),
@@ -105,15 +120,26 @@ export default function ControlCenter() {
         cashOutMultiplier: cashoutMultiplier,
       });
 
+      setHasCashOut(true);
+
       toast({
         title: `Cashed out at ${cashoutMultiplier}x`,
-        description: <Link href={`https://explorer.aptoslabs.com/txn/${blockchainRes.txnHash}/?network=testnet`} target="_blank" className="underline">View transaction</Link>
+        description: (
+          <Link
+            href={`https://explorer.aptoslabs.com/txn/${blockchainRes.txnHash}/?network=testnet`}
+            target="_blank"
+            className="underline"
+          >
+            View transaction
+          </Link>
+        ),
       });
     } catch (error) {
-      console.error('Error cashing out:', error);
+      console.error("Error cashing out:", error);
       toast({
         title: "Error cashing out",
-        description: "Please try again or contact support if the issue persists"
+        description:
+          "Please try again or contact support if the issue persists",
       });
 
       setHasCashOut(false);
@@ -126,18 +152,29 @@ export default function ControlCenter() {
       return;
     }
 
-    const timeUntilCrash = gameStatus.startTime + log(EXPONENTIAL_FACTOR, gameStatus.crashPoint) * 1000 - Date.now();
-    const timeUntilCashout = gameStatus.startTime + log(EXPONENTIAL_FACTOR, parseFloat(autoCashoutAmount) || 0) * 1000 - Date.now();
+    const timeUntilCrash =
+      gameStatus.startTime +
+      log(EXPONENTIAL_FACTOR, gameStatus.crashPoint) * 1000 -
+      Date.now();
+    const timeUntilCashout =
+      gameStatus.startTime +
+      log(EXPONENTIAL_FACTOR, parseFloat(autoCashoutAmount) || 0) * 1000 -
+      Date.now();
 
     console.log("Auto cashout check:", {
       hasBet,
       autoCashout,
       timeUntilCashout,
       timeUntilCrash,
-      autoCashoutAmount
+      autoCashoutAmount,
     });
 
-    if (hasBet && autoCashout && timeUntilCashout < timeUntilCrash && timeUntilCashout > 0) {
+    if (
+      hasBet &&
+      autoCashout &&
+      timeUntilCashout < timeUntilCrash &&
+      timeUntilCashout > 0
+    ) {
       console.log("Scheduling auto cashout");
       setTimeout(() => {
         console.log("Executing auto cashout");
@@ -168,7 +205,7 @@ export default function ControlCenter() {
       });
 
       if (!blockchainRes) {
-        throw new Error('Error placing bet');
+        throw new Error("Error placing bet");
       }
 
       await setNewBet({
@@ -182,17 +219,24 @@ export default function ControlCenter() {
 
       toast({
         title: `Bet placed at ${betAmount} CASH`,
-        description: <Link href={`https://explorer.aptoslabs.com/txn/${blockchainRes.txnHash}/?network=testnet`} target="_blank" className="underline">View transaction</Link>
+        description: (
+          <Link
+            href={`https://explorer.aptoslabs.com/txn/${blockchainRes.txnHash}/?network=testnet`}
+            target="_blank"
+            className="underline"
+          >
+            View transaction
+          </Link>
+        ),
       });
     } catch (error) {
-      console.error('Error placing bet:', error);
+      console.error("Error placing bet:", error);
       toast({
         title: "Error placing bet",
-        description: "Please try again"
+        description: "Please try again",
       });
     }
   }, [account, gameStatus, betAmount, toast]);
-
 
   return (
     <div className="w-full h-full flex flex-col gap-4 items-start p-2">
@@ -208,7 +252,12 @@ export default function ControlCenter() {
                   setBetAmount(e.target.value);
                 }}
                 placeholder="2.50"
-                disabled={!(gameStatus?.startTime !== undefined && gameStatus.startTime > Date.now())}
+                disabled={
+                  !(
+                    gameStatus?.startTime !== undefined &&
+                    gameStatus.startTime > Date.now()
+                  )
+                }
               ></input>
               <span>CASH</span>
             </span>
@@ -258,6 +307,32 @@ export default function ControlCenter() {
             )
           }
           {
+            account && gameStatus?.status === "IN_PROGRESS" && hasBet && (
+              <button
+                className={cn(
+                  "border px-6 py-1 w-full",
+                  hasCashOut
+                    ? "border-green-700 text-green-500 bg-[#264234]/40 cursor-not-allowed"
+                    : "hover:bg-[#404226]/40 hover:cursor-pointer bg-[#404226]/40 border-yellow-700 text-yellow-500 active:scale-95 active:opacity-80 transition-transform"
+                )}
+                onClick={onCashOut}
+                disabled={hasCashOut}
+              >
+                {hasCashOut ? "Cashed out" : "Cash out"}
+              </button>
+            )
+          }
+          {
+            account && gameStatus?.status === "IN_PROGRESS" && !hasBet && (
+              <button
+                className="border px-6 py-1 border-yellow-700 text-yellow-500 bg-neutral-950 cursor-not-allowed w-full"
+                disabled
+              >
+                Game in progress
+              </button>
+            )
+          }
+          {/* {
             account && gameStatus?.status === "IN_PROGRESS" && hasBet && !hasCashOut && (
               <button
                 className="border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 w-full hover:bg-[#404226]/40 hover:cursor-pointer bg-[#404226]/40 border-yellow-700 text-yellow-500 active:scale-95 active:opacity-80 transition-transform"
@@ -276,13 +351,15 @@ export default function ControlCenter() {
                 {hasCashOut ? "Cashed out" : "Game in progress"}
               </button>
             )
-          }
+          } */}
         </div>
       </div>
 
       <Accordion type="single" collapsible className="w-full px-2">
         <AccordionItem value="item-1">
-          <AccordionTrigger className="opacity-50">Advanced mode</AccordionTrigger>
+          <AccordionTrigger className="opacity-50">
+            Advanced mode
+          </AccordionTrigger>
           <AccordionContent>
             <div className=" flex flex-col items-start justify-around pt-2 gap-2 w-full">
               <div className="flex flex-col gap-1 w-full">
@@ -320,31 +397,27 @@ export default function ControlCenter() {
                 </div>
               </div>
               <div className="flex flex-row items-baseline gap-2 w-full text-lg">
-                {
-                  !account && (
-                    <button
-                      className="border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 cursor-not-allowed w-full"
-                      disabled
-                    >
-                      Log in to set auto cash out
-                    </button>
-                  )
-                }
-                {
-                  account && (
-                    <button
-                      className={cn(
-                        "border px-6 py-1 bg-neutral-950 w-full",
-                        autoCashout
-                          ? "border-green-700 text-green-500"
-                          : "border-neutral-700 text-neutral-500"
-                      )}
-                      onClick={() => setAutoCashout(!autoCashout)}
-                    >
-                      {autoCashout ? "Auto Cash Out On" : "Auto Cash Out Off"}
-                    </button>
-                  )
-                }
+                {!account && (
+                  <button
+                    className="border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 cursor-not-allowed w-full"
+                    disabled
+                  >
+                    Log in to set auto cash out
+                  </button>
+                )}
+                {account && (
+                  <button
+                    className={cn(
+                      "border px-6 py-1 bg-neutral-950 w-full",
+                      autoCashout
+                        ? "border-green-700 text-green-500"
+                        : "border-neutral-700 text-neutral-500"
+                    )}
+                    onClick={() => setAutoCashout(!autoCashout)}
+                  >
+                    {autoCashout ? "Auto Cash Out On" : "Auto Cash Out Off"}
+                  </button>
+                )}
               </div>
             </div>
           </AccordionContent>

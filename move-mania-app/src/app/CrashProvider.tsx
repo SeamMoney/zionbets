@@ -7,6 +7,8 @@ import { socket } from "@/lib/socket";
 import { getSession } from "next-auth/react";
 import { getCurrentGame, getUser, setUpAndGetUser } from "@/lib/api";
 import { SOCKET_EVENTS } from "@/lib/types";
+import { CashOutData } from "@/lib/types";
+import { PlayerState } from "./playerList";
 import { EXPONENTIAL_FACTOR, log } from "@/lib/utils";
 import {
   AlertDialog,
@@ -22,12 +24,16 @@ interface CrashPageProps {
   gameStatus: GameStatus | null;
   account: User | null;
   latestAction: number | null;
+  playerList: PlayerState[];
+  setPlayerList: React.Dispatch<React.SetStateAction<PlayerState[]>>;
 }
 
 export const gameStatusContext = createContext<CrashPageProps>({
   gameStatus: null,
   account: null,
   latestAction: null,
+  playerList: [],
+  setPlayerList: () => { },
 });
 
 export default function CrashProvider({ children }: { children: ReactNode }) {
@@ -36,9 +42,16 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
   const [account, setAccount] = useState<User | null>(null);
   const [latestAction, setLatestAction] = useState<number | null>(null);
   const [showPWAInstall, setShowPWAInstall] = useState(false);
+  const [playerList, setPlayerList] = useState<PlayerState[]>([]);
 
   const onConnect = useCallback(() => {
+    console.log("socket connected");
     setIsConnected(true);
+  }, []);
+
+  const updatePlayerList = useCallback((newPlayerList: React.SetStateAction<PlayerState[]>) => {
+    console.log("Updating playerList:", newPlayerList);
+    setPlayerList(newPlayerList);
   }, []);
 
   const onDisconnect = useCallback(() => {
@@ -73,11 +86,25 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
     setLatestAction(Date.now());
   }, []);
 
-  const onCashOutConfirmed = useCallback(() => {
+  const onCashOutConfirmed = useCallback((cashOutData: CashOutData) => {
+    console.log("onCashOutConfirmed called with data:", cashOutData);
+    console.log("Before updating playerList:", playerList);
     setLatestAction(Date.now());
+    setPlayerList((prevList) => {
+      const updatedList = prevList.map((player) =>
+        player.username === cashOutData.playerEmail
+          ? { ...player, cashOutMultiplier: cashOutData.cashOutMultiplier }
+          : player
+      );
+      console.log("After updating playerList:", updatedList);
+      return updatedList;
+    });
+    socket.emit(SOCKET_EVENTS.CASH_OUT_CONFIRMED, cashOutData);
+    console.log("JUST EMITTED CASH OUT CONFIRMED:", cashOutData);
   }, []);
 
   useEffect(() => {
+    console.log("CrashProvider updating game status:", gameStatus);
     getSession().then((session) => {
       if (session && session.user && session.user.email) {
         setUpAndGetUser({
@@ -93,6 +120,11 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
       }
     });
 
+    const logAllEvents = (eventName: string, ...args: any[]) => {
+      console.log(`Received ${eventName} event:`, ...args);
+    };
+
+    socket.onAny(logAllEvents);
     socket.on('connect', onConnect);
     socket.on('disconnect', onDisconnect);
     socket.on(SOCKET_EVENTS.ROUND_START, onRoundStart);
@@ -107,10 +139,12 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
       socket.off(SOCKET_EVENTS.BET_CONFIRMED, onBetConfirmed);
       socket.off(SOCKET_EVENTS.CASH_OUT_CONFIRMED, onCashOutConfirmed);
       socket.off(SOCKET_EVENTS.ROUND_RESULT, onRoundResult);
+      socket.offAny(logAllEvents);
     };
   }, [onConnect, onDisconnect, onRoundStart, onBetConfirmed, onCashOutConfirmed, onRoundResult]);
 
   useEffect(() => {
+    console.log("CrashProvider updating game status:", gameStatus);
     if (account && latestAction) {
       const timeoutId = setTimeout(() => {
         getUser(account.email).then((updatedUser) => {
@@ -125,6 +159,7 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
   }, [latestAction, account]);
 
   useEffect(() => {
+    console.log("CrashProvider updating game status:", gameStatus);
     const fetchGameStatus = async () => {
       try {
         const game = await getCurrentGame();
@@ -184,12 +219,15 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+
   return (
     <gameStatusContext.Provider
       value={{
         gameStatus,
         account,
         latestAction,
+        playerList,
+        setPlayerList: updatePlayerList,
       }}
     >
       {children}
