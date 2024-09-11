@@ -14,28 +14,26 @@ export type PlayerState = {
   username: string;
   betAmount: number;
   coinType: string;
-  cashOutMultiplier: number | null;
+  cashOutMultiplier: number; //not done with this line number||null
 };
 
 export default function PlayerList() {
-  const {
-    gameStatus,
-    latestAction
-  } = useContext(gameStatusContext);
+  const { gameStatus, latestAction } = useContext(gameStatusContext);
   const [players, setPlayers] = useState<PlayerState[]>([]);
 
   useEffect(() => {
     const fetchPlayers = async () => {
       const fetchedPlayers = await getPlayerList();
       setPlayers(fetchedPlayers);
+      console.log("player list:", fetchedPlayers);
     };
 
     fetchPlayers();
 
     const handleCashOut = (data: CashOutData) => {
       console.log("Cash out data:", data);
-      setPlayers(prevPlayers =>
-        prevPlayers.map(player =>
+      setPlayers((prevPlayers) =>
+        prevPlayers.map((player) =>
           player.username === data.playerEmail
             ? { ...player, cashOutMultiplier: data.cashOutMultiplier }
             : player
@@ -58,19 +56,17 @@ export default function PlayerList() {
           <tr className="border-b border-neutral-800 text-neutral-400">
             <th className="w-[200px] text-left ps-4">Username</th>
             <th className="w-[100px] text-center">
-              Multiplier{" "}
-              <span className="text-neutral-500  text-xs">x</span>
+              Multiplier <span className="text-neutral-500  text-xs">x</span>
             </th>
             <th className="w-[100px] text-right pr-4">
-              Bet{" "}
-              <span className="text-neutral-500  text-xs">cash</span>
+              Bet <span className="text-neutral-500  text-xs">cash</span>
             </th>
           </tr>
         </thead>
         <tbody>
           {players
             .sort((a, b) => {
-              if (gameStatus?.status == 'COUNTDOWN') {
+              if (gameStatus?.status == "COUNTDOWN") {
                 return b.betAmount - a.betAmount;
               } else {
                 if (a.cashOutMultiplier && b.cashOutMultiplier) {
@@ -86,7 +82,7 @@ export default function PlayerList() {
             })
             .map((player, index) => (
               <tr key={index} className="text-white text-sm  h-8">
-                {gameStatus?.status == "END" ? ( // IF the game has ended
+                {gameStatus?.status == "IN_PROGRESS" ? ( // IF the game has ended
                   player.cashOutMultiplier ? (
                     <td className="w-[200px] text-left ps-4 text-green-500 bg-[#264234]/40 border-b border-neutral-800">
                       {player.username}
@@ -101,27 +97,42 @@ export default function PlayerList() {
                     {player.username}
                   </td>
                 ) : (
-                  <td className="w-[200px] text-left ps-4 bg-neutral-800/40 bg-[#264234]/40 border-b border-neutral-800">{player.username}</td>
+                  <td className="w-[200px] text-left ps-4 bg-neutral-800/40 bg-[#264234]/40 border-b border-neutral-800">
+                    {player.username}
+                  </td>
                 )}
-                {gameStatus?.status == "END" ? (
+                {gameStatus?.status == "IN_PROGRESS" ? (
                   player.cashOutMultiplier ? (
-                    <td className={cn("w-[100px] text-center text-green-500 bg-[#264234]/40 border-b border-neutral-800")}>
+                    <td
+                      className={cn(
+                        "w-[100px] text-center text-green-500 bg-[#264234]/40 border-b border-neutral-800"
+                      )}
+                    >
                       {player.cashOutMultiplier.toFixed(2)}
                     </td>
                   ) : (
-                    <td className="w-[100px] text-center text-red-500 bg-[#3F221E]/40 border-b border-neutral-800">0.00</td>
+                    <td className="w-[100px] text-center text-red-500 bg-[#3F221E]/40 border-b border-neutral-800">
+                      0.00
+                    </td>
                   )
                 ) : player.cashOutMultiplier ? (
-                  <td className={cn("w-[100px] text-center text-green-500 bg-[#264234]/40 border-b border-neutral-800")}>
+                  <td
+                    className={cn(
+                      "w-[100px] text-center text-green-500 bg-[#264234]/40 border-b border-neutral-800"
+                    )}
+                  >
                     {player.cashOutMultiplier.toFixed(2)}
                   </td>
                 ) : (
-                  <td className="w-[100px] text-center bg-neutral-800/40 bg-[#264234]/40 border-b border-neutral-800">--</td>
+                  <td className="w-[100px] text-center bg-neutral-800/40 bg-[#264234]/40 border-b border-neutral-800">
+                    --
+                  </td>
                 )}
-                {gameStatus?.status == "END" ? ( // IF the game has ended
+                {gameStatus?.status == "IN_PROGRESS" ? ( // IF the game has ended
                   player.cashOutMultiplier ? (
                     <td className="w-[100px] text-right pr-4  text-green-500 bg-[#264234]/40 border-b border-neutral-800">
-                      +{(player.betAmount * player.cashOutMultiplier).toFixed(2)}
+                      +
+                      {(player.betAmount * player.cashOutMultiplier).toFixed(2)}
                     </td>
                   ) : (
                     <td className="w-[100px] text-right pr-4  text-red-500 bg-[#3F221E]/40 border-b border-neutral-800">
