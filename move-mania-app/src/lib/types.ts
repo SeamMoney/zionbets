@@ -11,20 +11,20 @@ export const SOCKET_EVENTS = {
 };
 
 export type BetData = {
-  roundId: number;
+  roundId: string;
   playerEmail: string;
   betAmount: number;
   coinType: string;
 };
 
 export type CashOutData = {
-  roundId: number;
+  roundId: string;
   playerEmail: string;
   cashOutMultiplier: number;
 };
 
 export type RoundStart = {
-  roundId: number;
+  roundId: string;
   startTime: number;
   crashPoint: number;
 };

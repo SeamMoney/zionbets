@@ -14,7 +14,7 @@ export type PlayerState = {
   username: string;
   betAmount: number;
   coinType: string;
-  cashOutMultiplier: number | null;
+  cashOutMultiplier: number;
 };
 
 export default function PlayerList() {
