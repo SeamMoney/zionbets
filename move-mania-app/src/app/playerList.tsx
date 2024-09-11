@@ -14,7 +14,7 @@ export type PlayerState = {
   username: string;
   betAmount: number;
   coinType: string;
-  cashOutMultiplier: number; //not done with this line number||null
+  cashOutMultiplier: number | null; //not done with this line number||null
 };
 
 export default function PlayerList() {
@@ -25,15 +25,16 @@ export default function PlayerList() {
     const fetchPlayers = async () => {
       const fetchedPlayers = await getPlayerList();
       setPlayers(fetchedPlayers);
-      console.log("player list:", fetchedPlayers);
+      console.log(players);
     };
 
     fetchPlayers();
 
     const handleCashOut = (data: CashOutData) => {
       console.log("Cash out data:", data);
-      setPlayers((prevPlayers) =>
-        prevPlayers.map((player) =>
+
+      setPlayers((prevPlayers: any[]) =>
+        prevPlayers.map((player: { username: string; }) =>
           player.username === data.playerEmail
             ? { ...player, cashOutMultiplier: data.cashOutMultiplier }
             : player
@@ -65,8 +66,9 @@ export default function PlayerList() {
         </thead>
         <tbody>
           {players
-            .sort((a, b) => {
+            .sort((a: { betAmount: number; cashOutMultiplier: number; }, b: { betAmount: number; cashOutMultiplier: number; }) => {
               if (gameStatus?.status == "COUNTDOWN") {
+                console.log(players);
                 return b.betAmount - a.betAmount;
               } else {
                 if (a.cashOutMultiplier && b.cashOutMultiplier) {
@@ -80,7 +82,7 @@ export default function PlayerList() {
                 }
               }
             })
-            .map((player, index) => (
+            .map((player: { cashOutMultiplier: number; username: any; betAmount: number; }, index: any) => (
               <tr key={index} className="text-white text-sm  h-8">
                 {gameStatus?.status == "IN_PROGRESS" ? ( // IF the game has ended
                   player.cashOutMultiplier ? (
