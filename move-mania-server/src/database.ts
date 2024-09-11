@@ -390,6 +390,12 @@ export async function addCashOutToPlayerList(cashOut: CashOutData) {
       cashOut.playerEmail
     );
     console.log("Cash out update result:", result);
+
+    const updatedPlayer = await db.get(
+      "SELECT * FROM player_list WHERE user_id = ?",
+      cashOut.playerEmail
+    );
+    console.log("Updated player data:", updatedPlayer);
   } catch (error) {
     console.error("Error updating player list with cash out:", error);
   } finally {

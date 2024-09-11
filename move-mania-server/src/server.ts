@@ -76,12 +76,15 @@ io.on("connection", (socket) => {
     try {
       const result = await handleCashOut(data.playerAddress, data.cashOutAmount);
       if (result) {
-        await addCashOutToPlayerList({
+        const cashOutData = {
           playerEmail: data.playerAddress,
           cashOutMultiplier: data.cashOutAmount / 100,
           roundId: 1
-        });
+        };
+        await addCashOutToPlayerList(cashOutData);
+        console.log("Cash out result", result);
         socket.emit(SOCKET_EVENTS.CASH_OUT_RESULT, { success: true, txnHash: result.txnHash });
+        io.emit(SOCKET_EVENTS.CASH_OUT_CONFIRMED, cashOutData);
       } else {
         socket.emit(SOCKET_EVENTS.CASH_OUT_RESULT, { success: false, error: 'Cash out failed' });
       }
