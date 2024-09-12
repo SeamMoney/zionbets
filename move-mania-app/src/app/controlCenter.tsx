@@ -69,12 +69,6 @@ export default function ControlCenter() {
   console.log("ControlCenter rendering, gameStatus:", gameStatus);
 
   const onCashOut = useCallback(async () => {
-    console.log("onCashOut called with:", {
-      socket,
-      account,
-      gameStatus,
-    });
-
     if (!socket || !account || !gameStatus?.startTime) {
       console.log("Missing required data for cash out:", {
         socket,
@@ -103,7 +97,7 @@ export default function ControlCenter() {
       });
 
       const blockchainRes = await cashOut(account.private_key, {
-        roundId: parseInt(gameStatus.roundId),
+        roundId: gameStatus.roundId,
         playerEmail: account.email,
         cashOutMultiplier: cashoutMultiplier,
       });
@@ -114,14 +108,15 @@ export default function ControlCenter() {
         throw new Error("Error cashing out on blockchain");
       }
 
+      setHasCashOut(true);
+
       const response = await cashOutBet({
-        roundId: parseInt(gameStatus.roundId),
+        roundId: gameStatus.roundId,
         playerEmail: account.email,
         cashOutMultiplier: cashoutMultiplier,
       });
-      console.log('Cash out response:', response);
 
-      setHasCashOut(true);
+      console.log("Cash out response:", response);
 
       toast({
         title: `Cashed out at ${cashoutMultiplier}x`,
@@ -199,7 +194,7 @@ export default function ControlCenter() {
 
     try {
       const blockchainRes = await placeBet(account.private_key, {
-        roundId: parseInt(gameStatus.roundId),
+        roundId: gameStatus.roundId,
         playerEmail: account.email,
         betAmount: parseFloat(betAmount),
         coinType: "CASH",
@@ -210,7 +205,7 @@ export default function ControlCenter() {
       }
 
       await setNewBet({
-        roundId: parseInt(gameStatus.roundId),
+        roundId: gameStatus.roundId,
         playerEmail: account.email,
         betAmount: parseFloat(betAmount),
         coinType: "CASH",
@@ -268,8 +263,8 @@ export default function ControlCenter() {
               <div
                 key={amount}
                 className={`border px-2 py-1 cursor-pointer grow text-center ${parseFloat(betAmount) === amount
-                  ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
-                  : "opacity-50 border-neutral-700"
+                    ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
+                    : "opacity-50 border-neutral-700"
                   }`}
                 onClick={() => setBetAmount(amount.toString())}
               >
@@ -279,80 +274,59 @@ export default function ControlCenter() {
           </div>
         </div>
         <div className="flex flex-row items-baseline gap-2 w-full text-lg">
-          {
-            !account && (
-              <button
-                className="border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 cursor-not-allowed w-full"
-                disabled
-              >
-                Log in to play
-              </button>
-            )
-          }
-          {
-            account && gameStatus?.status === "COUNTDOWN" && (
-              <button
-                className={cn(
-                  "border border-green-700 px-6 py-1 border-yellow-700 text-yellow-500 bg-neutral-950 w-full",
-                  hasBet
-                    ? "bg-[#264234]/40 cursor-not-allowed border-green-700 text-green-500"
-                    : "bg-[#404226]/40 active:scale-95 active:opacity-80 transition-transform",
-                )}
-                onClick={onSetBet}
-                disabled={!(parseFloat(betAmount) > 0) || hasBet}
-              >
-                {
-                  hasBet ? "Bet placed" : (parseFloat(betAmount) > 0) ? "Place bet" : "Enter bet amount"
-                }
-              </button>
-            )
-          }
-          {
-            account && gameStatus?.status === "IN_PROGRESS" && hasBet && (
-              <button
-                className={cn(
-                  "border px-6 py-1 w-full",
-                  hasCashOut
-                    ? "border-green-700 text-green-500 bg-[#264234]/40 cursor-not-allowed"
-                    : "hover:bg-[#404226]/40 hover:cursor-pointer bg-[#404226]/40 border-yellow-700 text-yellow-500 active:scale-95 active:opacity-80 transition-transform"
-                )}
-                onClick={onCashOut}
-                disabled={hasCashOut}
-              >
-                {hasCashOut ? "Cashed out" : "Cash out"}
-              </button>
-            )
-          }
-          {
-            account && gameStatus?.status === "IN_PROGRESS" && !hasBet && (
-              <button
-                className="border px-6 py-1 border-yellow-700 text-yellow-500 bg-neutral-950 cursor-not-allowed w-full"
-                disabled
-              >
-                Game in progress
-              </button>
-            )
-          }
-          {/* {
-            account && gameStatus?.status === "IN_PROGRESS" && hasBet && !hasCashOut && (
+          {!account && (
+            <button
+              className="border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 cursor-not-allowed w-full"
+              disabled
+            >
+              Log in to play
+            </button>
+          )}
+          {account && gameStatus?.status === "COUNTDOWN" && (
+            <button
+              className={cn(
+                "border border-green-700 px-6 py-1 border-yellow-700 text-yellow-500 bg-neutral-950 w-full",
+                hasBet
+                  ? "bg-[#264234]/40 cursor-not-allowed border-green-700 text-green-500"
+                  : "bg-[#404226]/40 active:scale-95 active:opacity-80 transition-transform"
+              )}
+              onClick={onSetBet}
+              disabled={!(parseFloat(betAmount) > 0) || hasBet}
+            >
+              {hasBet
+                ? "Bet placed"
+                : parseFloat(betAmount) > 0
+                  ? "Place bet"
+                  : "Enter bet amount"}
+            </button>
+          )}
+          {account &&
+            gameStatus?.status === "IN_PROGRESS" &&
+            hasBet &&
+            !hasCashOut && (
               <button
                 className="border border-green-700 px-6 py-1 text-green-500 bg-neutral-950 w-full hover:bg-[#404226]/40 hover:cursor-pointer bg-[#404226]/40 border-yellow-700 text-yellow-500 active:scale-95 active:opacity-80 transition-transform"
                 onClick={onCashOut}
               >
                 Cash out
               </button>
-            )
-          }
-          {
-            account && gameStatus?.status === "IN_PROGRESS" && (!hasBet || hasCashOut) && (
-              <button
-                className="border px-6 py-1 border-yellow-700 text-yellow-500 bg-neutral-950 cursor-not-allowed w-full"
-                disabled
-              >
-                {hasCashOut ? "Cashed out" : "Game in progress"}
-              </button>
-            )
-          } */}
+            )}
+          {account && gameStatus?.status === "IN_PROGRESS" && hasCashOut && (
+            <button
+              className="border px-6 py-1 border-neutral-700 text-green-500 bg-neutral-950 cursor-not-allowed w-full"
+              disabled
+            >
+              cashed out
+            </button>
+          )}
+          {account && gameStatus?.status === "IN_PROGRESS" && !hasBet && (
+            <button
+              className="border px-6 py-1 border-yellow-700 text-yellow-500 bg-neutral-950 cursor-not-allowed w-full"
+              disabled
+            >
+              Game in progress
+            </button>
+          )}
         </div>
       </div>
 
@@ -384,8 +358,8 @@ export default function ControlCenter() {
                     <div
                       key={amount}
                       className={`text-center border px-2 py-1 cursor-pointer grow ${parseFloat(autoCashoutAmount) === amount
-                        ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
-                        : "opacity-50 border-neutral-700"
+                          ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
+                          : "opacity-50 border-neutral-700"
                         }`}
                       onClick={() => {
                         setAutoCashout(false);

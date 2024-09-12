@@ -14,62 +14,34 @@ export type PlayerState = {
   username: string;
   betAmount: number;
   coinType: string;
-  cashOutMultiplier: number | null;
+  cashOutMultiplier: number; //not done with this line number||null
 };
 
 export default function PlayerList() {
-  console.log("PlayerList component rendered");
-  const {
-    gameStatus,
-    latestAction,
-    playerList: globalPlayerList,
-    setPlayerList,
-  } = useContext(gameStatusContext);
-
-  const [localPlayerList, setLocalPlayerList] = useState(globalPlayerList);
-
-  console.log("PlayerList render - Current localPlayerList:", localPlayerList);
-
-  useEffect(() => {
-    console.log('PlayerList useEffect - Updating localPlayerList:', globalPlayerList);
-    setLocalPlayerList(globalPlayerList);
-  }, [globalPlayerList]);
+  const { gameStatus, latestAction } = useContext(gameStatusContext);
+  const [players, setPlayers] = useState<PlayerState[]>([]);
 
 
   useEffect(() => {
-    console.log("PlayerList useEffect called, latestAction:", latestAction);
-
     const fetchPlayers = async () => {
-      console.log("Fetching players");
       const fetchedPlayers = await getPlayerList();
-      console.log("Fetched players:", fetchedPlayers);
-      setPlayerList(fetchedPlayers);
-      setLocalPlayerList(fetchedPlayers);
+      setPlayers(fetchedPlayers);
+      console.log(fetchedPlayers);
     };
 
     fetchPlayers();
 
 
     const handleCashOut = (data: CashOutData) => {
-      console.log("PlayerList received cash out event:", data);
-      setPlayerList(prevPlayers => {
-        const updatedPlayers = prevPlayers.map(player =>
+      console.log("Cash out data:", data);
+
+      setPlayers((prevPlayers) =>
+        prevPlayers.map((player) =>
           player.username === data.playerEmail
             ? { ...player, cashOutMultiplier: data.cashOutMultiplier }
             : player
-        );
-        console.log("Updated player list:", updatedPlayers);
-        return updatedPlayers;
-      });
-      setLocalPlayerList(prevPlayers => {
-        const updatedPlayers = prevPlayers.map(player =>
-          player.username === data.playerEmail
-            ? { ...player, cashOutMultiplier: data.cashOutMultiplier }
-            : player
-        );
-        console.log("Updated local player list:", updatedPlayers);
-        return updatedPlayers;
-      });
+        )
+      );
     };
 
 
@@ -77,10 +49,9 @@ export default function PlayerList() {
     console.log("socket.on CASH_OUT_CONFIRMED", SOCKET_EVENTS.CASH_OUT_CONFIRMED)
 
     return () => {
-      console.log("PlayerList useEffect cleanup");
       socket.off(SOCKET_EVENTS.CASH_OUT_CONFIRMED, handleCashOut);
     };
-  }, [latestAction, setPlayerList]);
+  }, [latestAction]);
 
 
 
@@ -100,9 +71,10 @@ export default function PlayerList() {
           </tr>
         </thead>
         <tbody>
-          {localPlayerList
+          {players
             .sort((a, b) => {
               if (gameStatus?.status == "COUNTDOWN") {
+                console.log(players);
                 return b.betAmount - a.betAmount;
               } else {
                 if (a.cashOutMultiplier && b.cashOutMultiplier) {
@@ -118,7 +90,7 @@ export default function PlayerList() {
             })
             .map((player, index) => (
               <tr key={index} className="text-white text-sm  h-8">
-                {gameStatus?.status == "END" ? ( // IF the game has ended
+                {gameStatus?.status == "IN_PROGRESS" ? ( // IF the game has ended
                   player.cashOutMultiplier ? (
                     <td className="w-[200px] text-left ps-4 text-green-500 bg-[#264234]/40 border-b border-neutral-800">
                       {player.username}
@@ -137,7 +109,7 @@ export default function PlayerList() {
                     {player.username}
                   </td>
                 )}
-                {gameStatus?.status == "END" ? (
+                {gameStatus?.status == "IN_PROGRESS" ? (
                   player.cashOutMultiplier ? (
                     <td
                       className={cn(
@@ -164,7 +136,7 @@ export default function PlayerList() {
                     --
                   </td>
                 )}
-                {gameStatus?.status == "END" ? ( // IF the game has ended
+                {gameStatus?.status == "IN_PROGRESS" ? ( // IF the game has ended
                   player.cashOutMultiplier ? (
                     <td className="w-[100px] text-right pr-4  text-green-500 bg-[#264234]/40 border-b border-neutral-800">
                       +
