@@ -44,28 +44,43 @@ function getAdminAccount() {
 }
 
 export async function handleCashOut(playerAddress: string, cashOutAmount: number) {
+  console.log(`Attempting cash out for player: ${playerAddress}, amount: ${cashOutAmount}`);
   const adminAccount = getAdminAccount();
 
-  const transaction = await provider.generateTransaction(
-    adminAccount.address(),
-    {
-      function: `${MODULE_ADDRESS}::crash::cash_out`,
-      type_arguments: [],
-      arguments: [playerAddress, cashOutAmount],
-    },
-    TRANSACTION_OPTIONS
-  );
+  try {
+    const formattedAddress = playerAddress.startsWith('0x') ? playerAddress : `0x${playerAddress}`;
 
-  const signedTx = await provider.signTransaction(adminAccount, transaction);
-  const pendingTx = await provider.submitTransaction(signedTx);
+    const transaction = await provider.generateTransaction(
+      adminAccount.address(),
+      {
+        function: `${MODULE_ADDRESS}::crash::cash_out`,
+        type_arguments: [],
+        arguments: [formattedAddress, cashOutAmount],
+      },
+      TRANSACTION_OPTIONS
+    );
 
-  const txResult = await client.waitForTransactionWithResult(pendingTx.hash);
+    console.log('Generated transaction:', JSON.stringify(transaction, null, 2));
 
-  if ((txResult as any).success === false) {
+    const signedTx = await provider.signTransaction(adminAccount, transaction);
+    const pendingTx = await provider.submitTransaction(signedTx);
+
+    console.log('Submitted transaction, hash:', pendingTx.hash);
+
+    const txResult = await client.waitForTransactionWithResult(pendingTx.hash);
+
+    console.log('Transaction result:', JSON.stringify(txResult, null, 2));
+
+    if ((txResult as any).success === false) {
+      console.error('Transaction failed:', (txResult as any).vm_status);
+      return null;
+    }
+
+    return { txnHash: txResult.hash };
+  } catch (error) {
+    console.error('Error in handleCashOut:', error);
     return null;
   }
-
-  return { txnHash: txResult.hash };
 }
 
 export async function createNewGame(house_secret: string, salt: string): Promise<{ txnHash: string, startTime: number, randomNumber: string } | null> {

@@ -51,7 +51,7 @@ export default function PlayerList() {
     return () => {
       socket.off(SOCKET_EVENTS.CASH_OUT_CONFIRMED, handleCashOut);
     };
-  }, [latestAction]);
+  }, []);
 
 
 

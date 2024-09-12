@@ -78,8 +78,10 @@ io.on("connection", (socket) => {
   });
 
   socket.on(SOCKET_EVENTS.CASH_OUT, async (data) => {
+    console.log('Cash-out process started for:', data);
     try {
       console.log('Received cash-out request:', data);
+      console.log('Calling handleCashOut with:', data.playerAddress, data.cashOutAmount);
       const result = await handleCashOut(data.playerAddress, data.cashOutAmount);
       console.log('handleCashOut result:', result);
       if (result) {
@@ -88,18 +90,28 @@ io.on("connection", (socket) => {
           cashOutMultiplier: data.cashOutAmount / 100,
           roundId: data.roundId,
         };
-        await addCashOutToPlayerList(cashOutData);
-        console.log('Emitting CASH_OUT_CONFIRMED:', cashOutData);
-        io.emit(SOCKET_EVENTS.CASH_OUT_CONFIRMED, cashOutData);
-        socket.emit(SOCKET_EVENTS.CASH_OUT_RESULT, { success: true });
+        console.log('Attempting to add cash-out to player list:', cashOutData);
+        const updateSuccess = await addCashOutToPlayerList(cashOutData);
+        if (updateSuccess) {
+          console.log('Successfully added cash-out to player list');
+          console.log('Emitting CASH_OUT_CONFIRMED:', cashOutData);
+          io.emit(SOCKET_EVENTS.CASH_OUT_CONFIRMED, cashOutData);
+        } else {
+          console.error('Failed to update player list');
+          socket.emit(SOCKET_EVENTS.CASH_OUT_RESULT, { success: false, error: 'Failed to update player list' });
+        }
       } else {
         console.error('Cash out failed, result:', result);
         socket.emit(SOCKET_EVENTS.CASH_OUT_RESULT, { success: false, error: 'Cash out failed' });
       }
     } catch (error) {
       console.error('Error in cash out:', error);
+      if (error instanceof Error) {
+        console.error('Error stack:', error.stack);
+      }
       socket.emit(SOCKET_EVENTS.CASH_OUT_RESULT, { success: false, error: 'Internal server error' });
     }
+    console.log('Cash-out process completed');
   });
 
   socket.on(SOCKET_EVENTS.START_ROUND, async () => {
