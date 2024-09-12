@@ -103,7 +103,7 @@ export default function ControlCenter() {
       });
 
       const blockchainRes = await cashOut(account.private_key, {
-        roundId: parseInt(gameStatus.roundId),
+        roundId: gameStatus.roundId,
         playerEmail: account.email,
         cashOutMultiplier: cashoutMultiplier,
       });
@@ -115,7 +115,7 @@ export default function ControlCenter() {
       }
 
       await cashOutBet({
-        roundId: parseInt(gameStatus.roundId),
+        roundId: gameStatus.roundId,
         playerEmail: account.email,
         cashOutMultiplier: cashoutMultiplier,
       });
@@ -198,7 +198,7 @@ export default function ControlCenter() {
 
     try {
       const blockchainRes = await placeBet(account.private_key, {
-        roundId: parseInt(gameStatus.roundId),
+        roundId: gameStatus.roundId,
         playerEmail: account.email,
         betAmount: parseFloat(betAmount),
         coinType: "CASH",
@@ -209,7 +209,7 @@ export default function ControlCenter() {
       }
 
       await setNewBet({
-        roundId: parseInt(gameStatus.roundId),
+        roundId: gameStatus.roundId,
         playerEmail: account.email,
         betAmount: parseFloat(betAmount),
         coinType: "CASH",
