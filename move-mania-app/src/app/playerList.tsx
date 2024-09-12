@@ -1,159 +1,223 @@
-"use client";
+'use client';
 
-import { getCurrentGame, getPlayerList } from "@/lib/api";
-import { BetData, CashOutData, RoundStart, SOCKET_EVENTS } from "@/lib/types";
-import { useContext, useEffect, useState } from "react";
-import { Socket, io } from "socket.io-client";
+import { User } from "@/lib/schema";
 import { GameStatus } from "./controlCenter";
-import { cn } from "@/lib/utils";
-
+import { ReactNode, createContext, useEffect, useState, useCallback } from "react";
 import { socket } from "@/lib/socket";
-import { gameStatusContext } from "./CrashProvider";
+import { getSession } from "next-auth/react";
+import { getCurrentGame, getUser, setUpAndGetUser } from "@/lib/api";
+import { SOCKET_EVENTS } from "@/lib/types";
+import { EXPONENTIAL_FACTOR, log } from "@/lib/utils";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog"
 
-export type PlayerState = {
-  username: string;
-  betAmount: number;
-  coinType: string;
-  cashOutMultiplier: number | null; //not done with this line number||null
-};
+interface CrashPageProps {
+  gameStatus: GameStatus | null;
+  account: User | null;
+  latestAction: number | null;
+}
 
-export default function PlayerList() {
-  const { gameStatus, latestAction } = useContext(gameStatusContext);
-  const [players, setPlayers] = useState<PlayerState[]>([]);
+export const gameStatusContext = createContext<CrashPageProps>({
+  gameStatus: null,
+  account: null,
+  latestAction: null,
+});
+
+export default function CrashProvider({ children }: { children: ReactNode }) {
+  const [isConnected, setIsConnected] = useState(socket.connected);
+  const [gameStatus, setGameStatus] = useState<GameStatus | null>(null);
+  const [account, setAccount] = useState<User | null>(null);
+  const [latestAction, setLatestAction] = useState<number | null>(null);
+  const [showPWAInstall, setShowPWAInstall] = useState(false);
+
+  const onConnect = useCallback(() => {
+    setIsConnected(true);
+  }, []);
+
+  const onDisconnect = useCallback(() => {
+    setIsConnected(false);
+  }, []);
+
+  const onRoundStart = useCallback((data: any) => {
+    setGameStatus({
+      status: "COUNTDOWN",
+      roundId: data.gameId,
+      startTime: data.startTime,
+      crashPoint: data.crashPoint,
+    });
+    setLatestAction(Date.now());
+  }, []);
+
+  const onRoundResult = useCallback((data: any) => {
+    if (data && data.roundId && data.crashPoint) {
+      setGameStatus({
+        status: "END",
+        roundId: data.gameId,
+        startTime: data.startTime,
+        crashPoint: data.crashPoint,
+      });
+      setLatestAction(Date.now());
+    } else {
+      console.error("Invalid data received in onRoundResult:", data);
+    }
+  }, [gameStatus]);
+
+  const onBetConfirmed = useCallback(() => {
+    setLatestAction(Date.now());
+  }, []);
+
+  const onCashOutConfirmed = useCallback(() => {
+    setLatestAction(Date.now());
+  }, []);
 
   useEffect(() => {
-    const fetchPlayers = async () => {
-      const fetchedPlayers = await getPlayerList();
-      setPlayers(fetchedPlayers);
-      console.log(players);
-    };
+    console.log("CrashProvider updating game status:", gameStatus);
+    getSession().then((session) => {
+      if (session && session.user && session.user.email) {
+        setUpAndGetUser({
+          email: session.user.email,
+          username: session.user.name || "",
+          image: session.user.image || "",
+          referred_by: null,
+        }).then((user) => {
+          if (user) {
+            setAccount(user);
+          }
+        });
+      }
+    });
 
-    fetchPlayers();
-
-    const handleCashOut = (data: CashOutData) => {
-      console.log("Cash out data:", data);
-
-      setPlayers((prevPlayers: any[]) =>
-        prevPlayers.map((player: { username: string; }) =>
-          player.username === data.playerEmail
-            ? { ...player, cashOutMultiplier: data.cashOutMultiplier }
-            : player
-        )
-      );
-    };
-
-    socket.on(SOCKET_EVENTS.CASH_OUT_CONFIRMED, handleCashOut);
+    socket.on('connect', onConnect);
+    socket.on('disconnect', onDisconnect);
+    socket.on(SOCKET_EVENTS.ROUND_START, onRoundStart);
+    socket.on(SOCKET_EVENTS.BET_CONFIRMED, onBetConfirmed);
+    socket.on(SOCKET_EVENTS.CASH_OUT_CONFIRMED, onCashOutConfirmed);
+    socket.on(SOCKET_EVENTS.ROUND_RESULT, onRoundResult);
 
     return () => {
-      socket.off(SOCKET_EVENTS.CASH_OUT_CONFIRMED, handleCashOut);
+      socket.off('connect', onConnect);
+      socket.off('disconnect', onDisconnect);
+      socket.off(SOCKET_EVENTS.ROUND_START, onRoundStart);
+      socket.off(SOCKET_EVENTS.BET_CONFIRMED, onBetConfirmed);
+      socket.off(SOCKET_EVENTS.CASH_OUT_CONFIRMED, onCashOutConfirmed);
+      socket.off(SOCKET_EVENTS.ROUND_RESULT, onRoundResult);
     };
-  }, [latestAction]);
+  }, [onConnect, onDisconnect, onRoundStart, onBetConfirmed, onCashOutConfirmed, onRoundResult]);
+
+  useEffect(() => {
+    console.log("CrashProvider updating game status:", gameStatus);
+    if (account && latestAction) {
+      const timeoutId = setTimeout(() => {
+        getUser(account.email).then((updatedUser) => {
+          if (updatedUser) {
+            setAccount(updatedUser);
+          }
+        });
+      }, 1000); // Delay API call by 1 second
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [latestAction, account]);
+
+  useEffect(() => {
+    console.log("CrashProvider updating game status:", gameStatus);
+    const fetchGameStatus = async () => {
+      try {
+        const game = await getCurrentGame();
+        if (game == null) {
+          setGameStatus(null);
+        } else {
+          const now = Date.now();
+          const gameEndTime = game.start_time + (game.secret_crash_point == 0 ? 0 : log(EXPONENTIAL_FACTOR, game.secret_crash_point)) * 1000;
+
+          if (game.start_time > now) {
+            setGameStatus({
+              status: "COUNTDOWN",
+              roundId: game.game_id,
+              startTime: game.start_time,
+              crashPoint: game.secret_crash_point,
+            });
+          } else if (now < gameEndTime) {
+            setGameStatus({
+              status: "IN_PROGRESS",
+              roundId: game.game_id,
+              startTime: game.start_time,
+              crashPoint: game.secret_crash_point,
+            });
+          } else {
+            setGameStatus({
+              status: "END",
+              roundId: game.game_id,
+              startTime: game.start_time,
+              crashPoint: game.secret_crash_point,
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching game status:", error);
+      }
+    };
+
+    fetchGameStatus();
+    const intervalId = setInterval(fetchGameStatus, 1000);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
+  function isInStandaloneMode() {
+    return Boolean(
+      (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)
+      || (window.navigator as any).standalone, // Fallback for iOS
+    );
+  }
+
+  useEffect(() => {
+    if (isInStandaloneMode()) {
+      console.log('This is running as standalone.');
+    } else {
+      console.log('This is not running as standalone.');
+      setShowPWAInstall(true);
+    }
+  }, []);
+
 
   return (
-    <div className="border border-neutral-700 h-full flex flex-col items-left gap-2 w-full min-h-[200px] max-h-[700px]">
-      <span className="font-semibold text-lg pt-1 ps-4">Live Bets</span>
-      <table className="w-full scroll">
-        <thead className="">
-          <tr className="border-b border-neutral-800 text-neutral-400">
-            <th className="w-[200px] text-left ps-4">Username</th>
-            <th className="w-[100px] text-center">
-              Multiplier <span className="text-neutral-500  text-xs">x</span>
-            </th>
-            <th className="w-[100px] text-right pr-4">
-              Bet <span className="text-neutral-500  text-xs">cash</span>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {players
-            .sort((a: { betAmount: number; cashOutMultiplier: number; }, b: { betAmount: number; cashOutMultiplier: number; }) => {
-              if (gameStatus?.status == "COUNTDOWN") {
-                console.log(players);
-                return b.betAmount - a.betAmount;
-              } else {
-                if (a.cashOutMultiplier && b.cashOutMultiplier) {
-                  return b.cashOutMultiplier - a.cashOutMultiplier;
-                } else if (a.cashOutMultiplier) {
-                  return 1;
-                } else if (b.cashOutMultiplier) {
-                  return -1;
-                } else {
-                  return b.betAmount - a.betAmount;
-                }
-              }
-            })
-            .map((player: { cashOutMultiplier: number; username: any; betAmount: number; }, index: any) => (
-              <tr key={index} className="text-white text-sm  h-8">
-                {gameStatus?.status == "IN_PROGRESS" ? ( // IF the game has ended
-                  player.cashOutMultiplier ? (
-                    <td className="w-[200px] text-left ps-4 text-green-500 bg-[#264234]/40 border-b border-neutral-800">
-                      {player.username}
-                    </td>
-                  ) : (
-                    <td className="w-[200px] text-left ps-4 text-red-500 bg-[#3F221E]/40 border-b border-neutral-800">
-                      {player.username}
-                    </td>
-                  )
-                ) : player.cashOutMultiplier ? (
-                  <td className="w-[200px] text-left ps-4 text-green-500 bg-[#264234]/40 border-b border-neutral-800">
-                    {player.username}
-                  </td>
-                ) : (
-                  <td className="w-[200px] text-left ps-4 bg-neutral-800/40 bg-[#264234]/40 border-b border-neutral-800">
-                    {player.username}
-                  </td>
-                )}
-                {gameStatus?.status == "IN_PROGRESS" ? (
-                  player.cashOutMultiplier ? (
-                    <td
-                      className={cn(
-                        "w-[100px] text-center text-green-500 bg-[#264234]/40 border-b border-neutral-800"
-                      )}
-                    >
-                      {player.cashOutMultiplier.toFixed(2)}
-                    </td>
-                  ) : (
-                    <td className="w-[100px] text-center text-red-500 bg-[#3F221E]/40 border-b border-neutral-800">
-                      0.00
-                    </td>
-                  )
-                ) : player.cashOutMultiplier ? (
-                  <td
-                    className={cn(
-                      "w-[100px] text-center text-green-500 bg-[#264234]/40 border-b border-neutral-800"
-                    )}
-                  >
-                    {player.cashOutMultiplier.toFixed(2)}
-                  </td>
-                ) : (
-                  <td className="w-[100px] text-center bg-neutral-800/40 bg-[#264234]/40 border-b border-neutral-800">
-                    --
-                  </td>
-                )}
-                {gameStatus?.status == "IN_PROGRESS" ? ( // IF the game has ended
-                  player.cashOutMultiplier ? (
-                    <td className="w-[100px] text-right pr-4  text-green-500 bg-[#264234]/40 border-b border-neutral-800">
-                      +
-                      {(player.betAmount * player.cashOutMultiplier).toFixed(2)}
-                    </td>
-                  ) : (
-                    <td className="w-[100px] text-right pr-4  text-red-500 bg-[#3F221E]/40 border-b border-neutral-800">
-                      -{player.betAmount.toFixed(2)}
-                    </td>
-                  )
-                ) : player.cashOutMultiplier ? (
-                  <td className="w-[100px] text-right pr-4  text-green-500 bg-[#264234]/40 border-b border-neutral-800">
-                    +{(player.betAmount * player.cashOutMultiplier).toFixed(2)}
-                  </td>
-                ) : (
-                  <td className="w-[100px] text-right pr-4  bg-neutral-800/40 bg-[#264234]/40 border-b border-neutral-800">
-                    -{player.betAmount.toFixed(2)}
-                  </td>
-                )}
-              </tr>
-            ))}
-        </tbody>
-      </table>
-    </div>
+    <gameStatusContext.Provider
+      value={{
+        gameStatus,
+        account,
+        latestAction,
+      }}
+    >
+      {children}
+      <AlertDialog open={showPWAInstall && localStorage.getItem("pwaPrompt") != 'true'}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Add to Phone Home Screen</AlertDialogTitle>
+            <AlertDialogDescription>
+              For the best experience, add this app to your home screen. <br /><br />
+              In your browser&apos;s menu, tap the <b>share</b> icon and choose <b>Add to Home Screen</b> in the options.
+              Then open the zion.bet app on your home screen to play.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              onClick={() => {
+                setShowPWAInstall(false);
+                localStorage.setItem("pwaPrompt", 'true');
+              }}
+              className="border border-red-700 px-6 py-1 text-red-500 bg-neutral-950 w-full focus:outline-none"
+            >I&apos;ll stay in my browser</AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </gameStatusContext.Provider>
   );
 }
