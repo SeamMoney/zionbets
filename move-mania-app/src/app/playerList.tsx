@@ -42,10 +42,10 @@ export default function PlayerList() {
       );
     };
 
-    socket.on(SOCKET_EVENTS.CASH_OUT, handleCashOut);
+    socket.on(SOCKET_EVENTS.CASH_OUT_CONFIRMED, handleCashOut);
 
     return () => {
-      socket.off(SOCKET_EVENTS.CASH_OUT, handleCashOut);
+      socket.off(SOCKET_EVENTS.CASH_OUT_CONFIRMED, handleCashOut);
     };
   }, [latestAction]);
 
