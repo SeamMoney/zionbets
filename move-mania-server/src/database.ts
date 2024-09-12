@@ -384,6 +384,7 @@ export async function addCashOutToPlayerList(cashOut: CashOutData) {
   });
 
   try {
+    console.log('Updating player list with cash out:', cashOut);
     const result = await db.run(
       "UPDATE player_list SET crash_point = ? WHERE user_id = ?",
       cashOut.cashOutMultiplier,
@@ -391,11 +392,23 @@ export async function addCashOutToPlayerList(cashOut: CashOutData) {
     );
     console.log("Cash out update result:", result);
 
+    if (result.changes === 0) {
+      console.error('No rows updated. Player not found or crash_point already set.');
+      return false;
+    }
+
     const updatedPlayer = await db.get(
       "SELECT * FROM player_list WHERE user_id = ?",
       cashOut.playerEmail
     );
     console.log("Updated player data:", updatedPlayer);
+
+    if (!updatedPlayer) {
+      console.error('Failed to retrieve updated player data');
+      return false;
+    }
+    return true;
+
   } catch (error) {
     console.error("Error updating player list with cash out:", error);
   } finally {

@@ -114,11 +114,12 @@ export default function ControlCenter() {
         throw new Error("Error cashing out on blockchain");
       }
 
-      await cashOutBet({
+      const response = await cashOutBet({
         roundId: parseInt(gameStatus.roundId),
         playerEmail: account.email,
         cashOutMultiplier: cashoutMultiplier,
       });
+      console.log('Cash out response:', response);
 
       setHasCashOut(true);
 

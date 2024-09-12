@@ -67,6 +67,11 @@ const getDateNow = async () => {
 }
 
 io.on("connection", (socket) => {
+  console.log("New client connected");
+
+  socket.onAny((eventName, ...args) => {
+    console.log(`Received event: ${eventName}`, args);
+  });
   socket.on(SOCKET_EVENTS.SET_BET, async (betData) => {
     await addBetToPlayerList(betData);
     io.emit(SOCKET_EVENTS.BET_CONFIRMED, betData);
@@ -74,18 +79,21 @@ io.on("connection", (socket) => {
 
   socket.on(SOCKET_EVENTS.CASH_OUT, async (data) => {
     try {
+      console.log('Received cash-out request:', data);
       const result = await handleCashOut(data.playerAddress, data.cashOutAmount);
+      console.log('handleCashOut result:', result);
       if (result) {
         const cashOutData = {
           playerEmail: data.playerAddress,
           cashOutMultiplier: data.cashOutAmount / 100,
-          roundId: 1
+          roundId: data.roundId,
         };
         await addCashOutToPlayerList(cashOutData);
-        console.log("Cash out result", result);
-        socket.emit(SOCKET_EVENTS.CASH_OUT_RESULT, { success: true, txnHash: result.txnHash });
+        console.log('Emitting CASH_OUT_CONFIRMED:', cashOutData);
         io.emit(SOCKET_EVENTS.CASH_OUT_CONFIRMED, cashOutData);
+        socket.emit(SOCKET_EVENTS.CASH_OUT_RESULT, { success: true });
       } else {
+        console.error('Cash out failed, result:', result);
         socket.emit(SOCKET_EVENTS.CASH_OUT_RESULT, { success: false, error: 'Cash out failed' });
       }
     } catch (error) {

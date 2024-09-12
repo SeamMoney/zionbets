@@ -31,8 +31,10 @@ export default function PlayerList() {
   console.log("PlayerList render - Current localPlayerList:", localPlayerList);
 
   useEffect(() => {
+    console.log('PlayerList useEffect - Updating localPlayerList:', globalPlayerList);
     setLocalPlayerList(globalPlayerList);
   }, [globalPlayerList]);
+
 
   useEffect(() => {
     console.log("PlayerList useEffect called, latestAction:", latestAction);
@@ -47,6 +49,7 @@ export default function PlayerList() {
 
     fetchPlayers();
 
+
     const handleCashOut = (data: CashOutData) => {
       console.log("PlayerList received cash out event:", data);
       setPlayerList(prevPlayers => {
@@ -58,15 +61,28 @@ export default function PlayerList() {
         console.log("Updated player list:", updatedPlayers);
         return updatedPlayers;
       });
+      setLocalPlayerList(prevPlayers => {
+        const updatedPlayers = prevPlayers.map(player =>
+          player.username === data.playerEmail
+            ? { ...player, cashOutMultiplier: data.cashOutMultiplier }
+            : player
+        );
+        console.log("Updated local player list:", updatedPlayers);
+        return updatedPlayers;
+      });
     };
 
+
     socket.on(SOCKET_EVENTS.CASH_OUT_CONFIRMED, handleCashOut);
+    console.log("socket.on CASH_OUT_CONFIRMED", SOCKET_EVENTS.CASH_OUT_CONFIRMED)
 
     return () => {
       console.log("PlayerList useEffect cleanup");
       socket.off(SOCKET_EVENTS.CASH_OUT_CONFIRMED, handleCashOut);
     };
   }, [latestAction, setPlayerList]);
+
+
 
   return (
     <div className="border border-neutral-700 h-full flex flex-col items-left gap-2 w-full min-h-[200px] max-h-[700px]">
