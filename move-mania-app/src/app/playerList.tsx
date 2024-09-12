@@ -25,7 +25,7 @@ export default function PlayerList() {
     const fetchPlayers = async () => {
       const fetchedPlayers = await getPlayerList();
       setPlayers(fetchedPlayers);
-      console.log(players);
+      console.log(fetchedPlayers);
     };
 
     fetchPlayers();
