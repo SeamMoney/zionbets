@@ -44,6 +44,9 @@ function getAdminAccount() {
 }
 
 export async function handleCashOut(playerAddress: string, cashOutAmount: number) {
+  console.log("playerAddress", playerAddress);
+  console.log("cashOutAmount", cashOutAmount);
+  console.log("HANDLE CASH OUT FUNCTION CALL");
   console.log(`Attempting cash out for player: ${playerAddress}, amount: ${cashOutAmount}`);
   const adminAccount = getAdminAccount();
 
