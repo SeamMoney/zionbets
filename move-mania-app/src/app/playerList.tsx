@@ -8,13 +8,14 @@ import { GameStatus } from "./controlCenter";
 import { cn } from "@/lib/utils";
 
 import { socket } from "@/lib/socket";
+import { getCashoutMultiplier } from "@/lib/cashOutStore";
 import { gameStatusContext } from "./CrashProvider";
 
 export type PlayerState = {
   username: string;
   betAmount: number;
   coinType: string;
-  cashOutMultiplier: any; //not done with this line number||null
+  cashOutMultiplier: any;
 };
 
 export default function PlayerList() {
@@ -27,14 +28,43 @@ export default function PlayerList() {
       setPlayers(fetchedPlayers);
       console.log(fetchedPlayers);
     };
-
     fetchPlayers();
+
+    let cashOutMultiplier: any;
+    // -----------------------------------------------------
+
+    const checkCashoutMultiplier = (callback: (multiplier: number) => void) => {
+      const intervalId = setInterval(() => {
+        const multiplier = getCashoutMultiplier();
+
+        if (multiplier !== null) {
+          console.log("Cashout multiplier is available:", multiplier);
+          cashOutMultiplier = multiplier;
+          callback(multiplier);
+
+
+          clearInterval(intervalId);
+        }
+      }, 1000);
+    };
+
+    const onMultiplierAvailable = (multiplier: number) => {
+      console.log(`Multiplier is now available: ${multiplier}`);
+
+      handleCashOut;
+  
+    };
+
+
+    checkCashoutMultiplier(onMultiplierAvailable);
+
+    // ------------------------------------
 
     const handleCashOut = (data: CashOutData) => {
       setPlayers((prevPlayers) =>
         prevPlayers.map((player) =>
           player.username === data.playerEmail
-            ? { ...player, cashOutMultiplier: data.cashOutMultiplier }
+            ? { ...player, cashOutMultiplier: cashOutMultiplier }
             : player
         )
       );
@@ -82,7 +112,7 @@ export default function PlayerList() {
             })
             .map((player, index) => (
               <tr key={index} className="text-white text-sm  h-8">
-                {gameStatus?.status == "IN_PROGRESS" ? ( // IF the game has ended
+                {gameStatus?.status == "END" ? ( // IF the game has ended
                   player.cashOutMultiplier ? (
                     <td className="w-[200px] text-left ps-4 text-green-500 bg-[#264234]/40 border-b border-neutral-800">
                       {player.username}
@@ -101,7 +131,7 @@ export default function PlayerList() {
                     {player.username}
                   </td>
                 )}
-                {gameStatus?.status == "IN_PROGRESS" ? (
+                {gameStatus?.status == "END" ? (
                   player.cashOutMultiplier ? (
                     <td
                       className={cn(
@@ -128,7 +158,7 @@ export default function PlayerList() {
                     --
                   </td>
                 )}
-                {gameStatus?.status == "IN_PROGRESS" ? ( // IF the game has ended
+                {gameStatus?.status == "END" ? ( // IF the game has ended
                   player.cashOutMultiplier ? (
                     <td className="w-[100px] text-right pr-4  text-green-500 bg-[#264234]/40 border-b border-neutral-800">
                       +

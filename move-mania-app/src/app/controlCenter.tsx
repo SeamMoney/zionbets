@@ -27,6 +27,7 @@ import { socket } from "@/lib/socket";
 import { gameStatusContext } from "./CrashProvider";
 import { cashOut, placeBet } from "@/lib/aptos";
 import { useToast } from "@/components/ui/use-toast";
+import { setCashoutMultiplier } from "@/lib/cashOutStore";
 import Link from "next/link";
 
 export type GameStatus = {
@@ -84,6 +85,8 @@ export default function ControlCenter() {
       ).toFixed(2)
     );
 
+    setCashoutMultiplier(cashoutMultiplier);
+
     toast({
       title: `Attempting to cash out at ${cashoutMultiplier}x...`,
     });
@@ -110,13 +113,11 @@ export default function ControlCenter() {
 
       setHasCashOut(true);
 
-      const response = await cashOutBet({
+      await cashOutBet({
         roundId: gameStatus.roundId,
         playerEmail: account.email,
         cashOutMultiplier: cashoutMultiplier,
       });
-
-      console.log("Cash out response:", response);
 
       toast({
         title: `Cashed out at ${cashoutMultiplier}x`,
@@ -262,10 +263,11 @@ export default function ControlCenter() {
             {[1, 5, 10, 25].map((amount) => (
               <div
                 key={amount}
-                className={`border px-2 py-1 cursor-pointer grow text-center ${parseFloat(betAmount) === amount
+                className={`border px-2 py-1 cursor-pointer grow text-center ${
+                  parseFloat(betAmount) === amount
                     ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
                     : "opacity-50 border-neutral-700"
-                  }`}
+                }`}
                 onClick={() => setBetAmount(amount.toString())}
               >
                 {amount} CASH
@@ -296,8 +298,8 @@ export default function ControlCenter() {
               {hasBet
                 ? "Bet placed"
                 : parseFloat(betAmount) > 0
-                  ? "Place bet"
-                  : "Enter bet amount"}
+                ? "Place bet"
+                : "Enter bet amount"}
             </button>
           )}
           {account &&
@@ -357,10 +359,11 @@ export default function ControlCenter() {
                   {[1.01, 1.5, 2, 5].map((amount) => (
                     <div
                       key={amount}
-                      className={`text-center border px-2 py-1 cursor-pointer grow ${parseFloat(autoCashoutAmount) === amount
+                      className={`text-center border px-2 py-1 cursor-pointer grow ${
+                        parseFloat(autoCashoutAmount) === amount
                           ? "border border-green-700 bg-[#264234]/60 bg-noise text-green-500"
                           : "opacity-50 border-neutral-700"
-                        }`}
+                      }`}
                       onClick={() => {
                         setAutoCashout(false);
                         setAutoCashoutAmount(amount.toString());
