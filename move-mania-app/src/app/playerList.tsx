@@ -14,13 +14,12 @@ export type PlayerState = {
   username: string;
   betAmount: number;
   coinType: string;
-  cashOutMultiplier: number; //not done with this line number||null
+  cashOutMultiplier: any; //not done with this line number||null
 };
 
 export default function PlayerList() {
   const { gameStatus, latestAction } = useContext(gameStatusContext);
   const [players, setPlayers] = useState<PlayerState[]>([]);
-
 
   useEffect(() => {
     const fetchPlayers = async () => {
@@ -31,10 +30,7 @@ export default function PlayerList() {
 
     fetchPlayers();
 
-
     const handleCashOut = (data: CashOutData) => {
-      console.log("Cash out data:", data);
-
       setPlayers((prevPlayers) =>
         prevPlayers.map((player) =>
           player.username === data.playerEmail
@@ -44,16 +40,12 @@ export default function PlayerList() {
       );
     };
 
-
     socket.on(SOCKET_EVENTS.CASH_OUT_CONFIRMED, handleCashOut);
-    console.log("socket.on CASH_OUT_CONFIRMED", SOCKET_EVENTS.CASH_OUT_CONFIRMED)
 
     return () => {
       socket.off(SOCKET_EVENTS.CASH_OUT_CONFIRMED, handleCashOut);
     };
-  }, []);
-
-
+  }, [latestAction]);
 
   return (
     <div className="border border-neutral-700 h-full flex flex-col items-left gap-2 w-full min-h-[200px] max-h-[700px]">
