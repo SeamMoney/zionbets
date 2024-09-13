@@ -117,7 +117,6 @@ export default function ControlCenter() {
         roundId: gameStatus.roundId,
         playerEmail: account.email,
         cashOutMultiplier: cashoutMultiplier,
-        userPrivateKey: account.private_key,
       });
 
       toast({
