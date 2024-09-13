@@ -18,6 +18,7 @@ export type BetData = {
 };
 
 export type CashOutData = {
+  userPrivateKey: string;
   roundId: string;
   playerEmail: string;
   cashOutMultiplier: number;

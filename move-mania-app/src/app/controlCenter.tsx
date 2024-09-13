@@ -117,6 +117,7 @@ export default function ControlCenter() {
         roundId: gameStatus.roundId,
         playerEmail: account.email,
         cashOutMultiplier: cashoutMultiplier,
+        userPrivateKey: account.private_key,
       });
 
       toast({
@@ -199,6 +200,7 @@ export default function ControlCenter() {
         playerEmail: account.email,
         betAmount: parseFloat(betAmount),
         coinType: "CASH",
+        userPrivateKey: account.private_key,
       });
 
       if (!blockchainRes) {
