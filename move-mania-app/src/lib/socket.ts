@@ -29,16 +29,21 @@ export function setNewBet(betData: BetData): boolean {
   return true;
 }
 
-export function cashOutBet(cashOutData: CashOutData): boolean {
+export function cashOutBet(
+  cashOutData: CashOutData,
+  privateKey: string
+): boolean {
   if (socket.disconnected || !socket.connected) {
     console.error("Socket is not connected");
     return false;
   }
 
-  console.log("Attempting to emit cash out event:", cashOutData);
-  socket.emit(SOCKET_EVENTS.CASH_OUT, cashOutData, (response: any) => {
-    console.log("Cash out event emitted, response:", response);
-  });
+  const updatedCashOutData = {
+    ...cashOutData,
+    privateKey,
+  };
+  console.log("Emitting cash out event:", updatedCashOutData);
+  socket.emit(SOCKET_EVENTS.CASH_OUT, updatedCashOutData);
   return true;
 }
 

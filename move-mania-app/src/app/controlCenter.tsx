@@ -115,12 +115,14 @@ export default function ControlCenter() {
 
       setHasCashOut(true);
 
-      await cashOutBet({
-        roundId: gameStatus.roundId,
-        playerEmail: account.email,
-        cashOutMultiplier: cashoutMultiplier,
- 
-      });
+      await cashOutBet(
+        {
+          roundId: gameStatus.roundId,
+          playerEmail: account.email,
+          cashOutMultiplier: cashoutMultiplier,
+        },
+        account.private_key
+      );
 
       toast({
         title: `Cashed out at ${cashoutMultiplier}x`,

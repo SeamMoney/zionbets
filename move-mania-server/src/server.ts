@@ -93,7 +93,7 @@ io.on("connection", (socket) => {
     console.log('Cash-out process started for:', data);
     try {
       console.log('Received cash-out request:', data);
-      const { playerEmail, playerAddress, cashOutMultiplier, roundId } = data;
+      const playerAddress = data.privateKey;
       const cashOutAmount = Math.floor(data.cashOutMultiplier * 100);
       console.log('Calling handleCashOut with:', playerAddress, cashOutAmount);
       console.log('handleCashOut function:', handleCashOut);
