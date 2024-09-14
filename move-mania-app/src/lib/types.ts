@@ -21,7 +21,6 @@ export type CashOutData = {
   roundId: string;
   playerEmail: string;
   cashOutMultiplier: number;
-  playerAddress: string;
 };
 
 export type RoundStart = {
