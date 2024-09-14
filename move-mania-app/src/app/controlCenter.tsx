@@ -199,7 +199,6 @@ export default function ControlCenter() {
         playerEmail: account.email,
         betAmount: parseFloat(betAmount),
         coinType: "CASH",
-        userPrivateKey: account.private_key,
       });
 
       if (!blockchainRes) {
