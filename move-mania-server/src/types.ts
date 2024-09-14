@@ -22,6 +22,7 @@ export type CashOutData = {
   roundId: number;
   playerEmail: string;
   cashOutMultiplier: number;
+  playerAddress: string;
 };
 
 export type RoundResult = {
