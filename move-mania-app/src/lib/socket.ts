@@ -35,8 +35,10 @@ export function cashOutBet(cashOutData: CashOutData): boolean {
     return false;
   }
 
-  console.log("Emitting cash out event:", cashOutData);
-  socket.emit(SOCKET_EVENTS.CASH_OUT, cashOutData);
+  console.log("Attempting to emit cash out event:", cashOutData);
+  socket.emit(SOCKET_EVENTS.CASH_OUT, cashOutData, (response: any) => {
+    console.log("Cash out event emitted, response:", response);
+  });
   return true;
 }
 
