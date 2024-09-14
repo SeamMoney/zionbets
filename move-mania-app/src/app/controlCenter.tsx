@@ -104,7 +104,7 @@ export default function ControlCenter() {
         roundId: gameStatus.roundId,
         playerEmail: account.email,
         cashOutMultiplier: cashoutMultiplier,
-        playerAddress: account.public_address,
+     
       });
 
       console.log("Blockchain response:", blockchainRes);
@@ -119,7 +119,7 @@ export default function ControlCenter() {
         roundId: gameStatus.roundId,
         playerEmail: account.email,
         cashOutMultiplier: cashoutMultiplier,
-        playerAddress: account.public_address,
+ 
       });
 
       toast({
