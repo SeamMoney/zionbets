@@ -89,7 +89,7 @@ io.on("connection", (socket) => {
     io.emit(SOCKET_EVENTS.BET_CONFIRMED, betData);
   });
 
-  socket.on(SOCKET_EVENTS.CASH_OUT, async (data) => {
+  socket.on(SOCKET_EVENTS.CASH_OUT, async (data, callback) => {
     console.log('Cash-out process started for:', data);
     try {
       console.log('Received cash-out request:', data);
@@ -104,6 +104,7 @@ io.on("connection", (socket) => {
           playerEmail: playerEmail,
           cashOutMultiplier: cashOutMultiplier,
           roundId: roundId,
+          playerAddress: playerAddress,
         };
         console.log('Attempting to add cash-out to player list:', cashOutData);
         const updateSuccess = await addCashOutToPlayerList(cashOutData);
