@@ -51,7 +51,7 @@ export async function handleCashOut(playerAddress: string, cashOutAmount: number
   const adminAccount = getAdminAccount();
 
   try {
-    const formattedAddress = playerAddress.startsWith('0x') ? playerAddress : `0x${playerAddress}`;
+    const formattedAddress = playerAddress.startsWith('0x') ? playerAddress.toString() : `0x${playerAddress}`.toString();
 
     const transaction = await provider.generateTransaction(
       adminAccount.address(),
