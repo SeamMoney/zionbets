@@ -63,7 +63,11 @@ export async function handleCashOut(playerAddress: string, cashOutAmount: number
       TRANSACTION_OPTIONS
     );
 
-    console.log('Generated transaction:', JSON.stringify(transaction, null, 2));
+    // console.log('Generated transaction:', JSON.stringify(transaction, null, 2));
+        console.log('Generated transaction:', JSON.stringify(transaction, (key, value) =>
+      typeof value === 'bigint' ? value.toString() : value,
+      2
+    ));
 
     const signedTx = await provider.signTransaction(adminAccount, transaction);
     const pendingTx = await provider.submitTransaction(signedTx);
@@ -72,7 +76,11 @@ export async function handleCashOut(playerAddress: string, cashOutAmount: number
 
     const txResult = await client.waitForTransactionWithResult(pendingTx.hash);
 
-    console.log('Transaction result:', JSON.stringify(txResult, null, 2));
+    // console.log('Transaction result:', JSON.stringify(txResult, null, 2));
+        console.log('Generated transaction:', JSON.stringify(transaction, (key, value) =>
+      typeof value === 'bigint' ? value.toString() : value,
+      2
+    ));
 
     if ((txResult as any).success === false) {
       console.error('Transaction failed:', (txResult as any).vm_status);
