@@ -11,6 +11,8 @@ const MODULE_ADDRESS = process.env.MODULE_ADDRESS
 const CRASH_RESOURCE_ACCOUNT_ADDRESS = process.env.CRASH_RESOURCE_ACCOUNT_ADDRESS as string;
 const LP_RESOURCE_ACCOUNT_ADDRESS = process.env.LP_RESOURCE_ACCOUNT_ADDRESS as string;
 const CASH_RESOURCE_ACCOUNT_ADDRESS = process.env.CASH_RESOURCE_ACCOUNT_ADDRESS as string;
+import { socket } from "@/lib/socket";
+import { SOCKET_EVENTS } from "@/lib/types";
 
 
 export const RPC_URL = 'https://fullnode.testnet.aptoslabs.com';
@@ -373,6 +375,8 @@ export async function cashOut(userPrivateKey: string, cashOutData: CashOutData) 
       console.error("Transaction failed:", txResult);
       throw new Error('Transaction failed on blockchain');
     }
+
+    socket.emit(SOCKET_EVENTS.CASH_OUT, cashOutData);
 
     return {
       txnHash: txResult.hash,

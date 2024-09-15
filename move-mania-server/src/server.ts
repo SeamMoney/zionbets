@@ -228,4 +228,4 @@ function log(base: number, value: number): number {
   console.log("log value:", value)
   console.log("log result:", Math.log(value) / Math.log(base))
   return Math.log(value) / Math.log(base);
-}
+}    
