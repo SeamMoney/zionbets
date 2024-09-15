@@ -76,7 +76,7 @@ io.on("connection", (socket) => {
     console.log('Cash-out process started for:', data);
     try {
       console.log('Received cash-out request:', data);
-      const { playerEmail, privateKey, cashOutMultiplier, roundId } = data;
+      const { playerEmail, playerAddress, privateKey, cashOutMultiplier, roundId } = data;
       const cashOutAmount = Math.floor(data.cashOutMultiplier * 100);
       console.log('Calling handleCashOut with:', privateKey, cashOutAmount);
       console.log('handleCashOut function:', handleCashOut);
@@ -84,10 +84,10 @@ io.on("connection", (socket) => {
       console.log('handleCashOut result:', result);
       if (result) {
         const cashOutData = {
+          roundId: roundId,
           playerEmail: playerEmail,
           cashOutMultiplier: cashOutMultiplier,
-          roundId: roundId,
-          playerAddress: privateKey,
+          playerAddress: playerAddress,
         };
         console.log('Attempting to add cash-out to player list:', cashOutData);
         const updateSuccess = await addCashOutToPlayerList(cashOutData);
