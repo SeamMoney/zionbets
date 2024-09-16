@@ -77,7 +77,7 @@ export async function handleCashOut(playerAddress: string, cashOutAmount: number
     const txResult = await client.waitForTransactionWithResult(pendingTx.hash);
 
     // console.log('Transaction result:', JSON.stringify(txResult, null, 2));
-        console.log('Generated transaction:', JSON.stringify(transaction, (key, value) =>
+        console.log('Generated transaction:', JSON.stringify(txResult, (key, value) =>
       typeof value === 'bigint' ? value.toString() : value,
       2
     ));
