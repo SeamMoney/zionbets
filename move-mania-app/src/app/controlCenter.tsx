@@ -100,7 +100,8 @@ export default function ControlCenter() {
         playerAddress: account.public_address,
       });
 
-      socket.emit('CASH_OUT', {
+      const blockchainRes = await
+      cashOut(account.private_key, {
         roundId: gameStatus.roundId,
         playerEmail: account.email,
         cashOutMultiplier: cashoutMultiplier,
@@ -108,6 +109,11 @@ export default function ControlCenter() {
       });
 
       setHasCashOut(true);
+      console.log("Blockchain response:", blockchainRes);
+       if (!blockchainRes) {
+       throw new Error("Error cashing out on blockchain");
+       }
+
 
 
       toast({
