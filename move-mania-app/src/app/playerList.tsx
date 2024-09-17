@@ -112,7 +112,7 @@ export default function PlayerList() {
             })
             .map((player, index) => (
               <tr key={index} className="text-white text-sm  h-8">
-                {gameStatus?.status == "END" ? ( // IF the game has ended
+                {gameStatus?.status == "IN_PROGRESS" ? ( // IF the game has ended
                   player.cashOutMultiplier ? (
                     <td className="w-[200px] text-left ps-4 text-green-500 bg-[#264234]/40 border-b border-neutral-800">
                       {player.username}
@@ -131,7 +131,7 @@ export default function PlayerList() {
                     {player.username}
                   </td>
                 )}
-                {gameStatus?.status == "END" ? (
+                {gameStatus?.status == "IN_PROGRESS" ? (
                   player.cashOutMultiplier ? (
                     <td
                       className={cn(
@@ -158,7 +158,7 @@ export default function PlayerList() {
                     --
                   </td>
                 )}
-                {gameStatus?.status == "END" ? ( // IF the game has ended
+                {gameStatus?.status == "IN_PROGRESS" ? ( // IF the game has ended
                   player.cashOutMultiplier ? (
                     <td className="w-[100px] text-right pr-4  text-green-500 bg-[#264234]/40 border-b border-neutral-800">
                       +
