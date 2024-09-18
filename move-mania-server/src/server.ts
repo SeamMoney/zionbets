@@ -79,10 +79,9 @@ io.on("connection", (socket) => {
       const { playerEmail, playerAddress, privateKey, cashOutMultiplier, roundId } = data;
       const cashOutAmount = Math.floor(cashOutMultiplier * 100);
       console.log('Calling handleCashOut with:', playerAddress, cashOutAmount);
+      const blockchainRes = await handleCashOut(playerAddress, cashOutAmount);
       console.log('handleCashOut function:', handleCashOut);
-      const result = await handleCashOut(playerAddress, cashOutAmount);
-      console.log('handleCashOut result:', result);
-      if (result) {
+      
         const cashOutData = {
           roundId: roundId,
           playerEmail: playerEmail,
@@ -100,10 +99,7 @@ io.on("connection", (socket) => {
           console.error('Failed to update player list');
           socket.emit(SOCKET_EVENTS.CASH_OUT_RESULT, { success: false, error: 'Failed to update player list' });
         }
-      } else {
-        console.error('Cash out failed, result:', result);
-        socket.emit(SOCKET_EVENTS.CASH_OUT_RESULT, { success: false, error: 'Cash out failed' });
-      }
+      
     } catch (error) {
       console.error('Error in cash out:', error);
       if (error instanceof Error) {
