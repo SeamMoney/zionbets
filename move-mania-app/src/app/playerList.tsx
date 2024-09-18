@@ -118,7 +118,7 @@ export default function PlayerList() {
                       {player.username}
                     </td>
                   ) : (
-                    <td className="w-[200px] text-left ps-4 text-red-500 bg-[#3F221E]/40 border-b border-neutral-800">
+                    <td className="w-[200px] text-left ps-4 text-neutral-500 bg-[#3F221E]/40 border-b border-neutral-800">
                       {player.username}
                     </td>
                   )
@@ -127,7 +127,7 @@ export default function PlayerList() {
                     {player.username}
                   </td>
                 ) : (
-                  <td className="w-[200px] text-left ps-4 bg-neutral-800/40 bg-[#264234]/40 border-b border-neutral-800">
+                  <td className="w-[200px] text-left ps-4 bg-red-800/40 bg-[#264234]/40 border-b border-neutral-800">
                     {player.username}
                   </td>
                 )}
@@ -141,7 +141,7 @@ export default function PlayerList() {
                       {player.cashOutMultiplier.toFixed(2)}
                     </td>
                   ) : (
-                    <td className="w-[100px] text-center text-red-500 bg-[#3F221E]/40 border-b border-neutral-800">
+                    <td className="w-[100px] text-center text-neutral-500 bg-[#3F221E]/40 border-b border-neutral-800">
                       0.00
                     </td>
                   )
@@ -154,7 +154,7 @@ export default function PlayerList() {
                     {player.cashOutMultiplier.toFixed(2)}
                   </td>
                 ) : (
-                  <td className="w-[100px] text-center bg-neutral-800/40 bg-[#264234]/40 border-b border-neutral-800">
+                  <td className="w-[100px] text-center bg-red-800/40 bg-[#264234]/40 border-b border-neutral-800">
                     --
                   </td>
                 )}
@@ -165,7 +165,7 @@ export default function PlayerList() {
                       {(player.betAmount * player.cashOutMultiplier).toFixed(2)}
                     </td>
                   ) : (
-                    <td className="w-[100px] text-right pr-4  text-red-500 bg-[#3F221E]/40 border-b border-neutral-800">
+                    <td className="w-[100px] text-right pr-4  text-neutral-500 bg-[#3F221E]/40 border-b border-neutral-800">
                       -{player.betAmount.toFixed(2)}
                     </td>
                   )
@@ -174,7 +174,7 @@ export default function PlayerList() {
                     +{(player.betAmount * player.cashOutMultiplier).toFixed(2)}
                   </td>
                 ) : (
-                  <td className="w-[100px] text-right pr-4  bg-neutral-800/40 bg-[#264234]/40 border-b border-neutral-800">
+                  <td className="w-[100px] text-right pr-4  bg-red-800/40 bg-[#264234]/40 border-b border-neutral-800">
                     -{player.betAmount.toFixed(2)}
                   </td>
                 )}
