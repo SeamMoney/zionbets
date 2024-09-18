@@ -100,21 +100,28 @@ export default function ControlCenter() {
         playerAddress: account.public_address,
       });
 
-      const blockchainRes = await
-      cashOut(account.private_key, {
+      // const blockchainRes = await
+      // cashOut(account.private_key, {
+      //   roundId: gameStatus.roundId,
+      //   playerEmail: account.email,
+      //   cashOutMultiplier: cashoutMultiplier,
+      //   playerAddress: account.public_address,
+      // });
+
+      setHasCashOut(true);
+      // console.log("Blockchain response:", blockchainRes);
+      //  if (!blockchainRes) {
+      //  throw new Error("Error cashing out on blockchain");
+      //  }
+
+
+      
+      socket.emit('CASH_OUT', {
         roundId: gameStatus.roundId,
         playerEmail: account.email,
         cashOutMultiplier: cashoutMultiplier,
         playerAddress: account.public_address,
       });
-
-      setHasCashOut(true);
-      console.log("Blockchain response:", blockchainRes);
-       if (!blockchainRes) {
-       throw new Error("Error cashing out on blockchain");
-       }
-
-
 
       toast({
         title: `Cashed out at ${cashoutMultiplier}x`,
