@@ -126,11 +126,15 @@ export default function PlayerList() {
                   <td className="w-[200px] text-left ps-4 text-green-500 bg-[#264234]/40 border-b border-neutral-800">
                     {player.username}
                   </td>
-                ) : (
-                  <td className="w-[200px] text-left ps-4 bg-red-800/40 bg-[#264234]/40 border-b border-neutral-800">
+                ) : gameStatus?.status == "COUNTDOWN"(
+                  <td className="w-[200px] text-left ps-4 bg-neutral-500/40 bg-[#264234]/40 border-b border-neutral-800">
                     {player.username}
                   </td>
-                )}
+                ):(
+                <td className="w-[200px] text-left ps-4 bg-red-800/40 bg-[#264234]/40 border-b border-neutral-800">
+                  {player.username}
+                </td>)
+                }
                 {gameStatus?.status == "IN_PROGRESS" ? (
                   player.cashOutMultiplier ? (
                     <td
@@ -153,7 +157,7 @@ export default function PlayerList() {
                   >
                     {player.cashOutMultiplier.toFixed(2)}
                   </td>
-                ) : (
+                ) : gameStatus?.status == "COUNTDOWN"(
                   <td className="w-[100px] text-center bg-red-800/40 bg-[#264234]/40 border-b border-neutral-800">
                     --
                   </td>
