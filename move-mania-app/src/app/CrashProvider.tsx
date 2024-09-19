@@ -146,15 +146,11 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     console.log("CrashProvider updating game status:", gameStatus);
     if (account && latestAction) {
-      const timeoutId = setTimeout(() => {
-        getUser(account.email).then((updatedUser) => {
-          if (updatedUser) {
-            setAccount(updatedUser);
-          }
-        });
-      }, 1000); // Delay API call by 1 second
-
-      return () => clearTimeout(timeoutId);
+      getUser(account.email).then((updatedUser) => {
+        if (updatedUser) {
+          setAccount(updatedUser);
+        }
+      });
     }
   }, [latestAction, account]);
 
@@ -198,9 +194,9 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
     };
 
     fetchGameStatus();
-    const intervalId = setInterval(fetchGameStatus, 1000);
+    // const intervalId = setInterval(fetchGameStatus, 1000);
 
-    return () => clearInterval(intervalId);
+    // return () => clearInterval(intervalId);
   }, []);
 
   function isInStandaloneMode() {
