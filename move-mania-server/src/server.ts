@@ -79,27 +79,27 @@ io.on("connection", (socket) => {
       const { playerEmail, playerAddress, privateKey, cashOutMultiplier, roundId } = data;
       const cashOutAmount = Math.floor(cashOutMultiplier * 100);
       console.log('Calling handleCashOut with:', playerAddress, cashOutAmount);
-      const blockchainRes = await handleCashOut(playerAddress, cashOutAmount);
-      console.log('handleCashOut function:', handleCashOut);
-      
-        const cashOutData = {
-          roundId: roundId,
-          playerEmail: playerEmail,
-          cashOutMultiplier: cashOutMultiplier,
-          playerAddress: playerAddress,
-        };
-        console.log('Attempting to add cash-out to player list:', cashOutData);
-        const updateSuccess = await addCashOutToPlayerList(cashOutData);
-        if (updateSuccess) {
-          console.log('Successfully added cash-out to player list');
-          console.log('Emitting CASH_OUT_CONFIRMED:', cashOutData);
-          io.emit(SOCKET_EVENTS.CASH_OUT_CONFIRMED, cashOutData);
-          socket.emit(SOCKET_EVENTS.CASH_OUT_RESULT, { success: true });
-        } else {
-          console.error('Failed to update player list');
-          socket.emit(SOCKET_EVENTS.CASH_OUT_RESULT, { success: false, error: 'Failed to update player list' });
-        }
-      
+      // const blockchainRes = await handleCashOut(playerAddress, cashOutAmount);
+      // console.log('handleCashOut function:', handleCashOut);
+
+      const cashOutData = {
+        roundId: roundId,
+        playerEmail: playerEmail,
+        cashOutMultiplier: cashOutMultiplier,
+        playerAddress: playerAddress,
+      };
+      console.log('Attempting to add cash-out to player list:', cashOutData);
+      const updateSuccess = await addCashOutToPlayerList(cashOutData);
+      if (updateSuccess) {
+        console.log('Successfully added cash-out to player list');
+        console.log('Emitting CASH_OUT_CONFIRMED:', cashOutData);
+        io.emit(SOCKET_EVENTS.CASH_OUT_CONFIRMED, cashOutData);
+        socket.emit(SOCKET_EVENTS.CASH_OUT_RESULT, { success: true });
+      } else {
+        console.error('Failed to update player list');
+        socket.emit(SOCKET_EVENTS.CASH_OUT_RESULT, { success: false, error: 'Failed to update player list' });
+      }
+
     } catch (error) {
       console.error('Error in cash out:', error);
       if (error instanceof Error) {
