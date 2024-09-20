@@ -45,7 +45,7 @@ export default function PlayerList() {
 
           clearInterval(intervalId);
         }
-      }, 100);
+      }, 1000);
     };
 
     const onMultiplierAvailable = (multiplier: number) => {

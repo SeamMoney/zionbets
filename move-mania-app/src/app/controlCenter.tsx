@@ -49,6 +49,13 @@ export default function ControlCenter() {
   const [hasCashOut, setHasCashOut] = useState(false);
 
   useEffect(() => {
+    if (gameStatus?.status === 'END') {
+      setHasBet(false);
+      setHasCashOut(false);
+    }
+  }, [gameStatus?.status]);
+
+  useEffect(() => {
     console.log("Game Status:", gameStatus);
 
     if (account && gameStatus?.status === "COUNTDOWN") {
@@ -318,10 +325,10 @@ export default function ControlCenter() {
             )}
           {account && gameStatus?.status === "IN_PROGRESS" && hasCashOut && (
             <button
-              className="border px-6 py-1 border-neutral-700 text-green-500 bg-neutral-950 cursor-not-allowed w-full"
+              className="border px-6 py-1 border-green-700 text-green-500 bg-[#264234]/40 cursor-not-allowed w-full"
               disabled
             >
-              cashed out
+              Cashed out
             </button>
           )}
           {account && gameStatus?.status === "IN_PROGRESS" && !hasBet && (
@@ -332,6 +339,16 @@ export default function ControlCenter() {
               Game in progress
             </button>
           )}
+          {
+            account && gameStatus?.status === "END" && (
+              <button
+                className="border border-yellow-700 px-6 py-1 text-yellow-500 bg-neutral-950 cursor-not-allowed w-full"
+                disabled
+              >
+                Game ended
+              </button>
+            )
+          }
         </div>
       </div>
 
