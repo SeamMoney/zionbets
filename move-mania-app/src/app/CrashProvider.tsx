@@ -194,9 +194,9 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
     };
 
     fetchGameStatus();
-    // const intervalId = setInterval(fetchGameStatus, 1000);
+    const intervalId = setInterval(fetchGameStatus, 1000);
 
-    // return () => clearInterval(intervalId);
+    return () => clearInterval(intervalId);
   }, []);
 
   function isInStandaloneMode() {
