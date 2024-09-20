@@ -145,10 +145,18 @@ export default function CrashProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     console.log("CrashProvider updating game status:", gameStatus);
+
     if (account && latestAction) {
       getUser(account.email).then((updatedUser) => {
         if (updatedUser) {
-          setAccount(updatedUser);
+          const timeoutId = setTimeout(() => {
+            getUser(account.email).then((updatedUser) => {
+              if (updatedUser) {
+                setAccount(updatedUser);
+              }
+            });
+          }, 1000); // Delay API call by 1 second
+          return () => clearTimeout(timeoutId);
         }
       });
     }
