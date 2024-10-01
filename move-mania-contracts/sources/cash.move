@@ -1,83 +1,77 @@
 module zion::cash {
-    
-  use std::signer;
-  use std::string;
-  use aptos_framework::coin;
-  use aptos_framework::account;
 
-  const SEED: vector<u8> = b"zion-cash";
-  const COIN_DECIMALS: u8 = 8;
+    use std::signer;
+    use std::string;
+    use aptos_framework::coin;
+    use aptos_framework::account;
 
-  const EUserIsNotModuleOwner: u64 = 101;
+    const SEED: vector<u8> = b"zion-cash";
+    const COIN_DECIMALS: u8 = 8;
 
-  struct CASH {}
+    const EUserIsNotModuleOwner: u64 = 101;
 
-  struct AdminCap has key {}
+    struct CASH {}
 
-  struct State has key {
-    signer_cap: account::SignerCapability,
-    aptos_coin_mint_cap: coin::MintCapability<CASH>,
-    aptos_coin_burn_cap: coin::BurnCapability<CASH>
-  }
+    struct AdminCap has key {}
 
-  fun init_module(admin: &signer) {
-    let (resource_account_signer, signer_cap) = account::create_resource_account(admin, SEED);
+    struct State has key {
+        signer_cap: account::SignerCapability,
+        aptos_coin_mint_cap: coin::MintCapability<CASH>,
+        aptos_coin_burn_cap: coin::BurnCapability<CASH>
+    }
 
-    let (burn_cap, freeze_cap, mint_cap) = coin::initialize<CASH>(
-      admin, 
-      string::utf8(b"Zion Cash"),
-      string::utf8(b"CASH"),
-      COIN_DECIMALS,
-      true
-    );
-    coin::destroy_freeze_cap(freeze_cap);
+    fun init_module(admin: &signer) {
+        let (resource_account_signer, signer_cap) =
+            account::create_resource_account(admin, SEED);
 
-    move_to<State>(
-      &resource_account_signer,
-      State {
-        signer_cap: signer_cap,
-        aptos_coin_mint_cap: mint_cap,
-        aptos_coin_burn_cap: burn_cap
-      }
-    );
+        let (burn_cap, freeze_cap, mint_cap) =
+            coin::initialize<CASH>(
+                admin,
+                string::utf8(b"Zion Cash"),
+                string::utf8(b"CASH"),
+                COIN_DECIMALS,
+                true
+            );
+        coin::destroy_freeze_cap(freeze_cap);
 
-    coin::register<CASH>(&resource_account_signer);
-  }
+        move_to<State>(
+            &resource_account_signer,
+            State {
+                signer_cap: signer_cap,
+                aptos_coin_mint_cap: mint_cap,
+                aptos_coin_burn_cap: burn_cap
+            }
+        );
 
-  public entry fun mint(
-    admin: &signer,
-    amount: u64, 
-    recipient: address
-  ) acquires State {
-    assert_user_is_module_owner(admin);
-    let state = borrow_global_mut<State>(get_resource_address());
-    let minted_coin = coin::mint(amount, &state.aptos_coin_mint_cap);
-    coin::deposit(recipient, minted_coin);
-  }
+        coin::register<CASH>(&resource_account_signer);
+    }
 
-  public entry fun register(recipient: &signer) {
-    coin::register<CASH>(recipient);
-  }
+    public entry fun mint(admin: &signer, amount: u64, recipient: address) acquires State {
+        assert_user_is_module_owner(admin);
+        let state = borrow_global_mut<State>(get_resource_address());
+        let minted_coin = coin::mint(amount, &state.aptos_coin_mint_cap);
+        coin::deposit(recipient, minted_coin);
+    }
 
-  public entry fun burn(
-    owner: &signer,
-    amount: u64
-  ) acquires State {
-    let state = borrow_global_mut<State>(get_resource_address());
-    let coin_to_burn = coin::withdraw(owner, amount);
-    coin::burn(coin_to_burn, &state.aptos_coin_burn_cap);
-  }
+    public entry fun register(recipient: &signer) {
+        coin::register<CASH>(recipient);
+    }
 
-  /* 
-    Create and return the address of the module's resource account
-    @return - address of the module's resource account
-  */ 
-  inline fun get_resource_address(): address {
-    account::create_resource_address(&@zion, SEED)
-  }
+    public entry fun burn(owner: &signer, amount: u64) acquires State {
+        let state = borrow_global_mut<State>(get_resource_address());
+        let coin_to_burn = coin::withdraw(owner, amount);
+        coin::burn(coin_to_burn, &state.aptos_coin_burn_cap);
+    }
 
-  inline fun assert_user_is_module_owner(user: &signer) {
-    assert!(signer::address_of(user) == @zion, EUserIsNotModuleOwner);
-  }
+    /*
+      Create and return the address of the module's resource account
+      @return - address of the module's resource account
+    */
+    inline fun get_resource_address(): address {
+        account::create_resource_address(&@zion, SEED)
+    }
 
+    inline fun assert_user_is_module_owner(user: &signer) {
+        assert!(signer::address_of(user) == @zion, EUserIsNotModuleOwner);
+    }
 }
