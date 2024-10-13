@@ -7,7 +7,7 @@ import { Toaster } from "@/components/ui/toaster";
 import NavbarDropdown from "./navbarDropdown";
 import { Suspense } from "react";
 import Image from "next/image";
-import logo from "@/../public/zionbet_nobackground.png";
+import logo from "@/../public/cashhh.png";
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
     return (
