@@ -7,7 +7,7 @@ import { Toaster } from "@/components/ui/toaster";
 import NavbarDropdown from "./navbarDropdown";
 import { Suspense } from "react";
 import Image from "next/image";
-import logo from "@/../public/cashhh.png";
+import logo from "@/../public/$CASH.svg";
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
     return (
@@ -16,7 +16,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                 <div className="flex flex-row items-center justify-between w-full h-full">
                     <div className="flex flex-row items-center gap-4">
                         <div className="flex flex-row items-center justify-start">
-                            <Link href='/'><Image src={logo} className="" alt="" width={200} height={200} /></Link>
+                            <Link href='/'><Image src={logo} className="" alt="" width={100} height={100} /></Link>
                         </div>
                     </div>
                     <div className="flex flex-row gap-4 items-center">
