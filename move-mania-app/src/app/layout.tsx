@@ -12,8 +12,8 @@ const baijamjuree = Bai_Jamjuree({
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Zion Bets",
-  description: "Your chance to win big!",
+  title: "Cash Markets",
+  description: "Predict the Crash, Win the $CASH!",
   generator: "Next.js",
   manifest: "/manifest.json",
   keywords: ["nextjs", "nextjs13", "next13", "pwa", "next-pwa", "aptos"],
@@ -22,8 +22,8 @@ export const metadata: Metadata = {
     { name: "Max Mohammadi" },
   ],
   icons: [
-    // { rel: "apple-touch-icon", url: "icons/icon-128x128.png" },
-    // { rel: "icon", url: "icons/icon-128x128.png" },
+    { rel: "apple-touch-icon", url: "./../public/CASH_IOS_ICON.svg" },
+    { rel: "icon", url: "./../public/CASH_IOS_ICON.svg" },
   ],
 };
 
